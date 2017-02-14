@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/order_item_list_item"
+                android:paddingLeft="@dimen/default_gap"
+                android:paddingRight="@dimen/default_gap"
+                android:paddingTop="@dimen/default_gap">
+
+    <TextView
+        android:text="Наименование продукции"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/tvProduct"
+        android:textSize="14sp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvProduct"
+        android:id="@+id/packs_and_amounts"
+        >
+
+        <TextView
+            android:text="Количество упаковок"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvAmountPacks"
+            android:layout_weight="1"
+            android:theme="@style/order_list_item_Summary"
+            />
+
+        <TextView
+            android:text="Количество единиц"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvAmount"
+            android:layout_weight="1"
+            android:theme="@style/order_list_item_Summary"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_below="@+id/packs_and_amounts"
+        android:id="@+id/mass_and_sum"
+        >
+
+        <TextView
+            android:text="Масса"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvMass"
+            android:layout_weight="1"
+            android:theme="@style/order_list_item_Summary"
+            />
+
+        <TextView
+            android:text="Сумма"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvSum"
+            android:layout_weight="1"
+            android:theme="@style/order_list_item_Summary"
+            />
+    </LinearLayout>
+
+</RelativeLayout>

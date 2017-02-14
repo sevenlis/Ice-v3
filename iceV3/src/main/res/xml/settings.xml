@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="managerName"
+        android:summary="@string/pref_manager_db_summ"
+        android:title="@string/pref_manager_db"
+        android:defaultValue="@string/pref_manager_name_default" />
+
+    <EditTextPreference
+        android:key="storehouseDefaultCode"
+        android:summary="@string/pref_default_storehouse_summ"
+        android:title="@string/pref_default_storehouse_title"
+        android:inputType="number"
+        android:defaultValue="@string/pref_storehouse_code_default" />
+
+    <EditTextPreference
+        android:defaultValue="10"
+        android:key="orderDaysAhead"
+        android:summary="@string/pref_order_days_ahead_summ"
+        android:title="@string/pref_order_days_ahead_title"
+        android:inputType="number"
+        android:id="@+id/orderDaysAheadRestrict"
+        />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="updateNotificationsEnabled"
+        android:summary="@string/pref_notif_enable_summ"
+        android:title="@string/pref_notif_enable_title"/>
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:title="@string/item_search_input_numeric"
+        android:key="itemSearchInputNumeric"
+        android:summary="@string/item_search_input_numeric_summ"/>
+    <PreferenceScreen
+        android:key="screen_sys_opt"
+        android:summary="@string/pref_screen_sys_options_summ"
+        android:title="@string/pref_screen_sys_options_title"
+        android:persistent="false">
+
+        <EditTextPreference
+            android:defaultValue="30"
+            android:key="exchangeFrequency"
+            android:summary="@string/pref_exchange_frequency_summ"
+            android:title="@string/pref_exchange_frequency_title"
+            android:inputType="number"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:title="@string/pref_exchange_shutdown_on_exit_title"
+            android:key="exchangeShutdownOnExit"
+            android:summary="@string/pref_exchange_shutdown_on_exit"/>
+        <EditTextPreference
+            android:defaultValue="http://ingman.by/agent/iceV3.apk"
+            android:key="apkUpdateUrl"
+            android:summary="@string/pref_apk_update_url_summ"
+            android:title="@string/pref_apk_update_url_title"/>
+
+        <PreferenceCategory
+            android:key="catDB"
+            android:summary="@string/pref_cat_DB_options_summ"
+            android:title="@string/pref_cat_DB_options_title">
+
+            <EditTextPreference
+                android:defaultValue="80.249.87.247"
+                android:key="host"
+                android:title="@string/pref_db_host_title"/>
+
+            <EditTextPreference
+                android:defaultValue="41433"
+                android:inputType="number"
+                android:key="port"
+                android:title="@string/pref_db_port_title"/>
+
+            <EditTextPreference
+                android:defaultValue="ingmanXchange"
+                android:key="baseName"
+                android:title="@string/pref_db_name_title"/>
+
+            <EditTextPreference
+                android:defaultValue="androidXchange"
+                android:key="usernameDB"
+                android:title="@string/pref_db_username_title"/>
+
+            <EditTextPreference
+                android:defaultValue="androidXchangeIngman759153!"
+                android:inputType="textPassword"
+                android:key="passwordDB"
+                android:title="@string/pref_db_password_title"/>
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+</PreferenceScreen>

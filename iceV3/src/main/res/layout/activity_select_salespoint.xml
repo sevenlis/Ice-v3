@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_salespoint_select"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/default_gap"
+    android:paddingLeft="@dimen/default_gap"
+    android:paddingRight="@dimen/default_gap"
+    android:paddingTop="@dimen/default_gap"
+    tools:context="by.ingman.sevenlis.ice_v3.SelectSalespointActivity">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linFilter">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:inputType="textPersonName"
+            android:ems="13"
+            android:id="@+id/etFilter"
+            android:layout_weight="0.2"
+            android:layout_height="50dp"
+            android:textColorLink="@color/colorPrimaryDark"
+            android:textColorHint="@color/colorPrimaryDark"
+            android:textColorHighlight="@color/colorPrimaryDark"/>
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:srcCompat="@android:drawable/ic_menu_search"
+            android:id="@+id/ibFilter"
+            android:layout_weight="1.1"
+            android:onClick="acceptFilterPoints"/>
+    </LinearLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/linFilter"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/listPoints"/>
+</RelativeLayout>

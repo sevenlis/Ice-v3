@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">ICE-V3</string>
+    <string name="manager_name">МенеджерNN</string>
+    <string name="manager">Менеджер</string>
+    <string name="manager_summary">Имя пользователя в 1С</string>
+    <string name="manager_pref_key">manager_pref_key</string>
+    <string name="add_order">Добавить заявку</string>
+    <string name="update_data">Обновить данные</string>
+    <string name="settings">Настройки</string>
+    <string name="pref_manager_db_summ">Имя пользователя в 1С</string>
+    <string name="pref_manager_db">Менеджер</string>
+    <string name="pref_default_storehouse_summ">Код склада по умолчанию</string>
+    <string name="pref_default_storehouse_title">Код склада</string>
+    <string name="pref_order_days_ahead_summ">На сколько дней вперед можно резервировать заявки</string>
+    <string name="pref_order_days_ahead_title">Ограничение даты заявок</string>
+    <string name="pref_notif_enable_summ">Оповещать об обновлениях БД (оповещения о заявках приходят в любом случае)</string>
+    <string name="pref_notif_enable_title">Оповещения об обновлениях БД</string>
+    <string name="pref_screen_sys_options_title">Системные настройки</string>
+    <string name="pref_screen_sys_options_summ">Нужно изменять только при изменениях на сервере</string>
+    <string name="pref_exchange_frequency_title">Интервал обновления данных</string>
+    <string name="pref_exchange_frequency_summ">Интервал в секундах</string>
+    <string name="pref_exchange_shutdown_on_exit_title">Останавливать сервис обновлений</string>
+    <string name="pref_exchange_shutdown_on_exit">Останавливать сервис обновлений при выходе из программы</string>
+    <string name="pref_apk_update_url_title">Путь к обновленному приложению</string>
+    <string name="pref_apk_update_url_summ">Ссылка на обновленный apk-файл приложения</string>
+    <string name="pref_cat_DB_options_title">Настройки подключения к удаленной БД</string>
+    <string name="pref_cat_DB_options_summ">Настройки подключения к удаленной БД на сервере заявок</string>
+    <string name="pref_db_host_title">Хост (IP или Host)</string>
+    <string name="pref_db_port_title">Порт</string>
+    <string name="pref_db_name_title">База данных</string>
+    <string name="pref_db_username_title">Пользователь БД</string>
+    <string name="pref_db_username_summ">Имя пользователя для доступа к БД</string>
+    <string name="pref_db_password_title">Пароль пользователя БД</string>
+    <string-array name="adv_types_strings">
+        <item>Обычная РА</item>
+        <item>Perfect Store</item>
+        <item>Новый объект</item>
+        <item>Замена брака</item>
+        <item>Проект №1</item>
+    </string-array>
+    <string-array name="order_statuses">
+        <item>Записана</item>
+        <item>Отправлена</item>
+        <item>Получен ответ</item>
+    </string-array>
+    <string name="notif_error_updating">Ошибка обновления данных</string>
+    <string name="notif_update_data_title">Обновление данных</string>
+    <string name="notif_update_data_complete_title">Обновление завершено</string>
+    <string name="notif_error_orders_title">Обновление заявок</string>
+    <string name="notif_error_orders_updating">Ошибка отправки/проверки заявок</string>
+    <string name="notif_update_data_message">Обновляются %1$s</string>
+    <string name="notif_update_data_complete">Обновление %1$s завершено</string>
+
+    <string name="notif_data_products">остатки</string>
+    <string name="notif_data_contragents">контрагенты</string>
+    <string name="notif_data_debts">задолженности контрагентов</string>
+    <string name="notif_data_orders">заявки</string>
+    <string name="notif_data_answers">ответы на заявки</string>
+
+    <string name="notif_data_products_complete">остатков</string>
+    <string name="notif_data_contragents_complete">контрагентов</string>
+    <string name="notif_data_debts_complete">задолженностей контрагентов</string>
+    <string name="notif_data_orders_complete">заявок</string>
+    <string name="notif_data_answers_complete">ответов на заявки</string>
+
+    <string name="notif_request_success_title">Заявка отправлена</string>
+    <string name="notif_request_success_message">Заявка для %1$s отправлена</string>
+
+    <string name="notif_response_title">Заявка %1$s обработана</string>
+    <string name="notif_response_text">Заявка для %1$s : %2$s</string>
+    <string name="error_disclaimer">Здесь отображаются ошибки приложения, для технических нужд.</string>
+    <string name="progress_dialog_title">Обновление данных…</string>
+    <string name="apk_file_not_found">Файл APK не найден!…</string>
+    <string name="item_search_input_numeric">Поиск продукции по цифровому коду</string>
+    <string name="item_search_input_numeric_summ">Значение по умолчанию</string>
+    <string name="pref_manager_name_default">МенеджерNN</string>
+    <string name="pref_storehouse_code_default">00279</string>
+    <string name="developer_name">"@sevenlis"</string>
+
+</resources>

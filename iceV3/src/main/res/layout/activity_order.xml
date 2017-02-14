@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/activity_order"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="by.ingman.sevenlis.ice_v3.OrderActivity"
+                android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlDate"
+        android:background="@android:color/darker_gray">
+
+        <TextView
+            android:text="Дата заявки"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewDate"
+            android:textSize="18sp"
+            android:layout_centerInParent="true"
+            android:textColor="@color/colorPrimaryDark" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/oder_header"
+        android:layout_below="@+id/rlDate"
+        android:paddingLeft="@dimen/default_gap"
+        android:paddingRight="@dimen/default_gap">
+
+        <TextView
+            android:text="Пункт разгрузки:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_contragent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView_point_label"
+            android:layout_marginTop="@dimen/default_gap"
+            android:onClick="onClick"
+            android:background="@color/light_grey"/>
+
+        <TextView
+            android:text="Контрагент:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_contr_label"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:onClick="onClick"
+            android:background="@color/light_grey"
+            android:layout_marginTop="@dimen/margin_4dp"/>
+
+        <TextView
+            android:text="Выберите контрагента"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_contragent"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/textView_contr_label"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:background="@color/light_grey"/>
+
+        <TextView
+            android:text="Выберите пункт разгрузки"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_point_label"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView_point"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:background="@color/light_grey"/>
+
+        <CheckBox
+            android:text="Реклама"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_point"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/checkBox_isAdv"
+            android:layout_marginTop="@dimen/default_gap"
+            android:onClick="isAdvOnClick"
+            android:checked="false"
+            android:buttonTint="@color/colorPrimary" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/checkBox_isAdv"
+            android:layout_toRightOf="@+id/checkBox_isAdv"
+            android:layout_toEndOf="@+id/checkBox_isAdv"
+            android:id="@+id/spinner_advType"
+            android:layout_alignTop="@+id/checkBox_isAdv"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:transitionGroup="false"
+            android:entries="@array/adv_types_strings"/>
+
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lvOrderItems"
+        android:layout_below="@+id/oder_header"/>
+</RelativeLayout>

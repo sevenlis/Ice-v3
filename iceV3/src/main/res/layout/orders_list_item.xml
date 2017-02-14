@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:orientation="vertical" android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_gap"
+        android:layout_marginRight="@dimen/default_gap">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="DD.MM.YYYY"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_date"
+                android:textColor="@android:color/holo_green_dark"
+                android:layout_marginLeft="@dimen/default_gap"
+                android:layout_weight="1.25"/>
+
+            <TextView
+                android:text="uid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_orderId"
+                android:textSize="10sp"
+                android:layout_weight="0.5"
+                android:textAlignment="viewEnd"
+                android:layout_gravity="end"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:text="Наименование контрагента"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_сontragent"
+            android:textSize="14sp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:text="Пункт разгрузки"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_point"
+            android:textSize="12sp"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:text="Масса"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_weight"
+                android:theme="@style/order_list_item_Summary"
+                android:textStyle="normal|bold"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:text="Количество упаковок"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_qtyPacks"
+                android:theme="@style/order_list_item_Summary"
+                android:textStyle="normal|bold"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:text="Сумма"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_summa"
+                android:theme="@style/order_list_item_Summary"
+                android:textStyle="normal|bold"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:text="Количество единиц"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_quantity"
+                android:theme="@style/order_list_item_Summary"
+                android:textStyle="normal|bold"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="Реклама: null"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_adv"
+                android:textSize="12sp"
+                android:layout_weight="1.25"/>
+
+            <TextView
+                android:text="Тип рекламы"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_advType"
+                android:textSize="12sp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:text="Состояние заявки"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_status"
+                android:textSize="12sp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:layout_gravity="end"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:text="Комментарий"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_comment"
+                android:textSize="12sp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:text="Дата время"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_dateUnload"
+                android:textSize="12sp"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:layout_gravity="end"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

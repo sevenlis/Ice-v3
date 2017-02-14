@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/select_salespoint_list_item"
+                  android:layout_marginLeft="@dimen/default_gap"
+                  android:layout_marginRight="@dimen/default_gap"
+                  android:layout_marginTop="@dimen/default_gap"
+                  android:layout_marginBottom="@dimen/default_gap">
+
+        <TextView
+            android:text="Наименование пункта разгрузки"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvPointName"
+            android:textSize="18sp"/>
+    </LinearLayout>
+</RelativeLayout>

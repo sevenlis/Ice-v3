@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/select_product_list_item"
+    >
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_gap"
+        android:layout_marginRight="@dimen/default_gap"
+        android:id="@+id/linProduct"
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_marginBottom="@dimen/default_gap">
+
+        <TextView
+            android:text="Код"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvItemCode"
+            android:paddingLeft="@dimen/activity_vertical_margin"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:text="Номенклатура"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvItemName"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="Упак.:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvRestPacks"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/green_darker"/>
+
+            <TextView
+                android:text="Кол.:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvRestAmount"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@color/green_darker"/>
+
+            <TextView
+                android:text="Цена:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvPrice"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
+
+            <TextView
+                android:text="В упак.:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvNumInPack"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@color/colorPrimaryDark"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

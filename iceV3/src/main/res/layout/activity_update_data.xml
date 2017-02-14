@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_update_data"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="by.ingman.sevenlis.ice_v3.UpdateDataActivity">
+
+    <TextView
+        android:text="Обновление данных"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewInfo"
+        android:textSize="18sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linProgress"
+        android:layout_below="@+id/textViewInfo"
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_marginBottom="@dimen/default_gap">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:layout_below="@+id/textViewInfo"
+            />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="0 %"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewProgressPercent"
+                android:layout_weight="1"
+                />
+
+            <TextView
+                android:text="100 / 100"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewProgressValue"
+                android:textAlignment="viewEnd"
+                android:layout_gravity="end"
+                android:gravity="end"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:text="В зависимости от скорости соединения с сетью может занимать продолжительное время."
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linProgress"
+        android:id="@+id/textViewInfo2"
+        android:textAlignment="center"
+        android:textColor="@color/color_red" />
+
+    <Button
+        android:text="Обновить таблицу номенклатуры и остатков"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:id="@+id/buttonRests"
+        android:layout_alignParentTop="false"
+        android:layout_centerInParent="true"
+        android:onClick="buttonRestsOnClick"
+        android:layout_below="@+id/textViewInfo2" />
+
+    <Button
+        android:text="Обновить таблицу контрагентов и пунктов разгрузок контрагентов"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonClients"
+        android:layout_below="@+id/buttonRests"
+        android:layout_centerInParent="true"
+        android:onClick="buttonClientsOnClick" />
+
+    <Button
+        android:text="Обновить таблицу отношений и задолженностей контрагентов"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonClients"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:id="@+id/buttonDebts"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="false"
+        android:onClick="buttonDebtsOnClick" />
+
+    <Button
+        android:text="Скачать и обновить приложение"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonDebts"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:id="@+id/buttonUpdateAPK"
+        android:onClick="updateAPK"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>

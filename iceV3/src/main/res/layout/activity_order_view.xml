@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_order_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/default_gap"
+    android:paddingLeft="@dimen/default_gap"
+    android:paddingRight="@dimen/default_gap"
+    android:paddingTop="@dimen/default_gap"
+    tools:context="by.ingman.sevenlis.ice_v3.OrderViewActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="Дата заявки"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewOrderDate"
+            android:textAlignment="center"
+            android:textColor="@color/green_darker"
+            android:layout_weight="1.25"/>
+
+        <TextView
+            android:text="Status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewStatus"
+            android:layout_weight="1"
+            android:textAlignment="viewEnd"
+            android:textSize="12sp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:text="Контрагент:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewClientLabel"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:text="Наименование контрагента"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewClientName"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:text="Пункт разгрузки:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewPointLabel"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:text="Наименование разгрузки"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewPointName"
+        android:textSize="16sp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorButtonNormal">
+
+        <TextView
+            android:text="Реклама: НЕТ"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewIsAdv"
+            android:layout_weight="1"
+            android:textColor="@color/colorPrimaryDark"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:text="Обычная"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewAdvType"
+            android:layout_weight="1"
+            android:textColor="@color/colorPrimaryDark"
+            android:textAlignment="center"/>
+    </LinearLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/listOrderItems"/>
+</LinearLayout>

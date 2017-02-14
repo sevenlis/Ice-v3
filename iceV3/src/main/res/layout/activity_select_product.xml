@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_select_product"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/default_gap"
+    android:paddingLeft="@dimen/default_gap"
+    android:paddingRight="@dimen/default_gap"
+    android:paddingTop="@dimen/default_gap"
+    tools:context="by.ingman.sevenlis.ice_v3.SelectProductActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:text="123"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/checkBoxInputType"
+            android:layout_weight="1.25"
+            android:onClick="checkBoxInputTypeNumericOnClick"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/editTextFilter"
+            android:layout_weight="0.5"
+            android:selectAllOnFocus="true"/>
+
+        <ImageButton
+            android:layout_width="match_parent"
+            app:srcCompat="@android:drawable/ic_menu_search"
+            android:id="@+id/imageButton"
+            android:layout_weight="1.25"
+            android:layout_height="50dp"
+            android:onClick="applyFilterItems"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/listViewProductsList"/>
+
+</LinearLayout>
