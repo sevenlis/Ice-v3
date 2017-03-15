@@ -13,12 +13,10 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
-class ConnectionFactory {
-    private static final String URL_FORMAT = "jdbc:jtds:sqlserver://{0}:{1}/{2}";
-
+public class ConnectionFactory {
     private Context ctx;
 
-    ConnectionFactory(Context context) {
+    public ConnectionFactory(Context context) {
         this.ctx = context;
 
         try {
@@ -34,7 +32,7 @@ class ConnectionFactory {
         return ni != null && ni.isConnected();
     }
 
-    Connection getConnection() {
+    public Connection getConnection() {
         if (!isConnected()) return null;
 
         String user     = SettingsUtils.RemoteDB.getUserName(ctx);
@@ -52,9 +50,16 @@ class ConnectionFactory {
 
     @NonNull
     private String getConnectionURL() {
+        String urlFormat;
+        urlFormat = "jdbc:jtds:sqlserver://{0}:{1}/{2}";
+        String instance = SettingsUtils.RemoteDB.getInstance(ctx);
+        if (!instance.isEmpty()) {
+            urlFormat = "jdbc:jtds:sqlserver://{0}:{1}/{2};instance={3}";
+        }
         String host = SettingsUtils.RemoteDB.getHost(ctx);
         String port = SettingsUtils.RemoteDB.getPort(ctx);
         String baseName = SettingsUtils.RemoteDB.getDBName(ctx);
-        return MessageFormat.format(URL_FORMAT, host, port, baseName);
+
+        return MessageFormat.format(urlFormat, host, port, baseName, instance);
     }
 }

@@ -53,7 +53,7 @@
             android:key="exchangeShutdownOnExit"
             android:summary="@string/pref_exchange_shutdown_on_exit"/>
         <EditTextPreference
-            android:defaultValue="http://ingman.by/agent/iceV3.apk"
+            android:defaultValue="@string/pref_apk_update_url"
             android:key="apkUpdateUrl"
             android:summary="@string/pref_apk_update_url_summ"
             android:title="@string/pref_apk_update_url_title"/>
@@ -64,31 +64,37 @@
             android:title="@string/pref_cat_DB_options_title">
 
             <EditTextPreference
-                android:defaultValue="80.249.87.247"
+                android:defaultValue="@string/pref_hostDB_default"
                 android:key="host"
                 android:title="@string/pref_db_host_title"/>
 
             <EditTextPreference
-                android:defaultValue="41433"
+                android:defaultValue="@string/pref_portDB_default"
                 android:inputType="number"
                 android:key="port"
                 android:title="@string/pref_db_port_title"/>
 
             <EditTextPreference
-                android:defaultValue="ingmanXchange"
+                android:defaultValue="@string/pref_instanceDB_default"
+                android:key="instance"
+                android:title="@string/pref_instanceDB_title"/>
+
+            <EditTextPreference
+                android:defaultValue="@string/pref_nameDB_default"
                 android:key="baseName"
                 android:title="@string/pref_db_name_title"/>
 
             <EditTextPreference
-                android:defaultValue="androidXchange"
+                android:defaultValue="@string/pref_userDB_default"
                 android:key="usernameDB"
                 android:title="@string/pref_db_username_title"/>
 
             <EditTextPreference
-                android:defaultValue="androidXchangeIngman759153!"
+                android:defaultValue="@string/pref_passDB_default"
                 android:inputType="textPassword"
                 android:key="passwordDB"
-                android:title="@string/pref_db_password_title"/>
+                android:title="@string/pref_db_password_title"
+                android:password="true"/>
         </PreferenceCategory>
     </PreferenceScreen>
 

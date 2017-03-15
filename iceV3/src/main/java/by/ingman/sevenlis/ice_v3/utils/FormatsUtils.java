@@ -14,6 +14,11 @@ public class FormatsUtils {
                 String.format(Locale.ROOT, "%04d", date.getYear() + 1900)  + " г.";*/
     }
 
+    public static String getDateFormatted(Date date, String formatString) {
+        SimpleDateFormat sdf = new SimpleDateFormat(formatString,Locale.ROOT);
+        return sdf.format(date);
+    }
+
     public static String getDateFormattedWithSeconds(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss",Locale.ROOT);
         return sdf.format(date);

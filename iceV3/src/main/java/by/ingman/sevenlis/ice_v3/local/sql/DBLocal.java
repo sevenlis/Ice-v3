@@ -147,6 +147,20 @@ public class DBLocal {
         return contragentArrayList;
     }
 
+
+    public ArrayList<Contragent> getRecentContragents() {
+        ArrayList<Contragent> contragentArrayList = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(true,TABLE_ORDERS,new String[]{"code_k", "name_k"},null,null,null,null,"name_k ASC",null);
+        while (cursor.moveToNext()) {
+            Contragent contragent = new Contragent(cursor.getString(cursor.getColumnIndex("code_k")), cursor.getString(cursor.getColumnIndex("name_k")));
+            contragentArrayList.add(contragent);
+        }
+        cursor.close();
+        db.close();
+        return contragentArrayList;
+    }
+
     public ArrayList<Contragent> getContragents(String condition) {
         ArrayList<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();

@@ -31,6 +31,7 @@
     <string name="pref_db_username_title">Пользователь БД</string>
     <string name="pref_db_username_summ">Имя пользователя для доступа к БД</string>
     <string name="pref_db_password_title">Пароль пользователя БД</string>
+    <string name="pref_instanceDB_title">Именованный экземпляр сервера</string>
     <string-array name="adv_types_strings">
         <item>Обычная РА</item>
         <item>Perfect Store</item>
@@ -68,13 +69,24 @@
 
     <string name="notif_response_title">Заявка %1$s обработана</string>
     <string name="notif_response_text">Заявка для %1$s : %2$s</string>
+
     <string name="error_disclaimer">Здесь отображаются ошибки приложения, для технических нужд.</string>
+
     <string name="progress_dialog_title">Обновление данных…</string>
+
     <string name="apk_file_not_found">Файл APK не найден!…</string>
+
     <string name="item_search_input_numeric">Поиск продукции по цифровому коду</string>
     <string name="item_search_input_numeric_summ">Значение по умолчанию</string>
+
     <string name="pref_manager_name_default">МенеджерNN</string>
     <string name="pref_storehouse_code_default">00279</string>
+    <string name="pref_hostDB_default">212.98.187.177</string>
+    <string name="pref_instanceDB_default">""</string>
+    <string name="pref_portDB_default">41433</string>
+    <string name="pref_nameDB_default">ingmanXchange</string>
+    <string name="pref_userDB_default">androidXchange</string>
+    <string name="pref_passDB_default">androidXchangeIngman759153!</string>
+    <string name="pref_apk_update_url">http://ingman.by/agent/iceV3.apk</string>
     <string name="developer_name">"@sevenlis"</string>
-
 </resources>

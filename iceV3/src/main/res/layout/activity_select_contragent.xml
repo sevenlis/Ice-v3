@@ -30,12 +30,12 @@
             android:textColorHighlight="@color/colorPrimaryDark"/>
 
         <ImageButton
+            android:id="@+id/btnRecent"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            app:srcCompat="@android:drawable/ic_menu_search"
-            android:id="@+id/ibFilter"
             android:layout_weight="1.1"
-            android:onClick="acceptFilterContragents"/>
+            android:onClick="buttonRecentOnClick"
+            app:srcCompat="@android:drawable/btn_star_big_off"/>
     </LinearLayout>
 
     <ListView

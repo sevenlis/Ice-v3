@@ -12,4 +12,7 @@
         <item name="android:textColor">@color/dark_grey</item>
     </style>
 
+    <style name="AppBaseTheme.Launcher">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
 </resources>

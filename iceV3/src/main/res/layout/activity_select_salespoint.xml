@@ -29,13 +29,6 @@
             android:textColorHint="@color/colorPrimaryDark"
             android:textColorHighlight="@color/colorPrimaryDark"/>
 
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:srcCompat="@android:drawable/ic_menu_search"
-            android:id="@+id/ibFilter"
-            android:layout_weight="1.1"
-            android:onClick="acceptFilterPoints"/>
     </LinearLayout>
 
     <ListView

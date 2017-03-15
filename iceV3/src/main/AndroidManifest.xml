@@ -35,7 +35,8 @@
         </activity>
         <activity android:name=".SettingsActivity">
         </activity>
-        <activity android:name=".UpdateDataActivity">
+        <activity android:name=".UpdateDataActivity"
+                  android:screenOrientation="portrait">
         </activity>
         <activity android:name=".SelectContragentActivity">
         </activity>

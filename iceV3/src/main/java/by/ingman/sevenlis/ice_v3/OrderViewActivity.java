@@ -134,6 +134,7 @@ public class OrderViewActivity extends AppCompatActivity {
         buttonSubmit.setVisibility(View.GONE);
 
         TextView textViewComment = (TextView) v.findViewById(R.id.textViewComment);
+        textViewComment.setBackgroundColor(ContextCompat.getColor(this,R.color.light_grey));
         textViewComment.setText(mOrder.comment);
 
         TextView textViewAnswer = (TextView) v.findViewById(R.id.textViewAnswer);

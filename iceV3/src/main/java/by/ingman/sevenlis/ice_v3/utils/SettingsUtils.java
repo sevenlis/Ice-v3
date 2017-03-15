@@ -26,6 +26,7 @@ public class SettingsUtils {
     private static final String PREF_REMOTE_DB_NAME = "baseName";
     private static final String PREF_REMOTE_DB_USER = "usernameDB";
     private static final String PREF_REMOTE_DB_PASS = "passwordDB";
+    private static final String PREF_REMOTE_DB_INST = "instance";
 
     public static class Runtime {
         public static long getLastUpdateDate(Context ctx) {
@@ -89,7 +90,11 @@ public class SettingsUtils {
 
     public static class RemoteDB {
         public static String getHost(Context ctx) {
-            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_REMOTE_DB_HOST, "80.249.87.247");
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_REMOTE_DB_HOST, "212.98.187.177");
+        }
+
+        public static String getInstance(Context ctx) {
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_REMOTE_DB_INST, "");
         }
 
         public static String getPort(Context ctx) {

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +38,24 @@ public class SelectSalespointActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_salespoint);
 
         EditText editTextFilter = (EditText) findViewById(R.id.etFilter);
+
+        editTextFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                refreshPointsList(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         editTextFilter.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
@@ -55,12 +75,11 @@ public class SelectSalespointActivity extends AppCompatActivity {
         refreshPointsList();
     }
 
-    private void refreshPointsList() {
-        String filter           = ((EditText) findViewById(R.id.etFilter)).getText().toString();
+    private void refreshPointsList(String filter) {
         String condition        = "code_k = ? AND name_k = ?";
         String[] conditionArgs  = new String[]{this.mContragentCode, this.mContragentName};
         if (!filter.isEmpty()) {
-            condition      += " AND search_uppercase like ?";
+            condition      += " AND point_uppercase like ?";
             conditionArgs   = new String[]{this.mContragentCode, this.mContragentName, dbLocal.addWildcards(filter)};
         }
         pointsList = dbLocal.getPoints(condition,conditionArgs);
@@ -78,6 +97,11 @@ public class SelectSalespointActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void refreshPointsList() {
+        String filter = ((EditText) findViewById(R.id.etFilter)).getText().toString();
+        refreshPointsList(filter);
     }
 
     public void acceptFilterPoints(View view) {

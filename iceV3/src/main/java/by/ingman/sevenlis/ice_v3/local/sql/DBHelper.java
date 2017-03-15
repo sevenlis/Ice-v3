@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "iceDBv3";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private Context ctx;
 
     public DBHelper(Context context) {
@@ -91,7 +91,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "name_r text not null,"
                 + "code_mr text not null,"
                 + "name_mr text not null,"
-                + "search_uppercase text not null,"
+                + "client_uppercase text,"
+                + "point_uppercase text,"
                 + "date_unload integer not null" + ");");
     }
 

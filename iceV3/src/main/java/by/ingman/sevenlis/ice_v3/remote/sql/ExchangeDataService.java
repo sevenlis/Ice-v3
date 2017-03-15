@@ -354,7 +354,8 @@ public class ExchangeDataService extends IntentService {
                     cv.put("code_mr",rs.getString("code_mr"));
                     cv.put("name_mr",rs.getString("name_mr"));
                     cv.put("date_unload",rs.getTimestamp("datetime_unload").getTime());
-                    cv.put("search_uppercase",rs.getString("name_k").toUpperCase());
+                    cv.put("client_uppercase",rs.getString("name_k").toUpperCase());
+                    cv.put("point_uppercase",rs.getString("name_r").toUpperCase());
                     cvList.add(cv);
                 }
                 messageOnBroadcast += "Обновление таблицы контрагентов и разгрузок завершено.";

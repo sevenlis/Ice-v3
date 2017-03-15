@@ -36,13 +36,13 @@
         android:layout_gravity="bottom|center_horizontal"/>
 
     <TextView
-        android:text="Комментарий"
+        android:id="@+id/textViewComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textViewComment"
-        android:textSize="18sp"
         android:layout_marginLeft="@dimen/default_gap"
-        android:layout_marginRight="@dimen/default_gap"/>
+        android:layout_marginRight="@dimen/default_gap"
+        android:text="Комментарий"
+        android:textSize="16sp"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -51,13 +51,14 @@
         >
 
         <TextView
+            android:id="@+id/textViewAnswer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewAnswer"
-            android:textSize="18sp"
-            android:text="Нет ответа на заявку"
             android:layout_marginLeft="@dimen/default_gap"
-            android:layout_marginRight="@dimen/default_gap"/>
+            android:layout_marginRight="@dimen/default_gap"
+            android:padding="@dimen/margin_4dp"
+            android:text="Нет ответа на заявку"
+            android:textSize="16sp"/>
     </RelativeLayout>
 
 </LinearLayout>

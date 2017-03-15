@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.widget.Toast;
 
 import by.ingman.sevenlis.ice_v3.ErrorMessageActivity;
 import by.ingman.sevenlis.ice_v3.MainActivity;
@@ -32,7 +33,7 @@ public class NotificationsUtil {
         this.ctx = context;
     }
 
-    public void showUpdateProgressNotification(int notificationId, String title, String message) {
+    private void showUpdateProgressNotification(int notificationId, String title, String message) {
         Notification.Builder builder = setupCommonNotification(title, message, false)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setOngoing(true)
@@ -70,15 +71,23 @@ public class NotificationsUtil {
                 break;
         }
         String message = ctx.getResources().getString(R.string.notif_update_data_message, dataName);
-        showUpdateProgressNotification(notificationId, title, message);
+        if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
+            showUpdateProgressNotification(notificationId, title, message);
+        } else {
+            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void showUpdateCompleteNotification(int notificationId, String title, String message) {
-        Notification.BigTextStyle bigTextStyle = new Notification.BigTextStyle().setBigContentTitle(title).bigText(message);
-        Notification.Builder builder = setupCommonNotification(title, message, true)
-                .setStyle(bigTextStyle)
-                .setSmallIcon(R.drawable.ic_action_accept);
-        getNotificationManager().notify(notificationId, builder.build());
+        if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
+            Notification.BigTextStyle bigTextStyle = new Notification.BigTextStyle().setBigContentTitle(title).bigText(message);
+            Notification.Builder builder = setupCommonNotification(title, message, true)
+                    .setStyle(bigTextStyle)
+                    .setSmallIcon(R.drawable.ic_action_accept);
+            getNotificationManager().notify(notificationId, builder.build());
+        } else {
+            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void showUpdateCompleteNotification(int notificationId) {
@@ -109,7 +118,11 @@ public class NotificationsUtil {
                 dataName = "данных";
         }
         String message = ctx.getResources().getString(R.string.notif_update_data_complete, dataName);
-        showUpdateCompleteNotification(notificationId, title, message);
+        if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
+            showUpdateCompleteNotification(notificationId, title, message);
+        } else {
+            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void dismissNotification(int id) {

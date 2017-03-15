@@ -1,9 +1,12 @@
 package by.ingman.sevenlis.ice_v3;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -24,9 +27,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Date;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 
+import by.ingman.sevenlis.ice_v3.classes.Product;
+import by.ingman.sevenlis.ice_v3.local.sql.DBHelper;
+import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
+import by.ingman.sevenlis.ice_v3.remote.sql.ConnectionFactory;
 import by.ingman.sevenlis.ice_v3.remote.sql.UpdateDataService;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
@@ -42,6 +54,7 @@ public class UpdateDataActivity extends AppCompatActivity {
     private LinearLayout linearLayoutProgress;
     private static boolean updateIsRunning = false;
     private File apkFile;
+    DBHelper dbHelper = new DBHelper(UpdateDataActivity.this);
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -185,6 +198,7 @@ public class UpdateDataActivity extends AppCompatActivity {
     }
 
     public void progressBarProgressIncrement(int curValue, int maxValue) {
+        progressBar.setVisibility(View.VISIBLE);
         progressBar.setIndeterminate(false);
         int increment = curValue - progressBar.getProgress();
         if (increment <= 0) return;
@@ -231,6 +245,211 @@ public class UpdateDataActivity extends AppCompatActivity {
             textViewInfo.setText(R.string.apk_file_not_found);
             Toast.makeText(ctx, "Файл APK не найден!", Toast.LENGTH_LONG).show();
             textViewInfo.setText("Обновление данных");
+        }
+    }
+
+    public void getOrdersFromRemote(View view) {
+        GetOrdersFromRemoteTask getOrdersTask = new GetOrdersFromRemoteTask();
+        getOrdersTask.execute();
+    }
+
+    private class GetOrdersFromRemoteTask extends AsyncTask<Void, Integer, Void> {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                getOrdersFromRemote();
+                getAnswersFromRemote();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        void getOrdersFromRemote() throws SQLException {
+            publishProgress(0,0);
+
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE,-30);
+            FormatsUtils.roundDayToStart(cal);
+            String fDate = FormatsUtils.getDateFormatted(cal.getTime(),"yyyy-MM-dd HH:mm:ss.000");
+
+            int rsSize  = 0;
+            int rsCount = 0;
+            String managerName = SettingsUtils.Settings.getManagerName(UpdateDataActivity.this).toUpperCase();
+            Connection conn = new ConnectionFactory(UpdateDataActivity.this).getConnection();
+            if (conn != null) {
+                try {
+                    PreparedStatement stat_count = conn.prepareStatement("SELECT COUNT(*) as count_rs FROM orders WHERE UPPER(name_m) = '" + managerName + "' AND order_date > CAST('" + fDate + "' as datetime)");
+                    ResultSet rs_count = stat_count.executeQuery();
+
+                    if (rs_count.next()) {
+                        rsSize = rs_count.getInt("count_rs");
+                    }
+
+                    PreparedStatement stat = conn.prepareStatement("SELECT * FROM orders WHERE UPPER(name_m) = '" + managerName + "' AND order_date > CAST('" + fDate + "' as datetime) ORDER BY in_datetime");
+                    ResultSet rs = stat.executeQuery();
+                    while (rs != null && rs.next()) {
+                        Product product = getProduct(rs.getString("code_p"),rs.getString("name_p"));
+
+                        ContentValues cv = new ContentValues();
+                        cv.put("order_id"       ,rs.getString("order_id"));
+                        cv.put("name_m"         ,rs.getString("name_m"));
+                        cv.put("order_date"     ,rs.getTimestamp("order_date").getTime());
+                        cv.put("is_advertising" ,rs.getInt("is_advertising"));
+                        cv.put("adv_type"       ,rs.getInt("adv_type"));
+                        cv.put("code_k"         ,rs.getString("code_k"));
+                        cv.put("name_k"         ,rs.getString("name_k"));
+                        cv.put("code_r"         ,rs.getString("code_r"));
+                        cv.put("name_r"         ,rs.getString("name_r"));
+                        cv.put("code_s"         ,rs.getString("code_s"));
+                        cv.put("name_s"         ,rs.getString("name_s"));
+                        cv.put("code_p"         ,rs.getString("code_p"));
+                        cv.put("name_p"         ,rs.getString("name_p"));
+                        cv.put("weight_p"       ,product.weight);
+                        cv.put("price_p"        ,product.price);
+                        cv.put("num_in_pack_p"  ,product.num_in_pack);
+                        cv.put("amount"         ,rs.getDouble("amount"));
+                        cv.put("amt_packs"      ,rs.getDouble("amt_packs"));
+                        cv.put("weight"         ,rs.getDouble("amount") * product.weight);
+                        cv.put("price"          ,product.price);
+                        cv.put("summa"          ,rs.getDouble("amount") * product.price);
+                        cv.put("comments"       ,rs.getString("comments"));
+                        cv.put("status"         ,2);
+                        cv.put("processed"      ,1);
+                        cv.put("sent"           ,1);
+                        cv.put("date_unload"    ,rs.getTimestamp("in_datetime").getTime());
+
+                        putOrderToLocalDB(cv);
+
+                        rsCount++;
+                        publishProgress(rsCount, rsSize);
+                    }
+                } finally {
+                    try {
+                        if (!conn.isClosed()) conn.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        void getAnswersFromRemote() throws SQLException {
+            publishProgress(0,0);
+
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE,-30);
+            FormatsUtils.roundDayToStart(cal);
+            String fDate = FormatsUtils.getDateFormatted(cal.getTime(),"yyyy-MM-dd HH:mm:ss.000");
+
+            int rsSize  = 0;
+            int rsCount = 0;
+            Connection conn = new ConnectionFactory(UpdateDataActivity.this).getConnection();
+            if (conn != null) {
+                try {
+                    PreparedStatement stat_count = conn.prepareStatement("SELECT COUNT(*) as count_rs FROM results WHERE datetime_unload > CAST('" + fDate + "' as datetime)");
+                    ResultSet rs_count = stat_count.executeQuery();
+
+                    if (rs_count.next()) {
+                        rsSize = rs_count.getInt("count_rs");
+                    }
+
+                    PreparedStatement stat = conn.prepareStatement("SELECT * FROM results WHERE datetime_unload > CAST('" + fDate + "' as datetime) ORDER BY datetime_unload");
+                    ResultSet rs = stat.executeQuery();
+                    while (rs != null && rs.next()) {
+                        ContentValues cv = new ContentValues();
+                        cv.put("order_id"       ,rs.getString("order_id"));
+                        cv.put("description"    ,rs.getString("description"));
+                        cv.put("date_unload"    ,rs.getTimestamp("datetime_unload").getTime());
+                        cv.put("result"         ,rs.getInt("result"));
+
+                        putAnswerToLocalDB(cv);
+
+                        rsCount++;
+                        publishProgress(rsCount, rsSize);
+                    }
+                } finally {
+                    try {
+                        if (!conn.isClosed()) conn.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            int progress    = values[0];
+            int max         = values[1];
+            if (progress == 0 & max == 0) {
+                displayProgressBar(true);
+            }
+            progressBarProgressIncrement(progress,max);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            displayProgressBar(false);
+            db.close();
+            super.onPostExecute(aVoid);
+        }
+
+        void  putOrderToLocalDB(ContentValues cv) {
+            if (!checkOrderEntry(cv)) {
+                try {
+                    db.beginTransaction();
+                    db.insert("orders",null,cv);
+                    db.setTransactionSuccessful();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+        }
+        Boolean checkOrderEntry(ContentValues cv) {
+            String order_id = cv.getAsString("order_id");
+            String code_p = cv.getAsString("code_p");
+            Cursor cursor = db.query(true,"orders", null, "order_id = ? AND code_p = ?", new String[]{order_id,code_p}, null, null, null, "1");
+            Boolean entryExist = cursor.moveToFirst();
+            cursor.close();
+            return entryExist;
+        }
+
+        private void putAnswerToLocalDB(ContentValues cv) {
+            if (!checkAnswerEntry(cv)) {
+                try {
+                    db.beginTransaction();
+                    db.insert("answers",null,cv);
+                    db.setTransactionSuccessful();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+        }
+        Boolean checkAnswerEntry(ContentValues cv) {
+            String order_id = cv.getAsString("order_id");
+            Cursor cursor = db.query(true,"answers", null, "order_id = ?", new String[]{order_id}, null, null, null, "1");
+            Boolean entryExist = cursor.moveToFirst();
+            cursor.close();
+            return entryExist;
+        }
+
+        Product getProduct(String pCode, String pName) {
+            Product product = new Product(pCode,pName,0,0,0);
+            Cursor cursor = db.query(true,"rests", null, "code_p = ?", new String[]{pCode}, null, null, null, "1");
+            if (cursor.moveToFirst()) {
+                product.weight = cursor.getDouble(cursor.getColumnIndex("gross_weight"));
+                product.price = cursor.getDouble(cursor.getColumnIndex("price"));
+                product.num_in_pack = cursor.getDouble(cursor.getColumnIndex("amt_in_pack"));
+            }
+            cursor.close();
+            return product;
         }
     }
 

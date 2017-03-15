@@ -2,8 +2,16 @@ package by.ingman.sevenlis.ice_v3;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +19,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,13 +36,36 @@ public class SelectContragentActivity extends AppCompatActivity {
     public static final String CONTRAGENT_NAME_VALUE_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_NAME_VALUE_KEY";
     private ArrayList<Contragent> contragentsList;
     private DBLocal dbLocal = new DBLocal(this);
+    Boolean useRecent = false;
+    ImageButton buttonRecent;
+    EditText editTextFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_contragent);
 
-        EditText editTextFilter = (EditText) findViewById(R.id.etFilter);
+        buttonRecent = (ImageButton) findViewById(R.id.btnRecent);
+
+        editTextFilter = (EditText) findViewById(R.id.etFilter);
+
+        editTextFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                refreshContragentsList(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         editTextFilter.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
@@ -47,15 +80,31 @@ public class SelectContragentActivity extends AppCompatActivity {
         refreshContragentsList();
     }
 
-    private void refreshContragentsList() {
-        String strFilter    = ((EditText) findViewById(R.id.etFilter)).getText().toString();
+    public void buttonRecentOnClick(View view) {
+        useRecent = !useRecent;
+
+        if (useRecent) {
+            buttonRecent.setImageResource(android.R.drawable.btn_star_big_on);
+            editTextFilter.setText("");
+        } else {
+            buttonRecent.setImageResource(android.R.drawable.btn_star_big_off);
+        }
+        editTextFilter.setEnabled(!useRecent);
+        refreshContragentsList();
+    }
+
+    private void refreshContragentsList(String strFilter) {
         String condition    = "";
         String[] conditionArgs  = new String[]{};
         if (!strFilter.isEmpty()) {
-            condition       = "search_uppercase like ?";
+            condition       = "client_uppercase like ?";
             conditionArgs   = new String[]{dbLocal.addWildcards(strFilter)};
         }
-        contragentsList = dbLocal.getContragents(condition,conditionArgs);
+        if (useRecent) {
+            contragentsList = dbLocal.getRecentContragents();
+        } else {
+            contragentsList = dbLocal.getContragents(condition,conditionArgs);
+        }
 
         CustomListAdapter customListAdapter = new CustomListAdapter(this,contragentsList);
         ListView lvContragents = (ListView) findViewById(R.id.listContragents);
@@ -73,6 +122,11 @@ public class SelectContragentActivity extends AppCompatActivity {
         });
     }
 
+    private void refreshContragentsList() {
+        String strFilter    = ((EditText) findViewById(R.id.etFilter)).getText().toString();
+        refreshContragentsList(strFilter);
+    }
+
     public void acceptFilterContragents(View view) {
         refreshContragentsList();
         if (contragentsList.size() == 0) return;
@@ -80,7 +134,7 @@ public class SelectContragentActivity extends AppCompatActivity {
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-    public class CustomListAdapter extends BaseAdapter {
+    private class CustomListAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;
         ArrayList<Contragent> objects;
