@@ -167,6 +167,7 @@ public class CheckApkUpdate extends IntentService {
         return versionName;
     }
 
+    @Nullable
     private File initVersionInfoFile() {
         File appFolder = new File(String.format("%s/%s", Environment.getExternalStorageDirectory(), SettingsUtils.APP_FOLDER));
         if (!appFolder.exists()) {

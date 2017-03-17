@@ -5,6 +5,7 @@
     android:id="@+id/activity_order_item_select"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
     android:orientation="vertical"
     android:paddingBottom="@dimen/default_gap"
     android:paddingLeft="@dimen/default_gap"
@@ -13,172 +14,209 @@
     tools:context="by.ingman.sevenlis.ice_v3.SelectOrderItemActivity">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/productInfo">
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkBoxInputType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:onClick="checkBoxInputTypeOnClick"
+            android:text="@string/digit_123"/>
+
+        <EditText
+            android:id="@+id/editTextFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:selectAllOnFocus="true"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/productInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/itemLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Номенклатура:"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/itemLabel"/>
+            tools:ignore="HardcodedText"/>
 
         <TextView
-            android:text="Выберите номенклатуру"
+            android:id="@+id/textViewProduct"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewProduct"
-            android:textSize="18sp"
+            android:focusable="true"
+            android:onClick="searchProduct"
+            android:text="Выберите номенклатуру"
             android:textColor="@android:color/black"
-            android:onClick="selectItem"/>
+            android:textSize="18sp"
+            tools:ignore="HardcodedText"/>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
-                android:text="Упак.:"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/textViewRestPacks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:text="Упак.:"
+                android:textColor="@color/green_darker"
                 android:textSize="12sp"
-                android:textColor="@color/green_darker"/>
+                tools:ignore="HardcodedText"/>
 
             <TextView
-                android:text="Кол.:"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/textViewRestAmount"
-                android:layout_weight="1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textColor="@color/green_darker"/>
-
-            <TextView
-                android:text="Цена:"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Кол.:"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@color/green_darker"
+                tools:ignore="HardcodedText"/>
+
+            <TextView
                 android:id="@+id/textViewPrice"
-                android:layout_weight="1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
-
-            <TextView
-                android:text="В упак.:"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textViewNumInPack"
                 android:layout_weight="1"
+                android:text="Цена:"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textColor="@color/colorPrimaryDark"/>
+                tools:ignore="HardcodedText"/>
+
+            <TextView
+                android:id="@+id/textViewNumInPack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="В упак.:"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@color/colorPrimaryDark"
+                tools:ignore="HardcodedText"/>
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/quantityPcsSelection"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:id="@+id/quantityPcsSelection"
-        android:layout_marginTop="@dimen/activity_vertical_margin">
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:orientation="horizontal">
 
         <TextView
-            android:text="Количество штук:"
+            android:id="@+id/tvNumPcsLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvNumPcsLabel"
             android:layout_weight="0.6"
+            android:text="Количество штук:"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textSize="16sp"
-            />
+            tools:ignore="HardcodedText"/>
 
         <Button
-            android:text="-"
+            android:id="@+id/buttonMinusPcs"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/buttonMinusPcs"
             android:layout_weight="1"
-            android:onClick="numPcsDecrease"/>
+            android:onClick="numPcsDecrease"
+            android:text="-"
+            tools:ignore="HardcodedText"/>
 
         <EditText
-            android:text="88.0"
+            android:id="@+id/editTextNumPcs"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/editTextNumPcs"
             android:layout_weight="1"
-            android:textSize="24sp"
-            android:textAlignment="center"
-            android:paddingTop="@dimen/default_gap"
             android:inputType="number|numberDecimal"
-            android:selectAllOnFocus="true">
+            android:paddingTop="@dimen/default_gap"
+            android:selectAllOnFocus="true"
+            android:text="88.0"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            tools:ignore="HardcodedText">
             <!-- <requestFocus /> -->
         </EditText>
 
         <Button
-            android:text="+"
+            android:id="@+id/buttonPlusPcs"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/buttonPlusPcs"
             android:layout_weight="1"
-            android:onClick="numPcsIncrease"/>
+            android:onClick="numPcsIncrease"
+            android:text="+"
+            tools:ignore="HardcodedText"/>
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/quantityPacksSelection"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:id="@+id/quantityPacksSelection"
-        android:layout_marginTop="@dimen/activity_vertical_margin">
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:orientation="horizontal">
 
         <TextView
-            android:text="Количество упаковок:"
+            android:id="@+id/tvNumPacksLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvNumPacksLabel"
             android:layout_weight="0.6"
+            android:text="Количество упаковок:"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textSize="16sp"
-            />
+            tools:ignore="HardcodedText"/>
 
         <Button
-            android:text="-"
+            android:id="@+id/buttonMinus"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/buttonMinus"
             android:layout_weight="1"
-            android:onClick="numPackDecrease"/>
+            android:onClick="numPackDecrease"
+            android:text="-"
+            tools:ignore="HardcodedText"/>
 
         <EditText
-            android:text="88.0"
+            android:id="@+id/editTextNumPacks"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/editTextNumPacks"
             android:layout_weight="1"
-            android:textSize="24sp"
-            android:textAlignment="center"
-            android:paddingTop="@dimen/default_gap"
             android:inputType="number|numberDecimal"
-            android:selectAllOnFocus="true">
+            android:paddingTop="@dimen/default_gap"
+            android:selectAllOnFocus="true"
+            android:text="88.0"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            tools:ignore="HardcodedText">
             <!-- <requestFocus /> -->
         </EditText>
 
         <Button
-            android:text="+"
+            android:id="@+id/buttonPlus"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/buttonPlus"
             android:layout_weight="1"
-            android:onClick="numPackIncrease"/>
+            android:onClick="numPackIncrease"
+            android:text="+"
+            tools:ignore="HardcodedText"/>
     </LinearLayout>
 
     <Button
-        android:text="Выбрать"
+        android:id="@+id/btnSubmit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnSubmit"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginLeft="64dp"
         android:layout_marginRight="64dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:enabled="false"
         android:onClick="btnSubmitOnClick"
-        android:enabled="false"/>
+        android:text="Выбрать"
+        tools:ignore="HardcodedText"/>
 </LinearLayout>

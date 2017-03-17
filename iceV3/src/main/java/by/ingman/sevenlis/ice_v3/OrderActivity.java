@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -39,7 +40,9 @@ public class OrderActivity extends AppCompatActivity {
     public static final int SELECT_CONTRAGENTS_REQUEST_CODE = 0;
     public static final int SELECT_POINT_REQUEST_CODE = 1;
     public static final int SELECT_ORDER_ITEM_REQUEST_CODE = 2;
+    public static final int CHANGE_ORDER_ITEM_REQUEST_CODE = 4;
     public static final int LIST_ITEM_CONTEXT_MENU_DEL = 3;
+    public static final int LIST_ITEM_CONTEXT_MENU_CHANGE = 5;
     private static final int OPTIONS_MENU_ADD_ORDER_ITEM_ID = 0;
     private Context ctx;
     Order mOrder;
@@ -219,6 +222,14 @@ public class OrderActivity extends AppCompatActivity {
         startActivityForResult(intent,SELECT_ORDER_ITEM_REQUEST_CODE);
     }
 
+    public void startOrderItemChange(OrderItem orderItem) {
+        int position = mOrderItems.indexOf(orderItem);
+        Intent intent = new Intent(this, SelectOrderItemActivity.class);
+        intent.putExtra(SelectOrderItemActivity.ORDER_ITEM_PARCELABLE_VALUE_KEY, orderItem);
+        intent.putExtra(SelectOrderItemActivity.ORDER_ITEM_POSITION_VALUE_KEY, position);
+        startActivityForResult(intent,CHANGE_ORDER_ITEM_REQUEST_CODE);
+    }
+
     public void onClick(View view) {
         switch (view.getId()) {
             case (R.id.textView_contragent): {
@@ -257,11 +268,11 @@ public class OrderActivity extends AppCompatActivity {
 
     private boolean checkDataFilling() {
         boolean result = true;
-        if (this.mOrder.contragent == null) {
+        if (this.mOrder.contragent == null || this.mOrder.contragent.getCode().isEmpty()) {
             Toast.makeText(ctx, "Не выбран Контрагент!", Toast.LENGTH_SHORT).show();
             result = false;
         }
-        if (this.mOrder.point == null) {
+        if (this.mOrder.point == null || this.mOrder.point.code.isEmpty()) {
             Toast.makeText(ctx, "Не выбран Пункт разгрузки!", Toast.LENGTH_SHORT).show();
             result = false;
         }
@@ -312,6 +323,14 @@ public class OrderActivity extends AppCompatActivity {
                 }
                 return;
             }
+            if (requestCode == CHANGE_ORDER_ITEM_REQUEST_CODE) {
+                OrderItem oi = data.getExtras().getParcelable(SelectOrderItemActivity.ORDER_ITEM_PARCELABLE_VALUE_KEY);
+                int position = data.getExtras().getInt(SelectOrderItemActivity.ORDER_ITEM_POSITION_VALUE_KEY);
+                this.mOrderItems.set(position, oi);
+                this.mOrder.setOrderItems(this.mOrderItems);
+                refreshOrderItemsList();
+                return;
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -347,7 +366,9 @@ public class OrderActivity extends AppCompatActivity {
         listViewOrderItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                final int position = (int) view.getTag();
+                final OrderItem orderItem = mOrderItems.get(position);
+                startOrderItemChange(orderItem);
             }
 
         });
@@ -355,7 +376,7 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 showPopupMenu(view);
-                return false;
+                return true;
             }
         });
     }
@@ -365,6 +386,7 @@ public class OrderActivity extends AppCompatActivity {
         final OrderItem orderItem = mOrderItems.get(position);
         final PopupMenu popupMenu = new PopupMenu(ctx,view);
         popupMenu.getMenu().add(0,LIST_ITEM_CONTEXT_MENU_DEL,0,"Удалить " + orderItem.product.code + " " + orderItem.product.name + ".");
+        popupMenu.getMenu().add(0,LIST_ITEM_CONTEXT_MENU_CHANGE,0,"Редактировать");
         popupMenu.setGravity(Gravity.END);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -373,6 +395,9 @@ public class OrderActivity extends AppCompatActivity {
                     case LIST_ITEM_CONTEXT_MENU_DEL:
                         mOrderItems.remove(position);
                         refreshOrderItemsList();
+                        break;
+                    case LIST_ITEM_CONTEXT_MENU_CHANGE:
+                        startOrderItemChange(orderItem);
                         break;
                 }
                 return false;

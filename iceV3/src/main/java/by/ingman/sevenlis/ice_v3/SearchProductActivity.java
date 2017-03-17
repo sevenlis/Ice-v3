@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -24,26 +27,46 @@ import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
-public class SelectProductActivity extends AppCompatActivity {
-    public static final String PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY = "by.ingman.sevenlis.ice_v3.PARCELABLE_ITEM_SINGLE_ARRAY_KEY";
+import static by.ingman.sevenlis.ice_v3.SelectOrderItemActivity.CHECKBOX_INPUT_TYPE_STATUS_KEY;
+import static by.ingman.sevenlis.ice_v3.SelectOrderItemActivity.STRING_FILTER_KEY;
+
+public class SearchProductActivity extends AppCompatActivity {
+    public static final String PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY = "by.ingman.sevenlis.ice_v3.PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY";
     CheckBox checkBoxInputTypeNumeric;
     EditText editTextFilter;
-    ArrayList<Product> arrayListProducts;
+    ArrayList<Product> arrayListProducts = new ArrayList<>();
     DBLocal dbLocal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_product);
+        setContentView(R.layout.activity_search_product);
 
         dbLocal = new DBLocal(this);
 
         editTextFilter = (EditText) findViewById(R.id.editTextFilter);
+
+        editTextFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                refreshListViewItemsList();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         editTextFilter.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                     refreshListViewItemsList();
+                    //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                    //InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    //imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     return true;
                 }
                 return false;
@@ -51,14 +74,17 @@ public class SelectProductActivity extends AppCompatActivity {
         });
 
         checkBoxInputTypeNumeric = (CheckBox) findViewById(R.id.checkBoxInputType);
-        checkBoxInputTypeNumeric.setChecked(SettingsUtils.Settings.getItemSearchInputTypeNumeric(this));
+        if (getIntent().getExtras() != null) {
+            checkBoxInputTypeNumeric.setChecked(getIntent().getExtras().getBoolean(CHECKBOX_INPUT_TYPE_STATUS_KEY));
+            editTextFilter.setText(getIntent().getExtras().getString(STRING_FILTER_KEY));
+        } else {
+            checkBoxInputTypeNumeric.setChecked(SettingsUtils.Settings.getItemSearchInputTypeNumeric(this));
+            refreshListViewItemsList();
+        }
         changeEditTextFilterInputType();
-
-        refreshListViewItemsList();
     }
 
     private void changeEditTextFilterInputType() {
-        editTextFilter.setText("");
         boolean isNumericType = checkBoxInputTypeNumeric.isChecked();
         if (isNumericType) {
             editTextFilter.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -87,6 +113,7 @@ public class SelectProductActivity extends AppCompatActivity {
             conditionArgs = new String[]{SettingsUtils.Settings.getDefaultStoreHouseCode(this), dbLocal.addWildcards(strFilter)};
         }
         arrayListProducts = dbLocal.getProducts(condition, conditionArgs);
+
         CustomListViewAdapter customListViewAdapter = new CustomListViewAdapter(this, arrayListProducts);
         ListView listViewItemsList = (ListView) findViewById(R.id.listViewProductsList);
         listViewItemsList.setAdapter(customListViewAdapter);
@@ -98,16 +125,21 @@ public class SelectProductActivity extends AppCompatActivity {
 
                 Intent answerIntent = new Intent();
                 answerIntent.putParcelableArrayListExtra(PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY,singleProductArray);
+                answerIntent.putExtra(CHECKBOX_INPUT_TYPE_STATUS_KEY,checkBoxInputTypeNumeric.isChecked());
+                answerIntent.putExtra(STRING_FILTER_KEY,editTextFilter.getText().toString());
                 setResult(RESULT_OK,answerIntent);
                 finish();
             }
         });
+
         if (arrayListProducts.size() == 1) {
             ArrayList<Product> singleProductArray = new ArrayList<>(1);
             singleProductArray.add(0,arrayListProducts.get(0));
 
             Intent answerIntent = new Intent();
             answerIntent.putParcelableArrayListExtra(PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY,singleProductArray);
+            answerIntent.putExtra(CHECKBOX_INPUT_TYPE_STATUS_KEY,checkBoxInputTypeNumeric.isChecked());
+            answerIntent.putExtra(STRING_FILTER_KEY,editTextFilter.getText().toString());
             setResult(RESULT_OK,answerIntent);
             finish();
         } else {
@@ -118,6 +150,7 @@ public class SelectProductActivity extends AppCompatActivity {
 
     public void checkBoxInputTypeNumericOnClick(View view) {
         changeEditTextFilterInputType();
+        refreshListViewItemsList();
     }
 
     private class CustomListViewAdapter extends BaseAdapter {

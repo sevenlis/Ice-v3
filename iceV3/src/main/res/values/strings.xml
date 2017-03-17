@@ -89,4 +89,5 @@
     <string name="pref_passDB_default">androidXchangeIngman759153!</string>
     <string name="pref_apk_update_url">http://ingman.by/agent/iceV3.apk</string>
     <string name="developer_name">"@sevenlis"</string>
+    <string name="digit_123">123</string>
 </resources>

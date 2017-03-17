@@ -3,6 +3,7 @@
           package="by.ingman.sevenlis.ice_v3">
 
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
@@ -10,9 +11,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE"/> -->
-    <!-- <uses-permission android:name="android.permission.VIBRATE"/> -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!-- <uses-permission android:name="android.permission.INSTALL_PACKAGES"/> -->
+    <!-- <uses-permission android:name="android.permission.VIBRATE"/> -->
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -44,7 +45,7 @@
         </activity>
         <activity android:name=".SelectOrderItemActivity">
         </activity>
-        <activity android:name=".SelectProductActivity">
+        <activity android:name=".SearchProductActivity">
         </activity>
 
         <service
