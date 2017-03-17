@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -53,7 +55,6 @@ public class UpdateDataActivity extends AppCompatActivity {
     private TextView textViewInfo;
     private LinearLayout linearLayoutProgress;
     private static boolean updateIsRunning = false;
-    private File apkFile;
     DBHelper dbHelper = new DBHelper(UpdateDataActivity.this);
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -227,18 +228,17 @@ public class UpdateDataActivity extends AppCompatActivity {
             Toast.makeText(ctx, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
             return;
         }
-        textViewInfo.setText("Запущено скачивание установочного файла...");
-        displayProgressBar(true);
         UpdateAPKTask updateAPKTask = new UpdateAPKTask();
         updateAPKTask.execute();
     }
 
-    private void startUpdateIntent() {
+    private void startUpdateIntent(File apkFile) {
         displayProgressBar(false);
         SettingsUtils.Runtime.setUpdateInProgress(ctx,false);
         if (apkFile != null && apkFile.exists()) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             textViewInfo.setText("Установка АРК-файла не выполнена.");
         } else {
@@ -459,6 +459,11 @@ public class UpdateDataActivity extends AppCompatActivity {
 
         private String errorMessage = null;
 
+        private Handler mHandler = new Handler(Looper.getMainLooper());
+
+        final File appFolder = new File(String.format("%s%s%s", Environment.getExternalStorageDirectory(), File.separator, SettingsUtils.APP_FOLDER));
+        final File apkFile = new File(String.format("%s%s%s", appFolder.getAbsolutePath(), File.separator, "iceV3.apk"));
+
         @Override
         protected Void doInBackground(Void... params) {
             SettingsUtils.Runtime.setUpdateInProgress(ctx,true);
@@ -482,30 +487,41 @@ public class UpdateDataActivity extends AppCompatActivity {
                 // might be -1: server did not report the length
                 int fileLength = connection.getContentLength();
 
-                File appFolder = new File(String.format("%s/%s",Environment.getExternalStorageDirectory(), SettingsUtils.APP_FOLDER));
                 if (!appFolder.exists()) {
                     if (!appFolder.mkdir()) {
-                        Toast.makeText(ctx, "Error creating folder " + appFolder.getPath(), Toast.LENGTH_SHORT).show();
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ctx, "Error creating folder " + appFolder.getPath(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         return null;
                     }
                 }
-
                 // download the file
                 boolean deleted = true;
                 boolean created = true;
                 input = connection.getInputStream();
-                apkFile = new File(String.format("%s/%s/iceV3.apk", Environment.getExternalStorageDirectory(), SettingsUtils.APP_FOLDER));
-                if (apkFile.exists()) {
-                    deleted = apkFile.delete();
-                }
-                if (deleted) {
-                    created = apkFile.createNewFile();
-                }
+                if (apkFile.exists()) { deleted = apkFile.delete(); }
+                if (deleted) { created = apkFile.createNewFile(); }
                 if (!created) {
-                    Toast.makeText(ctx, "Error creating file " + apkFile.getPath(), Toast.LENGTH_SHORT).show();
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ctx, "Error creating file " + apkFile.getPath(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     return null;
                 }
                 output = new FileOutputStream(apkFile);
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        displayProgressBar(true);
+                        textViewInfo.setText("Запущено скачивание установочного файла...");
+                    }
+                });
 
                 byte data[] = new byte[batchSize];
                 int count;
@@ -554,9 +570,13 @@ public class UpdateDataActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
                 errorMessage = null;
             } else {
-                Toast.makeText(getApplicationContext(), "Обновление загружено", Toast.LENGTH_SHORT).show();
+                if (apkFile.exists()) {
+                    Toast.makeText(getApplicationContext(), "Обновление загружено", Toast.LENGTH_SHORT).show();
+                    startUpdateIntent(apkFile);
+                } else {
+                    textViewInfo.setText("Обновление данных");
+                }
             }
-            startUpdateIntent();
         }
     }
 

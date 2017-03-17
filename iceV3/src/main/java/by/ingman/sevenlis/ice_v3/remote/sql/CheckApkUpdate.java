@@ -169,10 +169,10 @@ public class CheckApkUpdate extends IntentService {
 
     @Nullable
     private File initVersionInfoFile() {
-        File appFolder = new File(String.format("%s/%s", Environment.getExternalStorageDirectory(), SettingsUtils.APP_FOLDER));
+        File appFolder = new File(String.format("%s%s%s", getApplicationContext().getFilesDir().getAbsolutePath(), File.separator, SettingsUtils.APP_FOLDER));
         if (!appFolder.exists()) {
             if (!appFolder.mkdir()) {
-                Toast.makeText(this, "Error creating folder " + appFolder.getPath(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error creating folder " + appFolder.getPath(), Toast.LENGTH_SHORT).show();
                 return null;
             }
         }
@@ -189,7 +189,7 @@ public class CheckApkUpdate extends IntentService {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(this, "Error creating file " + mFile.getPath(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error creating file " + mFile.getPath(), Toast.LENGTH_SHORT).show();
                 return null;
             }
         }
@@ -204,7 +204,7 @@ public class CheckApkUpdate extends IntentService {
         connection.connect();
         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
             String errorMessage = String.format("Ошибка соединения. Код %s : %s", connection.getResponseCode(), connection.getResponseMessage());
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
             return;
         }
         OutputStream out = new FileOutputStream(versionInfoFile);
