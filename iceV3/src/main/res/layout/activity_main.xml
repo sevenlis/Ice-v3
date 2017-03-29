@@ -9,35 +9,45 @@
     tools:context="by.ingman.sevenlis.ice_v3.MainActivity">
 
     <RelativeLayout
+        android:id="@+id/dateAndOptions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/dateAndOptions"
         android:background="@android:color/darker_gray"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp">
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp">
 
         <TextView
-            android:text="TextView"
+            android:id="@+id/textViewDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewDate"
-            android:textSize="22sp"
+            android:layout_alignParentStart="false"
+            android:layout_centerHorizontal="true"
+            android:text="TextView"
             android:textColor="@color/colorPrimary"
-            android:layout_centerHorizontal="true" />
+            android:textSize="22sp"
+            android:layout_alignParentLeft="false"/>
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rlListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/dateAndOptions"
+        android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
-        android:id="@+id/rlListView">
+        android:layout_below="@+id/dateAndOptions">
+
+        <ProgressBar
+            android:id="@+id/progressBarLoad"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"/>
 
         <ListView
+            android:id="@+id/listViewOrders"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/listViewOrders" />
+            android:layout_below="@+id/progressBarLoad"/>
     </RelativeLayout>
 
 </RelativeLayout>

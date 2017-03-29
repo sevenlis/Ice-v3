@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -18,12 +19,12 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import by.ingman.sevenlis.ice_v3.classes.ExchangeDataIntents;
@@ -60,12 +61,14 @@ public class MainActivity extends AppCompatActivity {
     View footerIsAdv;
     View footerSummary;
     NotificationsUtil notifUtils;
+    ProgressBar progressBarLoad;
+    private Handler mHandler = new Handler();
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ExchangeDataService.CHANNEL)) {
-                refreshOrdersList();
+                refreshOrdersList(false);
             }
         }
     };
@@ -130,9 +133,8 @@ public class MainActivity extends AppCompatActivity {
                     Calendar orderDateCal = Calendar.getInstance();
                     orderDateCal.setTimeInMillis(orderDateMillis);
                     orderDateCalendar = (Calendar) orderDateCal.clone();
-                    textViewDateUpdateText();
                 }
-                refreshOrdersList();
+                refreshOrdersList(false);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -150,9 +152,10 @@ public class MainActivity extends AppCompatActivity {
         notifUtils          = new NotificationsUtil(ctx);
         exchangeDataIntents = new ExchangeDataIntents();
         chkApkUpdate        = new CheckApkUpdate();
+        progressBarLoad     = (ProgressBar) findViewById(R.id.progressBarLoad);
 
-        advTypesStrings = getResources().getStringArray(R.array.adv_types_strings);
-        orderStatuses   = getResources().getStringArray(R.array.order_statuses);
+        advTypesStrings     = getResources().getStringArray(R.array.adv_types_strings);
+        orderStatuses       = getResources().getStringArray(R.array.order_statuses);
 
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -197,7 +200,11 @@ public class MainActivity extends AppCompatActivity {
         footerNoAdv     = createFooterSummary("Итого без рекламы:",0);
         footerIsAdv     = createFooterSummary("Итого реклама:",1);
         footerSummary   = createFooterSummary("Итого:",-1);
-        refreshOrdersList();
+
+        progressBarLoad.setVisibility(View.GONE);
+        listViewOrders.setVisibility(View.VISIBLE);
+
+        refreshOrdersList(true);
 
         startExchangeDataService();
 
@@ -212,12 +219,17 @@ public class MainActivity extends AppCompatActivity {
                 orderDateCalendar.set(Calendar.DAY_OF_MONTH, day);
 
                 textViewDateUpdateText();
-
-                refreshOrdersList();
+                refreshOrdersList(true);
             }
         };
 
         startService(new Intent(ctx, CheckApkUpdate.class));
+    }
+
+    @Override
+    protected void onRestart() {
+        refreshOrdersList(true);
+        super.onRestart();
     }
 
     private void orderDateCalendarAddDay(int days) {
@@ -237,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
         orderDateCalendar.add(Calendar.DATE,days);
         textViewDateUpdateText();
-        refreshOrdersList();
+        refreshOrdersList(true);
     }
 
     private void startExchangeDataService() {
@@ -271,8 +283,45 @@ public class MainActivity extends AppCompatActivity {
         startActivity(orderViewIntent);
     }
 
-    private void refreshOrdersList() {
-        ordersList = dbLocal.getOrdersList(orderDateCalendar);
+    private void refreshOrdersList(final Boolean showProgress) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (showProgress) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBarLoad.setVisibility(View.VISIBLE);
+                            listViewOrders.setVisibility(View.GONE);
+                        }
+                    });
+                }
+
+                DBLocal dbLocalThread = new DBLocal(ctx);
+                ordersList = dbLocalThread.getOrdersList(orderDateCalendar);
+
+                if (showProgress) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBarLoad.setVisibility(View.GONE);
+                            listViewOrders.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshOrdersListView();
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void refreshOrdersListView() {
+        textViewDateUpdateText();
 
         CustomOrderListAdapter customOrderListAdapter = new CustomOrderListAdapter(ctx, ordersList);
         listViewOrders.removeFooterView(footerNoAdv);
@@ -326,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                             return false;
                         }
                         dbLocal.deleteOrder(order);
-                        refreshOrdersList();
+                        refreshOrdersList(false);
                         break;
                     case LIST_ITEM_CONTEXT_MENU_VIEW: {
                         viewOrder(order);
@@ -338,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
         popupMenu.show();
     }
 
-    public class CustomOrderListAdapter extends BaseAdapter {
+    private class CustomOrderListAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;
         ArrayList<Order> objects;
