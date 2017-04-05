@@ -58,7 +58,8 @@
 
         <activity android:name=".OrderViewActivity">
         </activity>
-        <activity android:name=".AboutActivity">
+        <activity android:name=".AboutActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
     </application>
 

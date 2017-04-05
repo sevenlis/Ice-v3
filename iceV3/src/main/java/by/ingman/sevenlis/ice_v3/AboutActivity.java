@@ -16,7 +16,7 @@ public class AboutActivity extends AppCompatActivity {
 
         int curVersionCode      = getVersionCodeLocal();
         double curVersionName   = Double.valueOf(getVersionNameLocal());
-        ((TextView) findViewById(R.id.textView5)).setText("ver." + FormatsUtils.getNumberFormatted(curVersionCode,0).trim() + " (" + FormatsUtils.getNumberFormatted(curVersionName,2).trim() + ")");
+        ((TextView) findViewById(R.id.textView5)).setText("ver." + FormatsUtils.getNumberFormatted(curVersionCode,0).trim() + " (" + FormatsUtils.getNumberFormatted(curVersionName,3).trim() + ")");
         ((TextView) findViewById(R.id.textView2)).setText(getPackageName());
     }
 
@@ -28,7 +28,7 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private String getVersionNameLocal() {
-        String versionName = "0.00";
+        String versionName = "0.000";
         try { versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) { e.printStackTrace(); }
         return versionName;

@@ -72,7 +72,7 @@ public class CheckApkUpdate extends IntentService {
                 .setSmallIcon(R.drawable.ic_info_white)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ice_pict))
                 .setContentTitle("Доступно обновление")
-                .setContentText("Обновление до версии " + FormatsUtils.getNumberFormatted(newVersionCode,0).trim() + " (" + FormatsUtils.getNumberFormatted(newVersionName,2).trim() + ") доступно");
+                .setContentText("Доступно обновление до версии " + FormatsUtils.getNumberFormatted(newVersionCode,0).trim() + " (" + FormatsUtils.getNumberFormatted(newVersionName,3).trim() + ")");
         Intent resultIntent = new Intent(this, UpdateDataActivity.class);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -112,7 +112,7 @@ public class CheckApkUpdate extends IntentService {
     }
 
     private String readVersionNameFromFile(File versionInfoFile) {
-        String versionName = "0.00";
+        String versionName = "0.000";
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(versionInfoFile));
             int count = 0;
@@ -161,7 +161,7 @@ public class CheckApkUpdate extends IntentService {
     }
 
     private String getVersionNameLocal() {
-        String versionName = "0.00";
+        String versionName = "0.000";
         try { versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) { e.printStackTrace(); }
         return versionName;

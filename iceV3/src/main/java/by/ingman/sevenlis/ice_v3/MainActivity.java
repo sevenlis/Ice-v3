@@ -28,7 +28,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import by.ingman.sevenlis.ice_v3.classes.ExchangeDataIntents;
-import by.ingman.sevenlis.ice_v3.classes.OnSwipeTouchListener;
+import by.ingman.sevenlis.ice_v3.classes.OnSwipeLeftRightTouchListener;
 import by.ingman.sevenlis.ice_v3.classes.Order;
 import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
 import by.ingman.sevenlis.ice_v3.remote.sql.CheckApkUpdate;
@@ -77,10 +77,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);
         menu.setGroupVisible(R.id.exchangeServiceMenuGroup,false);
-        MenuItem menuItem = menu.findItem(R.id.add_order);
+        /*MenuItem menuItem = menu.findItem(R.id.add_order);
         menuItem.setIcon(android.R.drawable.ic_input_add)
-                .setTitle("NEW")
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);*/
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -115,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
             } break;
             case R.id.startExchangeData: {
                 startExchangeDataService();
+            } break;
+            case R.id.refresh_list: {
+                refreshOrdersList(true);
             } break;
             case R.id.about_app: {
                 Intent intent = new Intent(ctx,AboutActivity.class);
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         textViewDateUpdateText();
 
         listViewOrders = (ListView) findViewById(R.id.listViewOrders);
-        listViewOrders.setOnTouchListener(new OnSwipeTouchListener(ctx) {
+        listViewOrders.setOnTouchListener(new OnSwipeLeftRightTouchListener(ctx) {
             public void onSwipeRight() {
                 orderDateCalendarAddDay(-1);
             }
@@ -224,12 +226,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         startService(new Intent(ctx, CheckApkUpdate.class));
-    }
-
-    @Override
-    protected void onRestart() {
-        refreshOrdersList(true);
-        super.onRestart();
     }
 
     private void orderDateCalendarAddDay(int days) {
@@ -275,6 +271,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
     }
 
     private void viewOrder(Order order) {
