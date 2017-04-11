@@ -3,14 +3,19 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/refresh_list"
-        android:icon="@drawable/ic_cached_white"
-        android:title="@string/refresh_list"
+        android:id="@+id/return_today"
+        android:icon="@drawable/ic_details_white"
+        android:title="@string/return_today"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/add_order"
         android:icon="@drawable/ic_add_circle_outline_white"
         android:title="@string/add_order"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/refresh_list"
+        android:icon="@drawable/ic_cached_white"
+        android:title="@string/refresh_list"
         app:showAsAction="ifRoom|withText"/>
     <item android:title="@string/settings"
           android:id="@+id/settings"

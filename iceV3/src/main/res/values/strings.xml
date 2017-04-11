@@ -7,6 +7,7 @@
     <string name="add_order">Добавить заявку</string>
     <string name="update_data">Обновить данные</string>
     <string name="refresh_list">Обновить</string>
+    <string name="return_today">Сегодня</string>
     <string name="settings">Настройки</string>
     <string name="pref_manager_db_summ">Имя пользователя в 1С</string>
     <string name="pref_manager_db">Менеджер</string>

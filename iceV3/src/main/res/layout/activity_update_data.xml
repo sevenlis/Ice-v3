@@ -71,62 +71,62 @@
         android:textColor="@color/color_red" />
 
     <Button
-        android:text="Обновить таблицу номенклатуры и остатков"
-        android:layout_width="wrap_content"
+        android:id="@+id/buttonRests"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:id="@+id/buttonRests"
         android:layout_alignParentTop="false"
+        android:layout_below="@+id/textViewInfo2"
         android:layout_centerInParent="true"
         android:onClick="buttonRestsOnClick"
-        android:layout_below="@+id/textViewInfo2" />
+        android:text="Обновить таблицу номенклатуры и остатков"/>
 
     <Button
-        android:text="Обновить таблицу контрагентов и пунктов разгрузок контрагентов"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/buttonClients"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/buttonRests"
         android:layout_centerInParent="true"
-        android:onClick="buttonClientsOnClick" />
+        android:onClick="buttonClientsOnClick"
+        android:text="Обновить таблицу контрагентов и пунктов разгрузок контрагентов"/>
 
     <Button
-        android:text="Обновить таблицу отношений и задолженностей контрагентов"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonClients"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
         android:id="@+id/buttonDebts"
-        android:layout_centerInParent="true"
-        android:layout_centerHorizontal="false"
-        android:onClick="buttonDebtsOnClick" />
-
-    <Button
-        android:text="Получить все заявки с сервера"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonDebts"
-        android:id="@+id/buttonGetOrders"
-        android:onClick="getOrdersFromRemote"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
-
-    <Button
-        android:text="Скачать и обновить приложение"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonGetOrders"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:id="@+id/buttonUpdateAPK"
-        android:onClick="updateAPK"
+        android:layout_below="@+id/buttonClients"
+        android:layout_centerHorizontal="false"
+        android:layout_centerInParent="true"
+        android:onClick="buttonDebtsOnClick"
+        android:text="Обновить таблицу отношений и задолженностей контрагентов"/>
+
+    <Button
+        android:id="@+id/buttonGetOrders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/buttonDebts"
+        android:layout_centerVertical="true"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:layout_centerInParent="true"/>
+        android:onClick="getOrdersFromRemote"
+        android:text="Получить все заявки с сервера"/>
+
+    <Button
+        android:id="@+id/buttonUpdateAPK"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/buttonGetOrders"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:onClick="updateAPK"
+        android:text="Скачать и обновить приложение"/>
 
 </RelativeLayout>

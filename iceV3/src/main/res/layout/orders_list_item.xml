@@ -27,14 +27,15 @@
                 android:layout_weight="1.25"/>
 
             <TextView
-                android:text="uid"
+                android:id="@+id/textView_orderId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView_orderId"
-                android:textSize="10sp"
+                android:layout_gravity="end"
                 android:layout_weight="0.5"
+                android:text="uid"
                 android:textAlignment="viewEnd"
-                android:layout_gravity="end"/>
+                android:textColor="@color/colorAccent"
+                android:textSize="10sp"/>
 
         </LinearLayout>
 
@@ -115,20 +116,22 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:text="Реклама: null"
+                android:id="@+id/textView_adv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView_adv"
-                android:textSize="12sp"
-                android:layout_weight="1.25"/>
+                android:layout_weight="1.25"
+                android:text="Реклама: null"
+                android:textColor="@color/colorAccent"
+                android:textSize="12sp"/>
 
             <TextView
-                android:text="Тип рекламы"
+                android:id="@+id/textView_advType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView_advType"
-                android:textSize="12sp"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="Тип рекламы"
+                android:textColor="@color/colorAccent"
+                android:textSize="12sp"/>
 
             <TextView
                 android:text="Состояние заявки"
@@ -150,22 +153,24 @@
             android:layout_weight="1">
 
             <TextView
-                android:text="Комментарий"
+                android:id="@+id/textView_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView_comment"
-                android:textSize="12sp"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="Комментарий"
+                android:textColor="@color/colorAccent"
+                android:textSize="12sp"/>
 
             <TextView
-                android:text="Дата время"
+                android:id="@+id/textView_dateUnload"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView_dateUnload"
-                android:textSize="12sp"
+                android:layout_gravity="end"
                 android:layout_weight="1"
+                android:text="Дата время"
                 android:textAlignment="viewEnd"
-                android:layout_gravity="end"/>
+                android:textColor="@color/colorAccent"
+                android:textSize="12sp"/>
         </LinearLayout>
 
     </LinearLayout>

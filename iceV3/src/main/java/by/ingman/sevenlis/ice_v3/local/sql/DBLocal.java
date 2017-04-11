@@ -28,15 +28,15 @@ public class DBLocal {
     public static final String TABLE_DEBTS = "debts";
     public static final String TABLE_CONTRAGENTS = "contragents";
 
-    private DBHelper dbHelper;
     private Context ctx;
 
     public DBLocal(Context context) {
         this.ctx = context;
-        this.dbHelper = new DBHelper(context);
     }
 
     public ArrayList<Order> getOrdersList(Calendar dateCal) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         Calendar dayStart = (Calendar) dateCal.clone();
         FormatsUtils.roundDayToStart(dayStart);
 
@@ -62,6 +62,8 @@ public class DBLocal {
     }
 
     public ArrayList<Order> getUnsentOrdersList() {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<String> ordersUids = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true,TABLE_ORDERS,new String[]{"order_id"},"sent = 0 AND status = 0 AND processed = 0",null,null,null,null,null);
@@ -78,6 +80,8 @@ public class DBLocal {
     }
 
     public ArrayList<String> getUnansweredOrdersUids() {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<String> ordersUids = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true,TABLE_ORDERS,new String[]{"order_id"},"sent = 1 AND status = 1 AND processed = 0",null,null,null,null,null);
@@ -89,6 +93,8 @@ public class DBLocal {
     }
 
     public Order getOrder(String orderUid) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         Order mOrder = new Order(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true,TABLE_ORDERS,null,"order_id = ?",new String[]{orderUid},null,null,null,"1");
@@ -113,6 +119,8 @@ public class DBLocal {
     }
 
     private ArrayList<OrderItem> getOrderItems(String orderUid) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<OrderItem> orderItems = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TABLE_ORDERS,null,"order_id = ?",new String[]{orderUid},null, null, null, null);
@@ -129,6 +137,8 @@ public class DBLocal {
     }
 
     public ArrayList<Contragent> getContragents(String condition, String[] conditionArgs) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor;
@@ -149,6 +159,8 @@ public class DBLocal {
 
 
     public ArrayList<Contragent> getRecentContragents() {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true,TABLE_ORDERS,new String[]{"code_k", "name_k"},null,null,null,null,"name_k ASC",null);
@@ -162,6 +174,8 @@ public class DBLocal {
     }
 
     public ArrayList<Contragent> getContragents(String condition) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(condition,null);
@@ -175,6 +189,8 @@ public class DBLocal {
     }
 
     public ArrayList<Product> getProducts(String condition, String[] conditionArgs) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<Product> productArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor;
@@ -199,6 +215,8 @@ public class DBLocal {
     }
 
     public ArrayList<Point> getPoints(String condition, String[] conditionArgs) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         ArrayList<Point> pointArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true,TABLE_CONTRAGENTS,new String[]{"code_r", "name_r"},condition,conditionArgs,null,null,null,null);
@@ -212,6 +230,8 @@ public class DBLocal {
     }
 
     public String getContragentRating(Contragent contragent) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         String value = "";
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(DBLocal.TABLE_DEBTS, null, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
@@ -224,6 +244,8 @@ public class DBLocal {
     }
 
     public double getContragentDebt(Contragent contragent) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         double value = 0;
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(DBLocal.TABLE_DEBTS, null, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
@@ -236,6 +258,8 @@ public class DBLocal {
     }
 
     public double getContragentOverdue(Contragent contragent) throws SQLiteException {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         double value = 0;
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(DBLocal.TABLE_DEBTS, null, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
@@ -248,6 +272,8 @@ public class DBLocal {
     }
 
     public double getProductRestAmount(Product product) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -261,6 +287,8 @@ public class DBLocal {
     }
 
     public double getProductBlockAmount(Product product) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -274,6 +302,8 @@ public class DBLocal {
     }
 
     public double getProductRestPacks(Product product) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         Cursor cursor;
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
@@ -289,6 +319,8 @@ public class DBLocal {
     }
 
     public double getProductBlockPacks(Product product) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         Cursor cursor;
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
@@ -304,6 +336,8 @@ public class DBLocal {
     }
 
     public Storehouse getDefaultStorehouse() {
+        DBHelper dbHelper = new DBHelper(ctx);
+        
         Storehouse value = null;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -359,7 +393,8 @@ public class DBLocal {
 
             orderData.add(cv);
         }
-
+    
+        DBHelper dbHelper = new DBHelper(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         try {
             db.beginTransaction();
@@ -377,6 +412,7 @@ public class DBLocal {
     }
 
     public void deleteOrder(Order order) {
+        DBHelper dbHelper = new DBHelper(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         try {
             db.beginTransaction();
@@ -391,6 +427,7 @@ public class DBLocal {
     }
 
     public void setUnsetOrdersAsSent(ArrayList<Order> ordersList) {
+        DBHelper dbHelper = new DBHelper(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         for (Order order : ordersList) {
             ContentValues cv = new ContentValues();
@@ -411,6 +448,7 @@ public class DBLocal {
     }
 
     private void setOrderAsAnswered(String orderUid) {
+        DBHelper dbHelper = new DBHelper(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("status"     ,2);
@@ -430,6 +468,7 @@ public class DBLocal {
 
     public void updateAnswer(Answer answer) {
         boolean result = false;
+        DBHelper dbHelper = new DBHelper(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("order_id",answer.getOrderId());
@@ -456,6 +495,7 @@ public class DBLocal {
 
     public Answer getAnswer(String orderUid) {
         Answer answer = null;
+        DBHelper dbHelper = new DBHelper(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(DBLocal.TABLE_ANSWERS, null, "order_id = ?", new String[]{orderUid}, null, null, null, "1");
         if (cursor.moveToFirst()) {

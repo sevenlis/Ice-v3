@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.TaskStackBuilder;
@@ -28,7 +27,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import by.ingman.sevenlis.ice_v3.AboutActivity;
 import by.ingman.sevenlis.ice_v3.MainActivity;
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.UpdateDataActivity;

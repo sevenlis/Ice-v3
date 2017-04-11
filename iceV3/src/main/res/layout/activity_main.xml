@@ -1,56 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/scrollView"
-    tools:context="by.ingman.sevenlis.ice_v3.MainActivity">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".MainActivity">
 
-    <RelativeLayout
-        android:id="@+id/dateAndOptions"
+    <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/main_pager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/darker_gray"
-        android:paddingBottom="2dp"
-        android:paddingTop="2dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textViewDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="false"
-            android:layout_centerHorizontal="true"
-            android:text="TextView"
-            android:textColor="@color/colorPrimary"
-            android:textSize="22sp"
-            android:layout_alignParentLeft="false"
-            tools:ignore="HardcodedText"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rlListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/dateAndOptions">
-
-        <ProgressBar
-            android:id="@+id/progressBarLoad"
-            style="?android:attr/progressBarStyleHorizontal"
+        <android.support.v4.view.PagerTabStrip
+            android:id="@+id/pager_title_strip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"/>
+            android:layout_gravity="top"
+            android:background="@color/light_grey">
+        </android.support.v4.view.PagerTabStrip>
 
-        <ListView
-            android:id="@+id/listViewOrders"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/progressBarLoad">
-        </ListView>
-
-    </RelativeLayout>
+    </android.support.v4.view.ViewPager>
 
 </RelativeLayout>
