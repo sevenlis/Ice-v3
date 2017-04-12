@@ -1,10 +1,8 @@
 package by.ingman.sevenlis.ice_v3;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -16,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -34,7 +31,6 @@ import by.ingman.sevenlis.ice_v3.classes.Product;
 import by.ingman.sevenlis.ice_v3.classes.Storehouse;
 import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
-import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class OrderActivity extends AppCompatActivity {
     public static final int SELECT_CONTRAGENTS_REQUEST_CODE = 0;
@@ -49,7 +45,7 @@ public class OrderActivity extends AppCompatActivity {
     Spinner advTypesSpinner;
     CheckBox isAdvCheckBox;
     Calendar orderDateCalendar;
-    DatePickerDialog.OnDateSetListener onDateSetListener;
+    //DatePickerDialog.OnDateSetListener onDateSetListener;
     TextView textViewOrderDate;
     Contragent mContragent;
     Point mPoint;
@@ -64,8 +60,8 @@ public class OrderActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0,OPTIONS_MENU_ADD_ORDER_ITEM_ID,Menu.NONE,"ADD");
         MenuItem menuItem = menu.findItem(OPTIONS_MENU_ADD_ORDER_ITEM_ID);
-        menuItem.setIcon(android.R.drawable.ic_input_add)
-                .setTitle("ADD")
+        menuItem.setIcon(R.drawable.ic_add_circle_outline_white)
+                .setTitle("ДОБАВИТЬ")
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         return super.onCreateOptionsMenu(menu);
     }
@@ -107,14 +103,12 @@ public class OrderActivity extends AppCompatActivity {
 
         orderDateCalendar = Calendar.getInstance();
         if (getIntent().getExtras() != null) {
-            int year = getIntent().getExtras().getInt("calYear");
-            int month = getIntent().getExtras().getInt("calMonth");
-            int date = getIntent().getExtras().getInt("calDate");
-            orderDateCalendar.set(year, month, date);
+            long longDate = getIntent().getExtras().getLong("longDate");
+            orderDateCalendar.setTimeInMillis(longDate);
         }
 
         textViewOrderDate = (TextView) findViewById(R.id.textViewDate);
-        textViewOrderDate.setOnClickListener(new View.OnClickListener() {
+        /*textViewOrderDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Calendar cal = Calendar.getInstance();
@@ -133,14 +127,14 @@ public class OrderActivity extends AppCompatActivity {
 
                 dateDialog.show();
             }
-        });
+        });*/
 
         textViewOrderDateRefresh();
 
         footerSummary = createFooterSummary();
         footerSubmit = createFooterSubmit();
 
-        onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+        /*onDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
                 if (orderDateCalendar == null) {
@@ -149,7 +143,7 @@ public class OrderActivity extends AppCompatActivity {
                 orderDateCalendar.set(year, monthOfYear, dayOfMonth);
                 textViewOrderDateRefresh();
             }
-        };
+        };*/
 
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -176,7 +170,6 @@ public class OrderActivity extends AppCompatActivity {
             isAdvCheckBox.setChecked(mOrder.isAdvertising);
             setAdvTypesSpinnerState();
         }
-
     }
 
     @Override

@@ -18,6 +18,7 @@ public class SettingsUtils {
     private static final String PREF_DATA_UPDATE_INTERVAL = "exchangeFrequency";
     private static final String PREF_APK_UPDATE_URL = "apkUpdateUrl";
     private static final String PREF_ORDER_DAYS_AHEAD = "orderDaysAhead";
+    private static final String PREF_ORDER_LOG_DEPTH = "orderLogDepth";
     private static final String PREF_ITEM_SEARCH_INPUT_NUMERIC = "itemSearchInputNumeric";
     private static final String PREF_EXCHANGE_SHUTDOWN_ON_EXIT = "exchangeShutdownOnExit";
 
@@ -78,7 +79,11 @@ public class SettingsUtils {
         public static int getOrderDaysAhead(Context ctx) {
             return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_ORDER_DAYS_AHEAD, "10"));
         }
-
+    
+        public static int getOrderLogDepth(Context ctx) {
+            return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_ORDER_LOG_DEPTH, "30"));
+        }
+    
         public static boolean getItemSearchInputTypeNumeric(Context ctx) {
             return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(PREF_ITEM_SEARCH_INPUT_NUMERIC, true);
         }

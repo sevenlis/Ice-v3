@@ -26,14 +26,13 @@ public class MainActivity extends AppCompatActivity {
     
     private final int REQUEST_CODE_NEW_ORDER = 0;
 
-    private Calendar orderDateCalendar;
-
     private static ExchangeDataIntents exchangeDataIntents;
     private static CheckApkUpdate chkApkUpdate;
 
     NotificationsUtil notifUtils;
     ArrayList<Date> dateArrayList = new ArrayList<>();
     ViewPager viewPager;
+    Calendar mainOrderDateCal;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             if (intent.getAction().equals(ExchangeDataService.CHANNEL)) {
                 MainActivityPageFragment mainActivityPageFragment = (MainActivityPageFragment) getSupportFragmentManager().findFragmentById(R.id.main_pager);
                 if (mainActivityPageFragment == null) return;
-                mainActivityPageFragment.refreshOrdersList(false);
+                mainActivityPageFragment.refreshOrdersList(false, mainOrderDateCal);
             }
         }
     };
@@ -60,20 +59,18 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.add_order: {
-                Calendar newOrderDateCal = orderDateCalendar;
+                Calendar newOrderDateCal = mainOrderDateCal;
                 
                 Calendar nowStart = Calendar.getInstance();
                 FormatsUtils.roundDayToStart(nowStart);
                 
-                if (nowStart.getTimeInMillis() > orderDateCalendar.getTimeInMillis()) {
+                if (nowStart.getTimeInMillis() > mainOrderDateCal.getTimeInMillis()) {
                     Calendar tomorrow = Calendar.getInstance();
                     tomorrow.add(Calendar.DATE,1);
-                    newOrderDateCal = (Calendar) tomorrow.clone();
+                    newOrderDateCal.setTime(tomorrow.getTime());
                 }
                 Intent intent = new Intent(ctx, OrderActivity.class);
-                intent.putExtra("calYear", newOrderDateCal.get(Calendar.YEAR));
-                intent.putExtra("calMonth", newOrderDateCal.get(Calendar.MONTH));
-                intent.putExtra("calDate", newOrderDateCal.get(Calendar.DAY_OF_MONTH));
+                intent.putExtra("longDate", newOrderDateCal.getTimeInMillis());
                 startActivityForResult(intent, REQUEST_CODE_NEW_ORDER);
             } break;
             case R.id.settings: {
@@ -91,15 +88,15 @@ public class MainActivity extends AppCompatActivity {
                 startExchangeDataService();
             } break;
             case R.id.refresh_list: {
+                FormatsUtils.roundDayToStart(mainOrderDateCal);
+                viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
                 MainActivityPageFragment mainActivityPageFragment = (MainActivityPageFragment) getSupportFragmentManager().findFragmentById(R.id.main_pager);
-                FormatsUtils.roundDayToStart(orderDateCalendar);
-                viewPager.setCurrentItem(dateArrayList.indexOf(orderDateCalendar.getTime()));
-                mainActivityPageFragment.refreshOrdersList(true, orderDateCalendar);
+                mainActivityPageFragment.refreshOrdersList(true, mainOrderDateCal);
             } break;
             case R.id.return_today: {
-                orderDateCalendar = Calendar.getInstance();
-                FormatsUtils.roundDayToStart(orderDateCalendar);
-                viewPager.setCurrentItem(dateArrayList.indexOf(orderDateCalendar.getTime()));
+                mainOrderDateCal = Calendar.getInstance();
+                FormatsUtils.roundDayToStart(mainOrderDateCal);
+                viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
             } break;
             case R.id.about_app: {
                 Intent intent = new Intent(ctx,AboutActivity.class);
@@ -115,13 +112,13 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == REQUEST_CODE_NEW_ORDER) {
                 if (data.getExtras() != null) {
                     Long orderDateMillis = data.getExtras().getLong("orderDateMillis");
-                    orderDateCalendar.setTimeInMillis(orderDateMillis);
+                    mainOrderDateCal.setTimeInMillis(orderDateMillis);
                 }
-                FormatsUtils.roundDayToStart(orderDateCalendar);
-                viewPager.setCurrentItem(dateArrayList.indexOf(orderDateCalendar.getTime()));
+                FormatsUtils.roundDayToStart(mainOrderDateCal);
+                viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
                 MainActivityPageFragment mainActivityPageFragment = (MainActivityPageFragment) getSupportFragmentManager().findFragmentById(R.id.main_pager);
                 if (mainActivityPageFragment == null) return;
-                mainActivityPageFragment.refreshOrdersList(true, this.orderDateCalendar);
+                mainActivityPageFragment.refreshOrdersList(true, mainOrderDateCal);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -144,14 +141,14 @@ public class MainActivity extends AppCompatActivity {
             getActionBar().setSubtitle("Журнал заявок");
         }
     
-        orderDateCalendar = Calendar.getInstance();
+        mainOrderDateCal = Calendar.getInstance();
         if (savedInstanceState != null) {
             long dateMillis = savedInstanceState.getLong("orderDateLong");
-            orderDateCalendar.setTimeInMillis(dateMillis);
+            mainOrderDateCal.setTimeInMillis(dateMillis);
         }
-        FormatsUtils.roundDayToStart(orderDateCalendar);
+        FormatsUtils.roundDayToStart(mainOrderDateCal);
         
-        for (int i = -30; i <= SettingsUtils.Settings.getOrderDaysAhead(ctx); i++) {
+        for (int i = -SettingsUtils.Settings.getOrderLogDepth(ctx); i <= SettingsUtils.Settings.getOrderDaysAhead(ctx); i++) {
             Calendar nDate = Calendar.getInstance();
             nDate.add(Calendar.DATE, i);
             FormatsUtils.roundDayToStart(nDate);
@@ -160,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         
         viewPager = (ViewPager) findViewById(R.id.main_pager);
         viewPager.setAdapter(new MainActivityPagerAdapter(ctx, getSupportFragmentManager(), dateArrayList));
-        viewPager.setCurrentItem(dateArrayList.indexOf(orderDateCalendar.getTime()));
+        viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -169,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
     
             @Override
             public void onPageSelected(int position) {
-                orderDateCalendar.setTime(dateArrayList.get(position));
-                FormatsUtils.roundDayToStart(orderDateCalendar);
+                mainOrderDateCal.setTime(dateArrayList.get(position));
+                FormatsUtils.roundDayToStart(mainOrderDateCal);
             }
     
             @Override
@@ -189,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("orderDateLong", orderDateCalendar.getTimeInMillis());
+        outState.putLong("orderDateLong", mainOrderDateCal.getTimeInMillis());
     }
     
     private void startExchangeDataService() {

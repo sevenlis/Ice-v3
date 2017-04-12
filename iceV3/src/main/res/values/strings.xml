@@ -15,6 +15,8 @@
     <string name="pref_default_storehouse_title">Код склада</string>
     <string name="pref_order_days_ahead_summ">На сколько дней вперед можно резервировать заявки</string>
     <string name="pref_order_days_ahead_title">Ограничение даты заявок</string>
+    <string name="pref_order_log_depth_summ">Глубина журнала для просмотра прошлых заявок в днях</string>
+    <string name="pref_order_log_depth_title">Глубина журнала заявок</string>
     <string name="pref_notif_enable_summ">Оповещать об обновлениях БД (оповещения о заявках приходят в любом случае)</string>
     <string name="pref_notif_enable_title">Оповещения об обновлениях БД</string>
     <string name="pref_screen_sys_options_title">Системные настройки</string>

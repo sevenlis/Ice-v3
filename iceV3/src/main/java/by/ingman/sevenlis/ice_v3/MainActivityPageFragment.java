@@ -27,7 +27,7 @@ import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 public class MainActivityPageFragment extends Fragment {
     private Context ctx;
     
-    public Calendar orderDateCalendar;
+    public Calendar fragmentOrderDateCal;
     
     public static String[] advTypesStrings;
     public static String[] orderStatuses;
@@ -39,34 +39,35 @@ public class MainActivityPageFragment extends Fragment {
     ProgressBar progressBarLoad;
     LayoutInflater layoutInflater;
     
-    private Handler mHandler = new Handler();
+    private Handler mHandler;
     private ArrayList<Order> ordersList = new ArrayList<>();
     
     public static MainActivityPageFragment newInstance(Context context, Date date) {
         MainActivityPageFragment pageFragment = new MainActivityPageFragment();
         pageFragment.ctx = context;
-        pageFragment.orderDateCalendar = Calendar.getInstance();
-        pageFragment.orderDateCalendar.setTime(date);
-        FormatsUtils.roundDayToStart(pageFragment.orderDateCalendar);
+        pageFragment.fragmentOrderDateCal = Calendar.getInstance();
+        pageFragment.fragmentOrderDateCal.setTime(date);
+        FormatsUtils.roundDayToStart(pageFragment.fragmentOrderDateCal);
         return pageFragment;
     }
     
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (orderDateCalendar == null) {
-            orderDateCalendar = Calendar.getInstance();
+        if (fragmentOrderDateCal == null) {
+            fragmentOrderDateCal = Calendar.getInstance();
             if (savedInstanceState != null) {
                 long dateMillis = savedInstanceState.getLong("orderDateLong");
-                orderDateCalendar.setTimeInMillis(dateMillis);
+                fragmentOrderDateCal.setTimeInMillis(dateMillis);
             }
         }
+        mHandler = new Handler();
     }
     
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("orderDateLong", orderDateCalendar.getTimeInMillis());
+        outState.putLong("orderDateLong", fragmentOrderDateCal.getTimeInMillis());
     }
     
     @Override
@@ -115,7 +116,7 @@ public class MainActivityPageFragment extends Fragment {
                 }
                 
                 DBLocal dbLocalThread = new DBLocal(ctx);
-                ordersList = dbLocalThread.getOrdersList(orderDateCalendar);
+                ordersList = dbLocalThread.getOrdersList(fragmentOrderDateCal);
                 
                 if (showProgress) {
                     mHandler.post(new Runnable() {
@@ -138,8 +139,8 @@ public class MainActivityPageFragment extends Fragment {
     }
     
     public void refreshOrdersList(final Boolean showProgress, Calendar dateCalendar) {
-        orderDateCalendar = dateCalendar;
-        FormatsUtils.roundDayToStart(orderDateCalendar);
+        fragmentOrderDateCal = dateCalendar;
+        FormatsUtils.roundDayToStart(fragmentOrderDateCal);
         refreshOrdersList(showProgress);
     }
     

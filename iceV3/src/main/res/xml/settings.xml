@@ -17,10 +17,19 @@
     <EditTextPreference
         android:defaultValue="10"
         android:key="orderDaysAhead"
-        android:summary="@string/pref_order_days_ahead_summ"
         android:title="@string/pref_order_days_ahead_title"
+        android:summary="@string/pref_order_days_ahead_summ"
         android:inputType="number"
         android:id="@+id/orderDaysAheadRestrict"
+        />
+
+    <EditTextPreference
+        android:defaultValue="30"
+        android:key="orderLogDepth"
+        android:title="@string/pref_order_log_depth_title"
+        android:summary="@string/pref_order_log_depth_summ"
+        android:inputType="number"
+        android:id="@+id/orderLogDepth"
         />
 
     <CheckBoxPreference

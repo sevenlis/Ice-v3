@@ -6,20 +6,23 @@
                 android:layout_height="match_parent"
                 tools:context="by.ingman.sevenlis.ice_v3.OrderActivity"
                 android:orientation="vertical">
+
     <RelativeLayout
+        android:id="@+id/rlDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/rlDate"
-        android:background="@android:color/darker_gray">
+        >
 
         <TextView
-            android:text="Дата заявки"
+            android:id="@+id/textViewDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewDate"
-            android:textSize="18sp"
-            android:layout_centerInParent="true"
-            android:textColor="@color/colorPrimaryDark" />
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="false"
+            android:layout_marginRight="@dimen/default_gap"
+            android:text="Дата заявки"
+            android:textColor="@color/dark_grey"
+            android:textSize="14sp"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -43,16 +46,16 @@
             android:background="@color/light_grey"/>
 
         <TextView
-            android:text="Контрагент:"
+            android:id="@+id/textView_contr_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/textView_contr_label"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:onClick="onClick"
             android:background="@color/light_grey"
-            android:layout_marginTop="@dimen/margin_4dp"/>
+            android:onClick="onClick"
+            android:text="Контрагент:"
+            />
 
         <TextView
             android:text="Выберите контрагента"
