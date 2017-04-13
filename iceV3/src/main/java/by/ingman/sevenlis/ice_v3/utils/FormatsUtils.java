@@ -7,7 +7,7 @@ import java.util.Locale;
 
 public class FormatsUtils {
     public static String getDateFormatted(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy г.",Locale.ROOT);
+        SimpleDateFormat sdf = new SimpleDateFormat("E. dd.MM.yyyy г.",Locale.getDefault());
         return sdf.format(date);
         /*return  String.format(Locale.ROOT, "%02d", date.getDate()) + "." +
                 String.format(Locale.ROOT, "%02d", date.getMonth() + 1)    + "." +
@@ -15,12 +15,12 @@ public class FormatsUtils {
     }
 
     public static String getDateFormatted(Date date, String formatString) {
-        SimpleDateFormat sdf = new SimpleDateFormat(formatString,Locale.ROOT);
+        SimpleDateFormat sdf = new SimpleDateFormat(formatString,Locale.getDefault());
         return sdf.format(date);
     }
 
     public static String getDateFormattedWithSeconds(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss",Locale.ROOT);
+        SimpleDateFormat sdf = new SimpleDateFormat("E. dd.MM.yyyy HH:mm:ss",Locale.getDefault());
         return sdf.format(date);
         /*return  String.format(Locale.ROOT, "%02d", date.getDate()) + "." +
                 String.format(Locale.ROOT, "%02d", date.getMonth() + 1)    + "." +
@@ -31,7 +31,7 @@ public class FormatsUtils {
     }
 
     public static String getNumberFormatted(double number, int num) {
-        return String.format(Locale.ROOT,"%8." + String.valueOf(num) + "f",number);
+        return String.format(Locale.getDefault(),"%8." + String.valueOf(num) + "f",number);
     }
 
     public static Calendar roundDayToStart(Calendar c) {

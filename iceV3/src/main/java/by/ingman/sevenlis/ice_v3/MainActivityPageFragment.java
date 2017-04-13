@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.PagerTabStrip;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +97,7 @@ public class MainActivityPageFragment extends Fragment {
         
         orderStatuses = getResources().getStringArray(R.array.order_statuses);
         advTypesStrings = getResources().getStringArray(R.array.adv_types_strings);
-        
+    
         refreshOrdersList(true);
     
         return resultView;

@@ -11,13 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v4.view.PagerTabStrip
+        <by.ingman.sevenlis.ice_v3.classes.CustomPagerTabStrip
             android:id="@+id/pager_title_strip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:background="@color/light_grey">
-        </android.support.v4.view.PagerTabStrip>
+        </by.ingman.sevenlis.ice_v3.classes.CustomPagerTabStrip>
 
     </android.support.v4.view.ViewPager>
 
