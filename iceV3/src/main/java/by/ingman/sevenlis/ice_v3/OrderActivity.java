@@ -1,8 +1,10 @@
 package by.ingman.sevenlis.ice_v3;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -443,7 +445,31 @@ public class OrderActivity extends AppCompatActivity {
 
         return v;
     }
-
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+    
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+            .setTitle("Заявка не сохранена.")
+            .setMessage("Выйти без сохранения заявки?")
+            .setNegativeButton(android.R.string.no, null)
+            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface arg0, int arg1) {
+                    OrderActivity.super.onBackPressed();
+                }
+            }).create().show();
+    }
+    
+    
     private class CustomListViewAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;

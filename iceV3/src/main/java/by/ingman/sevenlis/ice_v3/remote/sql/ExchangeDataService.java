@@ -27,6 +27,7 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class ExchangeDataService extends IntentService {
     public static final String CHANNEL = "by.ingman.sevenlis.ice_v3." + ExchangeDataService.class.getSimpleName() + ".broadcastChannel";
+    public static final String CHANNEL_ORDERS_UPDATES = "by.ingman.sevenlis.ice_v3." + ExchangeDataService.class.getSimpleName() + ".broadcastOrdersUpdatesChannel";
     public static final String MESSAGE_ON_BROADCAST_KEY = ".ExchangeDataService.message_on_broadcast_key";
 
     private DBHelper dbHelper;
@@ -99,8 +100,8 @@ public class ExchangeDataService extends IntentService {
         SettingsUtils.Runtime.setUpdateInProgress(this,false);
     }
 
-    private void sendBroadcastMessage(String messageBroadcast) {
-        Intent intent = new Intent(CHANNEL);
+    private void sendBroadcastMessage(String channel, String messageBroadcast) {
+        Intent intent = new Intent(channel);
         intent.putExtra(MESSAGE_ON_BROADCAST_KEY,messageBroadcast);
 
         sendBroadcast(intent);
@@ -194,7 +195,7 @@ public class ExchangeDataService extends IntentService {
         }
         dbw.close();
 
-        sendBroadcastMessage(messageOnBroadcast);
+        sendBroadcastMessage(CHANNEL, messageOnBroadcast);
 
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
@@ -291,7 +292,7 @@ public class ExchangeDataService extends IntentService {
         }
         dbw.close();
 
-        sendBroadcastMessage(messageOnBroadcast);
+        sendBroadcastMessage(CHANNEL, messageOnBroadcast);
 
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
@@ -388,7 +389,7 @@ public class ExchangeDataService extends IntentService {
         }
         dbw.close();
 
-        sendBroadcastMessage(messageOnBroadcast);
+        sendBroadcastMessage(CHANNEL, messageOnBroadcast);
 
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
@@ -475,7 +476,7 @@ public class ExchangeDataService extends IntentService {
             dbLocal.setUnsetOrdersAsSent(orderUnsentList);
         }
 
-        sendBroadcastMessage(messageOnBroadcast);
+        sendBroadcastMessage(CHANNEL_ORDERS_UPDATES, messageOnBroadcast);
 
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
@@ -536,7 +537,7 @@ public class ExchangeDataService extends IntentService {
         //notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ANSWERS_ID);
 
         if (answersReceived) {
-            sendBroadcastMessage("Ответы на заявки получены");
+            sendBroadcastMessage(CHANNEL_ORDERS_UPDATES, "Ответы на заявки получены");
             notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ANSWERS_ID, "Получен ответ", "Получены ответы на отправленные заявки");
         }
 

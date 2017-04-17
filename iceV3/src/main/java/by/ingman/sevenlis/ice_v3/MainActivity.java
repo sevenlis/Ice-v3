@@ -30,19 +30,18 @@ public class MainActivity extends AppCompatActivity {
     private static ExchangeDataIntents exchangeDataIntents;
     private static CheckApkUpdate chkApkUpdate;
     
-    NotificationsUtil notifUtils;
-    ArrayList<Date> dateArrayList = new ArrayList<>();
-    ViewPager viewPager;
-    CustomPagerTabStrip customPagerTabStrip;
-    Calendar mainOrderDateCal = Calendar.getInstance();
+    private NotificationsUtil notifUtils;
+    private ViewPager viewPager;
+    private CustomPagerTabStrip customPagerTabStrip;
+    private Calendar mainOrderDateCal = Calendar.getInstance();
+    private static ArrayList<Date> dateArrayList = new ArrayList<>();
+    private static ArrayList<MainActivityPageFragment> fragmentArrayList = new ArrayList<>();
     
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ExchangeDataService.CHANNEL)) {
-                MainActivityPageFragment mainActivityPageFragment = (MainActivityPageFragment) getSupportFragmentManager().findFragmentById(R.id.main_pager);
-                if (mainActivityPageFragment == null) return;
-                mainActivityPageFragment.refreshOrdersList(false, mainOrderDateCal);
+            if (intent.getAction().equals(ExchangeDataService.CHANNEL_ORDERS_UPDATES)) {
+                refreshCurrentFragment();
             }
         }
     };
@@ -74,44 +73,33 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(ctx, OrderActivity.class);
                 intent.putExtra("longDate", newOrderDateCal.getTimeInMillis());
                 startActivityForResult(intent, REQUEST_CODE_NEW_ORDER);
-            }
-            break;
+            } break;
             case R.id.settings: {
                 Intent intent = new Intent(ctx, SettingsActivity.class);
                 startActivity(intent);
-            }
-            break;
+            } break;
             case R.id.update_data: {
                 Intent intent = new Intent(ctx, UpdateDataActivity.class);
                 startActivity(intent);
-            }
-            break;
+            } break;
             case R.id.stopExchangeData: {
                 stopExchangeDataService();
-            }
-            break;
+            } break;
             case R.id.startExchangeData: {
                 startExchangeDataService();
-            }
-            break;
+            }  break;
             case R.id.refresh_list: {
-                FormatsUtils.roundDayToStart(mainOrderDateCal);
-                viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
-                MainActivityPageFragment mainActivityPageFragment = (MainActivityPageFragment) getSupportFragmentManager().findFragmentById(R.id.main_pager);
-                mainActivityPageFragment.refreshOrdersList(true, mainOrderDateCal);
-            }
-            break;
+                refreshCurrentFragment();
+            } break;
             case R.id.return_today: {
                 mainOrderDateCal = Calendar.getInstance();
                 FormatsUtils.roundDayToStart(mainOrderDateCal);
                 viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
-            }
-            break;
+            } break;
             case R.id.about_app: {
                 Intent intent = new Intent(ctx, AboutActivity.class);
                 startActivity(intent);
-            }
-            break;
+            } break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -124,11 +112,7 @@ public class MainActivity extends AppCompatActivity {
                     Long orderDateMillis = data.getExtras().getLong("orderDateMillis");
                     mainOrderDateCal.setTimeInMillis(orderDateMillis);
                 }
-                FormatsUtils.roundDayToStart(mainOrderDateCal);
-                viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
-                MainActivityPageFragment mainActivityPageFragment = (MainActivityPageFragment) getSupportFragmentManager().findFragmentById(R.id.main_pager);
-                if (mainActivityPageFragment == null) return;
-                mainActivityPageFragment.refreshOrdersList(true, mainOrderDateCal);
+                refreshCurrentFragment();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -163,10 +147,18 @@ public class MainActivity extends AppCompatActivity {
             nDate.add(Calendar.DATE, i);
             FormatsUtils.roundDayToStart(nDate);
             dateArrayList.add(nDate.getTime());
+    
+            MainActivityPageFragment fragment = new MainActivityPageFragment();
+            fragment.fragmentOrderDateCal = Calendar.getInstance();
+            fragment.fragmentOrderDateCal.setTimeInMillis(nDate.getTimeInMillis());
+            FormatsUtils.roundDayToStart(fragment.fragmentOrderDateCal);
+            fragmentArrayList.add(fragment);
         }
+    
+        MainActivityPagerAdapter mainActivityPagerAdapter = new MainActivityPagerAdapter(getSupportFragmentManager(), fragmentArrayList, dateArrayList);
         
         viewPager = (ViewPager) findViewById(R.id.main_pager);
-        viewPager.setAdapter(new MainActivityPagerAdapter(ctx, getSupportFragmentManager(), dateArrayList));
+        viewPager.setAdapter(mainActivityPagerAdapter);
         viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -196,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
             customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(mainOrderDateCal));
         }
     
-        registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL));
+        registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
         
         startService(new Intent(ctx, CheckApkUpdate.class));
         
@@ -228,4 +220,13 @@ public class MainActivity extends AppCompatActivity {
         chkApkUpdate.cancelUpdateAvailableNotification();
         super.onDestroy();
     }
+    
+    private void refreshCurrentFragment() {
+        FormatsUtils.roundDayToStart(mainOrderDateCal);
+        MainActivityPageFragment mainActivityPageFragment = fragmentArrayList.get(dateArrayList.indexOf(mainOrderDateCal.getTime()));
+        if (mainActivityPageFragment == null) return;
+        mainActivityPageFragment.refreshOrdersList(true, mainOrderDateCal);
+        viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
+    }
+    
 }
