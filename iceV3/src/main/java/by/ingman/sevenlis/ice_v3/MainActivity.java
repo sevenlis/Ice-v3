@@ -149,9 +149,7 @@ public class MainActivity extends AppCompatActivity {
             dateArrayList.add(nDate.getTime());
     
             MainActivityPageFragment fragment = new MainActivityPageFragment();
-            fragment.fragmentOrderDateCal = Calendar.getInstance();
-            fragment.fragmentOrderDateCal.setTimeInMillis(nDate.getTimeInMillis());
-            FormatsUtils.roundDayToStart(fragment.fragmentOrderDateCal);
+            fragment.setFragmentOrderDateCal(nDate);
             fragmentArrayList.add(fragment);
         }
     

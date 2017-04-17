@@ -22,17 +22,17 @@ import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class MainActivityPageFragment extends Fragment {
-    Context ctx;
-    Calendar fragmentOrderDateCal;
-    ListView listViewOrders;
-    View footerNoAdv;
-    View footerIsAdv;
-    View footerSummary;
-    ProgressBar progressBarLoad;
-    LayoutInflater layoutInflater;
-    CustomOrderListAdapter customOrderListAdapter;
-    Handler mHandler;
-    ArrayList<Order> ordersList;
+    private Context ctx;
+    private Calendar fragmentOrderDateCal;
+    private ListView listViewOrders;
+    private View footerNoAdv;
+    private View footerIsAdv;
+    private View footerSummary;
+    private ProgressBar progressBarLoad;
+    private LayoutInflater layoutInflater;
+    private Handler mHandler;
+    private CustomOrderListAdapter customOrderListAdapter;
+    private ArrayList<Order> ordersList;
     
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -146,6 +146,11 @@ public class MainActivityPageFragment extends Fragment {
             listViewOrders.addFooterView(footerIsAdv,null,false);
             listViewOrders.addFooterView(footerSummary,null,false);
         }
+    }
+    
+    public void setFragmentOrderDateCal(Calendar fragmentOrderDateCal) {
+        this.fragmentOrderDateCal = fragmentOrderDateCal;
+        FormatsUtils.roundDayToStart(this.fragmentOrderDateCal);
     }
     
     private void viewOrder(Order order) {
