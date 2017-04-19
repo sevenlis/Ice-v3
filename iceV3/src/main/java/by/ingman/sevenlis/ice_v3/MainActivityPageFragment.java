@@ -23,7 +23,7 @@ import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class MainActivityPageFragment extends Fragment {
     private Context ctx;
-    private Calendar fragmentOrderDateCal;
+    private Calendar orderDateCal;
     private ListView listViewOrders;
     private View footerNoAdv;
     private View footerIsAdv;
@@ -37,12 +37,12 @@ public class MainActivityPageFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (fragmentOrderDateCal == null) {
-            fragmentOrderDateCal = Calendar.getInstance();
+        if (orderDateCal == null) {
+            orderDateCal = Calendar.getInstance();
         }
         if (savedInstanceState != null) {
             long dateMillis = savedInstanceState.getLong("orderDateLong");
-            fragmentOrderDateCal.setTimeInMillis(dateMillis);
+            orderDateCal.setTimeInMillis(dateMillis);
         }
         ctx                     = getActivity().getApplicationContext();
         mHandler                = new Handler();
@@ -57,7 +57,7 @@ public class MainActivityPageFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("orderDateLong", fragmentOrderDateCal.getTimeInMillis());
+        outState.putLong("orderDateLong", orderDateCal.getTimeInMillis());
     }
     
     @Override
@@ -103,7 +103,7 @@ public class MainActivityPageFragment extends Fragment {
                 }
                 
                 DBLocal dbLocalThread = new DBLocal(ctx);
-                final ArrayList<Order> newOrdersList = dbLocalThread.getOrdersList(fragmentOrderDateCal);
+                final ArrayList<Order> newOrdersList = dbLocalThread.getOrdersList(orderDateCal);
                 
                 if (showProgress) {
                     mHandler.post(new Runnable() {
@@ -127,12 +127,6 @@ public class MainActivityPageFragment extends Fragment {
         }).start();
     }
     
-    public void refreshOrdersList(final Boolean showProgress, Calendar dateCalendar) {
-        fragmentOrderDateCal = dateCalendar;
-        FormatsUtils.roundDayToStart(fragmentOrderDateCal);
-        refreshOrdersList(showProgress);
-    }
-    
     public void refreshOrdersListView() {
         listViewOrders.removeFooterView(footerNoAdv);
         listViewOrders.removeFooterView(footerIsAdv);
@@ -148,9 +142,13 @@ public class MainActivityPageFragment extends Fragment {
         }
     }
     
-    public void setFragmentOrderDateCal(Calendar fragmentOrderDateCal) {
-        this.fragmentOrderDateCal = fragmentOrderDateCal;
-        FormatsUtils.roundDayToStart(this.fragmentOrderDateCal);
+    public void setOrderDateCal(Calendar orderDateCal) {
+        this.orderDateCal = orderDateCal;
+        FormatsUtils.roundDayToStart(this.orderDateCal);
+    }
+    
+    public Calendar getOrderDateCal() {
+        return this.orderDateCal;
     }
     
     private void viewOrder(Order order) {

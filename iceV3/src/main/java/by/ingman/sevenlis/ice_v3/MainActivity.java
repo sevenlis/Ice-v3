@@ -12,7 +12,6 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import by.ingman.sevenlis.ice_v3.classes.CustomPagerTabStrip;
 import by.ingman.sevenlis.ice_v3.classes.ExchangeDataIntents;
@@ -33,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
     private NotificationsUtil notifUtils;
     private ViewPager viewPager;
     private CustomPagerTabStrip customPagerTabStrip;
-    private Calendar mainOrderDateCal = Calendar.getInstance();
-    private static ArrayList<Date> dateArrayList = new ArrayList<>();
+    private MainActivityPageFragment currentFragment;
     private static ArrayList<MainActivityPageFragment> fragmentArrayList = new ArrayList<>();
+    
     
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -50,22 +49,32 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         menu.setGroupVisible(R.id.exchangeServiceMenuGroup, false);
-        /*MenuItem menuItem = menu.findItem(R.id.add_order);
-        menuItem.setIcon(android.R.drawable.ic_input_add)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);*/
         return super.onCreateOptionsMenu(menu);
+    }
+    
+    private MainActivityPageFragment findMainActivityFragment(Calendar orderDateCal) {
+        FormatsUtils.roundDayToStart(orderDateCal);
+        
+        MainActivityPageFragment fragment = currentFragment;
+        for (MainActivityPageFragment fr : fragmentArrayList) {
+            if (fr.getOrderDateCal().getTimeInMillis() == orderDateCal.getTimeInMillis()) {
+                fragment = fr;
+                break;
+            }
+        }
+        return fragment;
     }
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_order: {
-                Calendar newOrderDateCal = mainOrderDateCal;
+                Calendar newOrderDateCal = currentFragment.getOrderDateCal();
                 
                 Calendar nowStart = Calendar.getInstance();
                 FormatsUtils.roundDayToStart(nowStart);
                 
-                if (nowStart.getTimeInMillis() > mainOrderDateCal.getTimeInMillis()) {
+                if (nowStart.getTimeInMillis() > newOrderDateCal.getTimeInMillis()) {
                     Calendar tomorrow = Calendar.getInstance();
                     tomorrow.add(Calendar.DATE, 1);
                     newOrderDateCal.setTime(tomorrow.getTime());
@@ -92,9 +101,8 @@ public class MainActivity extends AppCompatActivity {
                 refreshCurrentFragment();
             } break;
             case R.id.return_today: {
-                mainOrderDateCal = Calendar.getInstance();
-                FormatsUtils.roundDayToStart(mainOrderDateCal);
-                viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
+                currentFragment = findMainActivityFragment(Calendar.getInstance());
+                viewPager.setCurrentItem(fragmentArrayList.indexOf(currentFragment));
             } break;
             case R.id.about_app: {
                 Intent intent = new Intent(ctx, AboutActivity.class);
@@ -108,10 +116,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE_NEW_ORDER) {
-                if (data.getExtras() != null) {
-                    Long orderDateMillis = data.getExtras().getLong("orderDateMillis");
-                    mainOrderDateCal.setTimeInMillis(orderDateMillis);
-                }
                 refreshCurrentFragment();
             }
         }
@@ -134,30 +138,32 @@ public class MainActivity extends AppCompatActivity {
             getActionBar().setTitle(R.string.app_name);
             getActionBar().setSubtitle("Журнал заявок");
         }
+    
+        Calendar now = Calendar.getInstance();
+        FormatsUtils.roundDayToStart(now);
         
-        mainOrderDateCal = Calendar.getInstance();
-        if (savedInstanceState != null) {
-            long dateMillis = savedInstanceState.getLong("orderDateLong");
-            mainOrderDateCal.setTimeInMillis(dateMillis);
-        }
-        FormatsUtils.roundDayToStart(mainOrderDateCal);
+        currentFragment = new MainActivityPageFragment();
+        currentFragment.setOrderDateCal(now);
         
         for (int i = -SettingsUtils.Settings.getOrderLogDepth(ctx); i <= SettingsUtils.Settings.getOrderDaysAhead(ctx); i++) {
             Calendar nDate = Calendar.getInstance();
             nDate.add(Calendar.DATE, i);
             FormatsUtils.roundDayToStart(nDate);
-            dateArrayList.add(nDate.getTime());
     
             MainActivityPageFragment fragment = new MainActivityPageFragment();
-            fragment.setFragmentOrderDateCal(nDate);
+            fragment.setOrderDateCal(nDate);
             fragmentArrayList.add(fragment);
+            
+            if (nDate.getTimeInMillis() == now.getTimeInMillis()) {
+                currentFragment = fragment;
+            }
         }
     
-        MainActivityPagerAdapter mainActivityPagerAdapter = new MainActivityPagerAdapter(getSupportFragmentManager(), fragmentArrayList, dateArrayList);
+        MainActivityPagerAdapter mainActivityPagerAdapter = new MainActivityPagerAdapter(getSupportFragmentManager(), fragmentArrayList);
         
         viewPager = (ViewPager) findViewById(R.id.main_pager);
         viewPager.setAdapter(mainActivityPagerAdapter);
-        viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
+        viewPager.setCurrentItem(fragmentArrayList.indexOf(currentFragment));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -166,11 +172,10 @@ public class MainActivity extends AppCompatActivity {
     
             @Override
             public void onPageSelected(int position) {
-                mainOrderDateCal.setTime(dateArrayList.get(position));
-                FormatsUtils.roundDayToStart(mainOrderDateCal);
+                currentFragment = fragmentArrayList.get(position);
                 if (customPagerTabStrip != null) {
-                    customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(mainOrderDateCal));
-                    customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(mainOrderDateCal));
+                    customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
+                    customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
                 }
             }
     
@@ -182,8 +187,8 @@ public class MainActivity extends AppCompatActivity {
     
         customPagerTabStrip = (CustomPagerTabStrip) findViewById(R.id.pager_title_strip);
         if (customPagerTabStrip != null) {
-            customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(mainOrderDateCal));
-            customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(mainOrderDateCal));
+            customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
+            customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
         }
     
         registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
@@ -196,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("orderDateLong", mainOrderDateCal.getTimeInMillis());
     }
     
     private void startExchangeDataService() {
@@ -220,11 +224,8 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void refreshCurrentFragment() {
-        FormatsUtils.roundDayToStart(mainOrderDateCal);
-        MainActivityPageFragment mainActivityPageFragment = fragmentArrayList.get(dateArrayList.indexOf(mainOrderDateCal.getTime()));
-        if (mainActivityPageFragment == null) return;
-        mainActivityPageFragment.refreshOrdersList(true, mainOrderDateCal);
-        viewPager.setCurrentItem(dateArrayList.indexOf(mainOrderDateCal.getTime()));
+        if (currentFragment == null) return;
+        currentFragment.refreshOrdersList(true);
     }
     
 }
