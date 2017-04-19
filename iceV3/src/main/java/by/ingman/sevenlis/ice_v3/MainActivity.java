@@ -116,6 +116,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE_NEW_ORDER) {
+                if (data.getExtras() != null) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(data.getExtras().getLong("orderDateMillis"));
+                    FormatsUtils.roundDayToStart(cal);
+                    currentFragment = findMainActivityFragment(cal);
+                    viewPager.setCurrentItem(fragmentArrayList.indexOf(currentFragment));
+                }
                 refreshCurrentFragment();
             }
         }

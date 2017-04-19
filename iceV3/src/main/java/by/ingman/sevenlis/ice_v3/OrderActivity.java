@@ -1,5 +1,6 @@
 package by.ingman.sevenlis.ice_v3;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -33,6 +35,7 @@ import by.ingman.sevenlis.ice_v3.classes.Product;
 import by.ingman.sevenlis.ice_v3.classes.Storehouse;
 import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
+import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class OrderActivity extends AppCompatActivity {
     public static final int SELECT_CONTRAGENTS_REQUEST_CODE = 0;
@@ -42,12 +45,13 @@ public class OrderActivity extends AppCompatActivity {
     public static final int LIST_ITEM_CONTEXT_MENU_DEL = 3;
     public static final int LIST_ITEM_CONTEXT_MENU_CHANGE = 5;
     private static final int OPTIONS_MENU_ADD_ORDER_ITEM_ID = 0;
+    private static final int OPTIONS_MENU_SET_ORDER_DATE_ITEM_ID = 1;
     private Context ctx;
     Order mOrder;
     Spinner advTypesSpinner;
     CheckBox isAdvCheckBox;
     Calendar orderDateCalendar;
-    //DatePickerDialog.OnDateSetListener onDateSetListener;
+    DatePickerDialog.OnDateSetListener onDateSetListener;
     TextView textViewOrderDate;
     Contragent mContragent;
     Point mPoint;
@@ -60,11 +64,42 @@ public class OrderActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem menuItem;
+        
+        menu.add(0,OPTIONS_MENU_SET_ORDER_DATE_ITEM_ID,Menu.NONE,"DATE");
+        menuItem = menu.findItem(OPTIONS_MENU_SET_ORDER_DATE_ITEM_ID);
+        menuItem.setIcon(R.drawable.ic_date_range_white)
+                .setTitle("ДАТА")
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Calendar cal = Calendar.getInstance();
+                DatePickerDialog dateDialog = new DatePickerDialog(ctx, onDateSetListener,
+                        cal.get(Calendar.YEAR),
+                        cal.get(Calendar.MONTH),
+                        cal.get(Calendar.DAY_OF_MONTH));
+    
+                DatePicker datePicker = dateDialog.getDatePicker();
+                datePicker.setCalendarViewShown(false);
+                Calendar nowDate = FormatsUtils.roundDayToStart(Calendar.getInstance());
+                Calendar maxDate = FormatsUtils.roundDayToEnd(Calendar.getInstance());
+                maxDate.add(Calendar.DATE, SettingsUtils.Settings.getOrderDaysAhead(ctx));
+                datePicker.setMinDate(nowDate.getTimeInMillis());
+                datePicker.setMaxDate(maxDate.getTimeInMillis());
+    
+                dateDialog.show();
+                
+                return false;
+            }
+        });
+        
         menu.add(0,OPTIONS_MENU_ADD_ORDER_ITEM_ID,Menu.NONE,"ADD");
-        MenuItem menuItem = menu.findItem(OPTIONS_MENU_ADD_ORDER_ITEM_ID);
+        menuItem = menu.findItem(OPTIONS_MENU_ADD_ORDER_ITEM_ID);
         menuItem.setIcon(R.drawable.ic_add_circle_outline_white)
                 .setTitle("ДОБАВИТЬ")
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -110,33 +145,13 @@ public class OrderActivity extends AppCompatActivity {
         }
 
         textViewOrderDate = (TextView) findViewById(R.id.textViewDate);
-        /*textViewOrderDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar cal = Calendar.getInstance();
-                DatePickerDialog dateDialog = new DatePickerDialog(ctx, onDateSetListener,
-                        cal.get(Calendar.YEAR),
-                        cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH));
-
-                DatePicker datePicker = dateDialog.getDatePicker();
-                datePicker.setCalendarViewShown(false);
-                Calendar nowDate = FormatsUtils.roundDayToStart(Calendar.getInstance());
-                Calendar maxDate = FormatsUtils.roundDayToEnd(Calendar.getInstance());
-                maxDate.add(Calendar.DATE, SettingsUtils.Settings.getOrderDaysAhead(ctx));
-                datePicker.setMinDate(nowDate.getTimeInMillis());
-                datePicker.setMaxDate(maxDate.getTimeInMillis());
-
-                dateDialog.show();
-            }
-        });*/
 
         textViewOrderDateRefresh();
 
         footerSummary = createFooterSummary();
         footerSubmit = createFooterSubmit();
 
-        /*onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+        onDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
                 if (orderDateCalendar == null) {
@@ -145,7 +160,7 @@ public class OrderActivity extends AppCompatActivity {
                 orderDateCalendar.set(year, monthOfYear, dayOfMonth);
                 textViewOrderDateRefresh();
             }
-        };*/
+        };
 
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
