@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         currentFragment = new MainActivityPageFragment();
         currentFragment.setOrderDateCal(now);
         
+        MainActivity.fragmentArrayList.clear();
         for (int i = -SettingsUtils.Settings.getOrderLogDepth(ctx); i <= SettingsUtils.Settings.getOrderDaysAhead(ctx); i++) {
             Calendar nDate = Calendar.getInstance();
             nDate.add(Calendar.DATE, i);
@@ -164,6 +165,12 @@ public class MainActivity extends AppCompatActivity {
             if (nDate.getTimeInMillis() == now.getTimeInMillis()) {
                 currentFragment = fragment;
             }
+        }
+    
+        if (savedInstanceState != null) {
+            long dateMillis = savedInstanceState.getLong("orderDateLong");
+            now.setTimeInMillis(dateMillis);
+            currentFragment = findMainActivityFragment(now);
         }
     
         MainActivityPagerAdapter mainActivityPagerAdapter = new MainActivityPagerAdapter(getSupportFragmentManager(), fragmentArrayList);
@@ -208,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putLong("currentDateMillis",currentFragment.getOrderDateCal().getTimeInMillis());
     }
     
     private void startExchangeDataService() {
