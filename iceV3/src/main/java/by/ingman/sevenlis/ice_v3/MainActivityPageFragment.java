@@ -1,5 +1,6 @@
 package by.ingman.sevenlis.ice_v3;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ public class MainActivityPageFragment extends Fragment {
     private CustomOrderListAdapter customOrderListAdapter;
     private ArrayList<Order> ordersList;
     
+    @SuppressLint("RestrictedApi")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

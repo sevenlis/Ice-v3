@@ -24,7 +24,7 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 public class MainActivity extends AppCompatActivity {
     private Context ctx;
     
-    private final int REQUEST_CODE_NEW_ORDER = 0;
+    private static final int REQUEST_CODE_NEW_ORDER = 0;
     
     private static ExchangeDataIntents exchangeDataIntents;
     private static CheckApkUpdate chkApkUpdate;

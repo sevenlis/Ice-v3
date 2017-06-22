@@ -18,7 +18,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:text="Дата заявки"
+            android:text="@string/order_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewOrderDate"
@@ -27,7 +27,7 @@
             android:layout_weight="1.25"/>
 
         <TextView
-            android:text="Status"
+            android:text="@string/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewStatus"
@@ -39,28 +39,28 @@
     </LinearLayout>
 
     <TextView
-        android:text="Контрагент:"
+        android:text="@string/contragent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewClientLabel"
         android:textSize="12sp"/>
 
     <TextView
-        android:text="Наименование контрагента"
+        android:text="@string/contragent_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewClientName"
         android:textSize="16sp"/>
 
     <TextView
-        android:text="Пункт разгрузки:"
+        android:text="@string/salepoint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewPointLabel"
         android:textSize="12sp"/>
 
     <TextView
-        android:text="Наименование разгрузки"
+        android:text="@string/salepoint_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewPointName"
@@ -73,7 +73,7 @@
         android:background="?attr/colorButtonNormal">
 
         <TextView
-            android:text="Реклама: НЕТ"
+            android:text="@string/advertising_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewIsAdv"
@@ -82,7 +82,7 @@
             android:textAlignment="center"/>
 
         <TextView
-            android:text="Обычная"
+            android:text="@string/regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewAdvType"

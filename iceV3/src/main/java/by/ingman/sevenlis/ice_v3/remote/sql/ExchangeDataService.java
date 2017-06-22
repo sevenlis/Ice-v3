@@ -36,7 +36,7 @@ public class ExchangeDataService extends IntentService {
 
     private static boolean isConnected;
 
-    public ExchangeDataService() { super("ExchangeDataService"); }
+    public ExchangeDataService() { super(ExchangeDataService.class.getSimpleName()); }
 
     @Override
     public void onCreate() {

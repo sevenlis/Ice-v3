@@ -20,55 +20,14 @@
         android:layout_centerHorizontal="true"
         android:textAlignment="center" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/linProgress"
-        android:layout_below="@+id/textViewInfo"
-        android:layout_marginTop="@dimen/default_gap"
-        android:layout_marginBottom="@dimen/default_gap">
-
-        <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:layout_below="@+id/textViewInfo"
-            />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:text="0 %"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewProgressPercent"
-                android:layout_weight="1"
-                />
-
-            <TextView
-                android:text="100 / 100"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewProgressValue"
-                android:textAlignment="viewEnd"
-                android:layout_gravity="end"
-                android:gravity="end"/>
-        </LinearLayout>
-    </LinearLayout>
-
     <TextView
-        android:text="В зависимости от скорости соединения с сетью может занимать продолжительное время."
+        android:id="@+id/textViewInfo2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/linProgress"
-        android:id="@+id/textViewInfo2"
+        android:layout_below="@+id/textViewInfo"
+        android:text="В зависимости от скорости соединения с сетью может занимать продолжительное время."
         android:textAlignment="center"
-        android:textColor="@color/color_red" />
+        android:textColor="@color/color_red"/>
 
     <Button
         android:id="@+id/buttonRests"

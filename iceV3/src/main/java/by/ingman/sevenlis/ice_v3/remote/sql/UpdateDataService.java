@@ -35,13 +35,7 @@ public class UpdateDataService extends IntentService {
     public static final int EXTRA_ACTION_SEND_MESSAGE = 3;
     public static final String MESSAGE_ON_BROADCAST_KEY = ".UpdateDataService.message_on_broadcast_key";
 
-    public static final int EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE = 5;
-    public static final String EXTRA_PROGRESS_TOTAL_VALUE_KEY = ".UpdateDataService.progress_total_value_key";
-    public static final String EXTRA_PROGRESS_INCREMENT_VALUE_KEY = ".UpdateDataService.progress_increment_value_key";
-    public static final String EXTRA_PROGRESS_CURRENT_VALUE_KEY = ".UpdateDataService.progress_current_value_key";
-
     public static final String EXTRA_ACTION_COMPLETE_KEY = ".UpdateDataService.action_complete_key";
-    public static final String EXTRA_ACTION_STARTED_KEY = ".UpdateDataService.action_started_key";
 
     private NotificationsUtil notifUtils;
 
@@ -111,29 +105,12 @@ public class UpdateDataService extends IntentService {
     }
 
     private void updateAllContragentsFromRemote() throws SQLException {
-        Intent extraIntent = new Intent(CHANNEL);
-        int rsSize = 0;
-        int rsCount = 0;
-        double curProgress = 0;
-
+        notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
+    
         ArrayList<ContentValues> clientsList = new ArrayList<>();
         Connection conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
-            extraIntent.putExtra(EXTRA_ACTION_STARTED_KEY,true);
-            sendBroadcast(extraIntent);
-            extraIntent.putExtra(EXTRA_ACTION_STARTED_KEY,false);
             try {
-                PreparedStatement stat_count = conn.prepareStatement("SELECT COUNT(*) as count_rs FROM clients");
-                ResultSet rs_count = stat_count.executeQuery();
-
-                if (rs_count.next()) {
-                    rsSize = rs_count.getInt("count_rs");
-                }
-
-                extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                extraIntent.putExtra(EXTRA_PROGRESS_TOTAL_VALUE_KEY,rsSize);
-                sendBroadcast(extraIntent);
-
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM clients ORDER BY name_k, code_k");
                 ResultSet rs = stat.executeQuery();
                 while (rs != null && rs.next()) {
@@ -151,16 +128,6 @@ public class UpdateDataService extends IntentService {
                     cv.put("point_uppercase",rs.getString("name_r").toUpperCase());
                     clientsList.add(cv);
 
-                    rsCount++;
-                    curProgress = curProgress + 0.5;
-                    double prc = (double) rsCount / rsSize * 100;
-                    int prcInt = (int) prc;
-                    if (prcInt%10 == 0) {
-                        extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                        extraIntent.putExtra(EXTRA_PROGRESS_CURRENT_VALUE_KEY,curProgress);
-                        extraIntent.putExtra(EXTRA_PROGRESS_INCREMENT_VALUE_KEY,5);
-                        sendBroadcast(extraIntent);
-                    }
                 }
                 messageOnBroadcast += "Обновление таблицы контрагентов завершено.";
             } finally {
@@ -176,26 +143,12 @@ public class UpdateDataService extends IntentService {
             return;
         }
 
-        notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
-
-        rsCount = 0;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
             db.delete(DBLocal.TABLE_CONTRAGENTS, null, null);
             for (ContentValues cv : clientsList) {
                 db.insert(DBLocal.TABLE_CONTRAGENTS,null,cv);
-
-                rsCount++;
-                curProgress = curProgress + 0.5;
-                double prc = (double) rsCount / rsSize * 100;
-                int prcInt = (int) prc;
-                if (prcInt%10 == 0) {
-                    extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                    extraIntent.putExtra(EXTRA_PROGRESS_CURRENT_VALUE_KEY,curProgress);
-                    extraIntent.putExtra(EXTRA_PROGRESS_INCREMENT_VALUE_KEY,5);
-                    sendBroadcast(extraIntent);
-                }
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -211,29 +164,12 @@ public class UpdateDataService extends IntentService {
     }
 
     private void updateAllDebtsFromRemote() throws SQLException {
-        Intent extraIntent = new Intent(CHANNEL);
-        int rsSize = 0;
-        int rsCount = 0;
-        double curProgress = 0;
-
+        notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
+        
         ArrayList<ContentValues> debtsList = new ArrayList<>();
         Connection conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
-            extraIntent.putExtra(EXTRA_ACTION_STARTED_KEY,true);
-            sendBroadcast(extraIntent);
-            extraIntent.putExtra(EXTRA_ACTION_STARTED_KEY,false);
             try {
-                PreparedStatement stat_count = conn.prepareStatement("SELECT COUNT(*) as count_rs FROM debts");
-                ResultSet rs_count = stat_count.executeQuery();
-
-                if (rs_count.next()) {
-                    rsSize = rs_count.getInt("count_rs");
-                }
-
-                extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                extraIntent.putExtra(EXTRA_PROGRESS_TOTAL_VALUE_KEY,rsSize);
-                sendBroadcast(extraIntent);
-
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM debts ORDER BY name_k, code_k");
                 ResultSet rs = stat.executeQuery();
                 while (rs != null && rs.next()) {
@@ -247,17 +183,6 @@ public class UpdateDataService extends IntentService {
                     cv.put("date_unload",rs.getTimestamp("datetime_unload").getTime());
                     cv.put("search_uppercase",rs.getString("name_k").toUpperCase());
                     debtsList.add(cv);
-
-                    rsCount++;
-                    curProgress = curProgress + 0.5;
-                    double prc = (double) rsCount / rsSize * 100;
-                    int prcInt = (int) prc;
-                    if (prcInt%10 == 0) {
-                        extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                        extraIntent.putExtra(EXTRA_PROGRESS_CURRENT_VALUE_KEY,curProgress);
-                        extraIntent.putExtra(EXTRA_PROGRESS_INCREMENT_VALUE_KEY,5);
-                        sendBroadcast(extraIntent);
-                    }
                 }
                 messageOnBroadcast += "Обновление таблицы задолженностей контрагентов завершено.";
             } finally {
@@ -270,12 +195,8 @@ public class UpdateDataService extends IntentService {
             }
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
-            return;
         }
 
-        notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
-
-        rsCount = 0;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
@@ -283,17 +204,6 @@ public class UpdateDataService extends IntentService {
 
             for (ContentValues cv : debtsList) {
                 db.insert(DBLocal.TABLE_DEBTS,null,cv);
-
-                rsCount++;
-                curProgress = curProgress + 0.5;
-                double prc = (double) rsCount / rsSize * 100;
-                int prcInt = (int) prc;
-                if (prcInt%10 == 0) {
-                    extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                    extraIntent.putExtra(EXTRA_PROGRESS_CURRENT_VALUE_KEY,curProgress);
-                    extraIntent.putExtra(EXTRA_PROGRESS_INCREMENT_VALUE_KEY,5);
-                    sendBroadcast(extraIntent);
-                }
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -309,30 +219,12 @@ public class UpdateDataService extends IntentService {
     }
 
     private void updateAllRestsFromRemote() throws SQLException {
-        Intent extraIntent = new Intent(CHANNEL);
-        int rsSize = 0;
-        int rsCount = 0;
-        double curProgress = 0;
-
+        notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
+        
         ArrayList<ContentValues> restsList = new ArrayList<>();
         Connection conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
-            extraIntent.putExtra(EXTRA_ACTION_STARTED_KEY,true);
-            sendBroadcast(extraIntent);
-            extraIntent.putExtra(EXTRA_ACTION_STARTED_KEY,false);
             try {
-                PreparedStatement stat_count = conn.prepareStatement("SELECT COUNT(*) as count_rs FROM rests");
-                ResultSet rs_count = stat_count.executeQuery();
-
-                if (rs_count.next()) {
-                    rsSize = rs_count.getInt("count_rs");
-                }
-
-                extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                extraIntent.putExtra(EXTRA_PROGRESS_CURRENT_VALUE_KEY,curProgress);
-                extraIntent.putExtra(EXTRA_PROGRESS_TOTAL_VALUE_KEY,rsSize);
-                sendBroadcast(extraIntent);
-
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM rests ORDER BY code_p, name_p");
                 ResultSet rs = stat.executeQuery();
                 while (rs != null && rs.next()) {
@@ -349,17 +241,6 @@ public class UpdateDataService extends IntentService {
                     cv.put("date_unload",rs.getTimestamp("datetime_unload").getTime());
                     cv.put("search_uppercase",rs.getString("name_p").toUpperCase());
                     restsList.add(cv);
-
-                    rsCount++;
-                    curProgress = curProgress + 0.5;
-                    double prc = (double) rsCount / rsSize * 100;
-                    int prcInt = (int) prc;
-                    if (prcInt%10 == 0) {
-                        extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                        extraIntent.putExtra(EXTRA_PROGRESS_CURRENT_VALUE_KEY,curProgress);
-                        extraIntent.putExtra(EXTRA_PROGRESS_INCREMENT_VALUE_KEY,5);
-                        sendBroadcast(extraIntent);
-                    }
                 }
                 messageOnBroadcast += "Обновление таблицы остатков номенклатуры завершено.";
             } finally {
@@ -372,12 +253,8 @@ public class UpdateDataService extends IntentService {
             }
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
-            return;
         }
 
-        notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
-
-        rsCount = 0;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
@@ -385,17 +262,6 @@ public class UpdateDataService extends IntentService {
 
             for (ContentValues cv : restsList) {
                 db.insert(DBLocal.TABLE_RESTS,null,cv);
-
-                rsCount++;
-                curProgress = curProgress + 0.5;
-                double prc = (double) rsCount / rsSize * 100;
-                int prcInt = (int) prc;
-                if (prcInt%10 == 0) {
-                    extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_PROGRESS_INCREMENT_VALUE);
-                    extraIntent.putExtra(EXTRA_PROGRESS_CURRENT_VALUE_KEY,curProgress);
-                    extraIntent.putExtra(EXTRA_PROGRESS_INCREMENT_VALUE_KEY,5);
-                    sendBroadcast(extraIntent);
-                }
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
