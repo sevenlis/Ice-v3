@@ -29,8 +29,11 @@ public class UpdateDataService extends IntentService {
 
     public static final String EXTRA_ACTION_KEY = ".UpdateDataService.action_identify_key";
     public static final int EXTRA_UPDATE_ALL_CLIENTS_VALUE = 0;
+    public static final String EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY =".UpdateDataService.CLIENTS_button_identify_key";
     public static final int EXTRA_UPDATE_ALL_RESTS_VALUE = 1;
+    public static final String EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY =".UpdateDataService.RESTS_button_identify_key";
     public static final int EXTRA_UPDATE_ALL_DEBTS_VALUE = 2;
+    public static final String EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY =".UpdateDataService.DEBTS_button_identify_key";
 
     public static final int EXTRA_ACTION_SEND_MESSAGE = 3;
     public static final String MESSAGE_ON_BROADCAST_KEY = ".UpdateDataService.message_on_broadcast_key";
@@ -38,6 +41,8 @@ public class UpdateDataService extends IntentService {
     public static final String EXTRA_ACTION_COMPLETE_KEY = ".UpdateDataService.action_complete_key";
 
     private NotificationsUtil notifUtils;
+    
+    int button_clients_id = 0, button_rests_id = 0, button_debts_id = 0;
 
     @Override
     public void onCreate() {
@@ -53,6 +58,7 @@ public class UpdateDataService extends IntentService {
         if (intent.getExtras() != null) {
             switch (intent.getExtras().getInt(EXTRA_ACTION_KEY)) {
                 case EXTRA_UPDATE_ALL_CLIENTS_VALUE: {
+                    button_clients_id = intent.getExtras().getInt(EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY);
                     try {
                         updateAllContragentsFromRemote();
                     } catch (SQLException e) {
@@ -60,6 +66,7 @@ public class UpdateDataService extends IntentService {
                     }
                 } break;
                 case EXTRA_UPDATE_ALL_RESTS_VALUE: {
+                    button_rests_id = intent.getExtras().getInt(EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY);
                     try {
                         updateAllRestsFromRemote();
                     } catch (SQLException e) {
@@ -67,6 +74,7 @@ public class UpdateDataService extends IntentService {
                     }
                 } break;
                 case EXTRA_UPDATE_ALL_DEBTS_VALUE: {
+                    button_debts_id = intent.getExtras().getInt(EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY);
                     try {
                         updateAllDebtsFromRemote();
                     } catch (SQLException e) {
@@ -97,9 +105,12 @@ public class UpdateDataService extends IntentService {
     private void sendExtraOnResult() {
         SettingsUtils.Runtime.setUpdateInProgress(this,false);
         Intent extraIntent = new Intent(CHANNEL);
-        extraIntent.putExtra(EXTRA_ACTION_KEY,EXTRA_ACTION_SEND_MESSAGE);
-        extraIntent.putExtra(MESSAGE_ON_BROADCAST_KEY,messageOnBroadcast);
-        extraIntent.putExtra(EXTRA_ACTION_COMPLETE_KEY,true);
+        extraIntent.putExtra(EXTRA_ACTION_KEY                       ,EXTRA_ACTION_SEND_MESSAGE);
+        extraIntent.putExtra(MESSAGE_ON_BROADCAST_KEY               ,messageOnBroadcast);
+        extraIntent.putExtra(EXTRA_ACTION_COMPLETE_KEY              ,true);
+        extraIntent.putExtra(EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY ,button_clients_id);
+        extraIntent.putExtra(EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY   ,button_debts_id);
+        extraIntent.putExtra(EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY   ,button_rests_id);
         sendBroadcast(extraIntent);
         messageOnBroadcast = "";
     }

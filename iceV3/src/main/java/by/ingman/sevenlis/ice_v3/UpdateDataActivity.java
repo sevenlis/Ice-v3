@@ -55,7 +55,15 @@ public class UpdateDataActivity extends AppCompatActivity {
                     if (intent.getExtras().getInt(UpdateDataService.EXTRA_ACTION_KEY) == UpdateDataService.EXTRA_ACTION_SEND_MESSAGE) {
                         String messageOnBroadcast = intent.getExtras().getString(UpdateDataService.MESSAGE_ON_BROADCAST_KEY);
                         Toast.makeText(context, messageOnBroadcast, Toast.LENGTH_SHORT).show();
-                        ((TextView) findViewById(R.id.textViewInfo)).setText(messageOnBroadcast);
+                        //((TextView) findViewById(R.id.textViewInfo)).setText(messageOnBroadcast);
+                        
+                        pressedButton = (Button) findViewById(intent.getExtras().getInt(UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY));
+                        if (pressedButton != null) pressedButton.setEnabled(true);
+                        
+                        pressedButton = (Button) findViewById(intent.getExtras().getInt(UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY));
+                        if (pressedButton != null) pressedButton.setEnabled(true);
+    
+                        pressedButton = (Button) findViewById(intent.getExtras().getInt(UpdateDataService.EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY));
                         if (pressedButton != null) pressedButton.setEnabled(true);
                     }
                 }
@@ -100,6 +108,7 @@ public class UpdateDataActivity extends AppCompatActivity {
         pressedButton.setEnabled(false);
         Intent intent = new Intent(ctx, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_RESTS_VALUE);
+        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY,pressedButton.getId());
         startService(intent);
     }
     
@@ -112,6 +121,7 @@ public class UpdateDataActivity extends AppCompatActivity {
         pressedButton.setEnabled(false);
         Intent intent = new Intent(ctx, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_VALUE);
+        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY,pressedButton.getId());
         startService(intent);
     }
     
@@ -124,6 +134,7 @@ public class UpdateDataActivity extends AppCompatActivity {
         pressedButton.setEnabled(false);
         Intent intent = new Intent(ctx, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_VALUE);
+        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY,pressedButton.getId());
         startService(intent);
     }
 
@@ -170,7 +181,6 @@ public class UpdateDataActivity extends AppCompatActivity {
     }
     
     class GetOrdersFromRemoteTask extends AsyncTask<Void, Integer, Void> {
-        ProgressDialog progressDialog;
         String managerName = SettingsUtils.Settings.getManagerName(ctx).toUpperCase();
         SQLiteDatabase db = new DBHelper(ctx).getReadableDatabase();
         
@@ -198,8 +208,7 @@ public class UpdateDataActivity extends AppCompatActivity {
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             
-            int rsSize = 0;
-            int rsCount = 0;
+            int rsSize = 0, rsCount = 0;
             Connection connection = new ConnectionFactory(ctx).getConnection();
             if (connection != null) {
                 try {
@@ -262,7 +271,7 @@ public class UpdateDataActivity extends AppCompatActivity {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    progressDialog = showProgressDialog("Получение ответов на загруженные заявки...");
+                    progressDialog.setMessage("Получение ответов на загруженные заявки...");
                 }
             });
             
@@ -271,12 +280,11 @@ public class UpdateDataActivity extends AppCompatActivity {
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             
-            int rsSize = 0;
-            int rsCount = 0;
+            int rsSize = 0, rsCount = 0;
             Connection connection = new ConnectionFactory(ctx).getConnection();
             if (connection != null) {
                 try {
-                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) as count_rs FROM results WHERE datetime_unload > CAST('" + fDate + "' as datetime)");
+                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(0) AS count_rs FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE UPPER(O.name_m) = '" + managerName + "' AND O.order_date > CAST('" + fDate + "' as datetime))");
                     ResultSet rs_count = stat_count.executeQuery();
                     
                     if (rs_count.next()) {
@@ -284,7 +292,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                         publishProgress(rsCount,rsSize);
                     }
                     
-                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM results WHERE datetime_unload > CAST('" + fDate + "' as datetime) ORDER BY datetime_unload");
+                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE UPPER(O.name_m) = '" + managerName + "' AND O.order_date > CAST('" + fDate + "' as datetime)) ORDER BY R.datetime_unload");
                     ResultSet rs = stat.executeQuery();
                     while (rs != null && rs.next()) {
                         ContentValues cv = new ContentValues();
@@ -305,7 +313,6 @@ public class UpdateDataActivity extends AppCompatActivity {
                     }
                 }
             }
-            progressDialog.dismiss();
         }
         
         @Override
@@ -389,10 +396,15 @@ public class UpdateDataActivity extends AppCompatActivity {
         private final File appFolder = new File(String.format("%s%s%s", Environment.getExternalStorageDirectory(), File.separator, SettingsUtils.APP_FOLDER));
         private final File apkFile = new File(String.format("%s%s%s", appFolder.getAbsolutePath(), File.separator, "iceV3.apk"));
         
-        ProgressDialog progressDialog = showProgressDialog("Получение файла обновления...");
-    
         @Override
         protected Void doInBackground(Void... params) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog = showProgressDialog("Получение файла обновления...");
+                }
+            });
+            
             SettingsUtils.Runtime.setUpdateInProgress(ctx, true);
             
             InputStream input = null;
@@ -474,10 +486,10 @@ public class UpdateDataActivity extends AppCompatActivity {
                     if (input != null)
                         input.close();
                 } catch (IOException ignored) {
+                    //do nothing
                 }
                 
-                if (connection != null)
-                    connection.disconnect();
+                if (connection != null) connection.disconnect();
             }
             return null;
         }
@@ -509,7 +521,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                 errorMessage = null;
             } else {
                 if (apkFile.exists()) {
-                    Toast.makeText(getApplicationContext(), "Обновление загружено", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "Обновление загружено", Toast.LENGTH_SHORT).show();
                     startUpdateIntent(apkFile);
                 }
             }
