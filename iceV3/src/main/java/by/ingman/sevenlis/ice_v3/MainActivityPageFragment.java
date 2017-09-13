@@ -53,7 +53,7 @@ public class MainActivityPageFragment extends Fragment {
         footerNoAdv             = new View(ctx);
         footerIsAdv             = new View(ctx);
         footerSummary           = new View(ctx);
-        layoutInflater          = getLayoutInflater(new Bundle());
+        layoutInflater          = getLayoutInflater();
     }
     
     @Override

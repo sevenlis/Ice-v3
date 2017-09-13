@@ -11,6 +11,7 @@ import by.ingman.sevenlis.ice_v3.R;
 
 public class CustomPagerTabStrip extends PagerTabStrip {
     private Context ctx;
+    
     public CustomPagerTabStrip(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setDrawFullUnderline(true);

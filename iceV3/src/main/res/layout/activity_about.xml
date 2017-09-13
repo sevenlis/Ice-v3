@@ -74,5 +74,6 @@
         android:elevation="1dp"
         android:text="ver.3 (3.01)"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textColor="@color/color_red"/>
+        android:textColor="@color/color_red"
+        android:layout_alignLeft="@+id/textView2"/>
 </RelativeLayout>

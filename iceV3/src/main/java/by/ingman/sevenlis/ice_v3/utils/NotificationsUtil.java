@@ -34,12 +34,16 @@ public class NotificationsUtil {
     }
 
     private void showUpdateProgressNotification(int notificationId, String title, String message) {
-        Notification.Builder builder = setupCommonNotification(title, message, false)
-                .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setOngoing(true)
-                .setProgress(0, 0, true)
-                .setUsesChronometer(true);
-        getNotificationManager().notify(notificationId, builder.build());
+        if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
+            Notification.Builder builder = setupCommonNotification(title, message, false)
+                    .setSmallIcon(android.R.drawable.stat_sys_download)
+                    .setOngoing(true)
+                    .setProgress(0, 0, true)
+                    .setUsesChronometer(true);
+            getNotificationManager().notify(notificationId, builder.build());
+        } else {
+            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void showUpdateProgressNotification(int notificationId) {
@@ -71,11 +75,7 @@ public class NotificationsUtil {
                 break;
         }
         String message = ctx.getResources().getString(R.string.notif_update_data_message, dataName);
-        if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
-            showUpdateProgressNotification(notificationId, title, message);
-        } else {
-            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
-        }
+        showUpdateProgressNotification(notificationId, title, message);
     }
 
     public void showUpdateCompleteNotification(int notificationId, String title, String message) {
@@ -118,11 +118,7 @@ public class NotificationsUtil {
                 dataName = "данных";
         }
         String message = ctx.getResources().getString(R.string.notif_update_data_complete, dataName);
-        if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
-            showUpdateCompleteNotification(notificationId, title, message);
-        } else {
-            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
-        }
+        showUpdateCompleteNotification(notificationId, title, message);
     }
 
     public void dismissNotification(int id) {

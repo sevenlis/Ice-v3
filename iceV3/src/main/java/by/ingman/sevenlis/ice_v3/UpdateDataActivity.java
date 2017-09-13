@@ -203,8 +203,9 @@ public class UpdateDataActivity extends AppCompatActivity {
                 }
             });
             
+            int daysAhead = SettingsUtils.Settings.getOrderLogDepth(ctx);
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -30);
+            cal.add(Calendar.DATE, -daysAhead);
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             
@@ -274,9 +275,10 @@ public class UpdateDataActivity extends AppCompatActivity {
                     progressDialog.setMessage("Получение ответов на загруженные заявки...");
                 }
             });
-            
+    
+            int daysAhead = SettingsUtils.Settings.getOrderLogDepth(ctx);
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -30);
+            cal.add(Calendar.DATE, -daysAhead);
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             

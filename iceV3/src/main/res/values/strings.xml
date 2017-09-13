@@ -17,8 +17,8 @@
     <string name="pref_order_days_ahead_title">Ограничение даты заявок</string>
     <string name="pref_order_log_depth_summ">Глубина журнала для просмотра прошлых заявок в днях</string>
     <string name="pref_order_log_depth_title">Глубина журнала заявок</string>
-    <string name="pref_notif_enable_summ">Оповещать об обновлениях БД (оповещения о заявках приходят в любом случае)</string>
-    <string name="pref_notif_enable_title">Оповещения об обновлениях БД</string>
+    <string name="pref_notif_enable_summ">Включить уведомления (иначе кратковременное всплывающее сообщение)</string>
+    <string name="pref_notif_enable_title">Включить уведомления</string>
     <string name="pref_screen_sys_options_title">Системные настройки</string>
     <string name="pref_screen_sys_options_summ">Нужно изменять только при изменениях на сервере</string>
     <string name="pref_exchange_frequency_title">Интервал обновления данных</string>
@@ -105,4 +105,16 @@
     <string name="salepoint_name">Наименование разгрузки</string>
     <string name="regular">Обычная</string>
     <string name="advertising_no">Реклама: НЕТ</string>
+    <string name="dd_mm_yyyy">DD.MM.YYYY</string>
+    <string name="uid_uid">uid</string>
+    <string name="delivery_point_address">Пункт разгрузки</string>
+    <string name="mass">Масса</string>
+    <string name="packs_amount">Количество упаковок</string>
+    <string name="sum">Сумма</string>
+    <string name="amount">Количество единиц</string>
+    <string name="isAdvertising">Реклама: null</string>
+    <string name="adv_type">Тип рекламы</string>
+    <string name="order_condition">Состояние заявки</string>
+    <string name="comment">Комментарий</string>
+    <string name="datetime">Дата время</string>
 </resources>

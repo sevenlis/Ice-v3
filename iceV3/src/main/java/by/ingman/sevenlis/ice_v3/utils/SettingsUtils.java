@@ -81,7 +81,7 @@ public class SettingsUtils {
         }
     
         public static int getOrderLogDepth(Context ctx) {
-            return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_ORDER_LOG_DEPTH, "30"));
+            return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_ORDER_LOG_DEPTH, "10"));
         }
     
         public static boolean getItemSearchInputTypeNumeric(Context ctx) {
