@@ -278,11 +278,11 @@ public class OrderActivity extends AppCompatActivity {
 
     private boolean checkDataFilling() {
         boolean result = true;
-        if (this.mOrder.contragent == null || this.mOrder.contragent.getCode().isEmpty()) {
+        if (this.mOrder.contragent == null || this.mOrder.contragent.getName().isEmpty()) {
             Toast.makeText(ctx, "Не выбран Контрагент!", Toast.LENGTH_SHORT).show();
             result = false;
         }
-        if (this.mOrder.point == null || this.mOrder.point.code.isEmpty()) {
+        if (this.mOrder.point == null || this.mOrder.point.getName().isEmpty()) {
             Toast.makeText(ctx, "Не выбран Пункт разгрузки!", Toast.LENGTH_SHORT).show();
             result = false;
         }

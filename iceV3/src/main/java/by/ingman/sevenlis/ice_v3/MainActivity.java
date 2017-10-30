@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ExchangeDataService.CHANNEL_ORDERS_UPDATES)) {
+            String action = intent.getAction();
+            if (action != null && action.equals(ExchangeDataService.CHANNEL_ORDERS_UPDATES)) {
                 refreshCurrentFragment();
             }
         }

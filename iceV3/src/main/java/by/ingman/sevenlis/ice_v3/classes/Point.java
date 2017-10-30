@@ -16,7 +16,15 @@ public class Point implements Parcelable {
         code = in.readString();
         name = in.readString();
     }
-
+    
+    public String getCode() {
+        return code;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
     public static final Creator<Point> CREATOR = new Creator<Point>() {
         @Override
         public Point createFromParcel(Parcel in) {

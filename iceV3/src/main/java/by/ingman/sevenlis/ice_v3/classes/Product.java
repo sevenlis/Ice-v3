@@ -16,7 +16,7 @@ public class Product implements Parcelable {
         this.weight = weight;
         this.price = price;
         this.num_in_pack = num_in_pack;
-        if (this.num_in_pack == 0) this.num_in_pack = 1;
+        if (this.num_in_pack <= 0) this.num_in_pack = 1;
     }
 
     private Product(Parcel in) {
@@ -25,9 +25,17 @@ public class Product implements Parcelable {
         this.weight = in.readDouble();
         this.price = in.readDouble();
         this.num_in_pack = in.readDouble();
-        if (this.num_in_pack == 0) this.num_in_pack = 1;
+        if (this.num_in_pack <= 0) this.num_in_pack = 1;
     }
-
+    
+    public String getCode() {
+        return code;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
     public static final Creator<Product> CREATOR = new Creator<Product>() {
         @Override
         public Product createFromParcel(Parcel in) {

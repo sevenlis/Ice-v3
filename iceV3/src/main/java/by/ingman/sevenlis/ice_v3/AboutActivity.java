@@ -17,7 +17,7 @@ public class AboutActivity extends AppCompatActivity {
         int curVersionCode      = getVersionCodeLocal();
         double curVersionName   = Double.valueOf(getVersionNameLocal());
         String sVersion = "ver." + FormatsUtils.getNumberFormatted(curVersionCode,0).trim() + " (" + FormatsUtils.getNumberFormatted(curVersionName,3).trim() + ")";
-        ((TextView) findViewById(R.id.textView5)).setText(sVersion);
+        ((TextView) findViewById(R.id.textView5)).setText(sVersion.replace(",","."));
         ((TextView) findViewById(R.id.textView2)).setText(getPackageName());
     }
 
