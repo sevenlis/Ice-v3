@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3;
+package by.ingman.sevenlis.ice_v3.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,20 +11,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Order;
 
-class CustomOrderListAdapter extends BaseAdapter {
+public class CustomOrderListAdapter extends BaseAdapter {
     private Context ctx;
     private LayoutInflater layoutInflater;
     private ArrayList<Order> objects;
     
-    CustomOrderListAdapter(Context context, ArrayList<Order> orders) {
+    public CustomOrderListAdapter(Context context, ArrayList<Order> orders) {
         this.ctx = context;
         this.objects = orders;
         this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
     
-    void updateOrdersList(ArrayList<Order> orders) {
+    public void updateOrdersList(ArrayList<Order> orders) {
         this.objects.clear();
         this.objects.addAll(orders);
         this.notifyDataSetChanged();
@@ -64,11 +65,11 @@ class CustomOrderListAdapter extends BaseAdapter {
         ((TextView) view.findViewById(R.id.textView_qtyPacks)).setText(mText);
         mText = "Кол.ед.:  " + order.getQuantityString();
         ((TextView) view.findViewById(R.id.textView_quantity)).setText(mText);
-        mText = "Масса: "    + order.getWeightString();
+        mText = "Масса: " + order.getWeightString();
         ((TextView) view.findViewById(R.id.textView_weight)).setText(mText);
-        mText = "Сумма: "    + order.getSummaString();
+        mText = "Сумма: " + order.getSummaString();
         ((TextView) view.findViewById(R.id.textView_summa)).setText(mText);
-        mText = "Реклама: "  + order.getIsAdvString();
+        mText = "Реклама: " + order.getIsAdvString();
         ((TextView) view.findViewById(R.id.textView_adv)).setText(mText);
         ((TextView) view.findViewById(R.id.textView_advType)).setText(getAdvTypeString(order));
         ((TextView) view.findViewById(R.id.textView_comment)).setText(order.comment);
@@ -90,12 +91,12 @@ class CustomOrderListAdapter extends BaseAdapter {
     private String getDateTimeUnloadString(Order order) {
         Calendar dateCal = Calendar.getInstance();
         dateCal.setTimeInMillis(order.dateUnload);
-        String sD = String.format(Locale.ROOT,"%02d",dateCal.get(Calendar.DAY_OF_MONTH));
-        String sM = String.format(Locale.ROOT,"%02d",dateCal.get(Calendar.MONTH) + 1);
-        String sY = String.format(Locale.ROOT,"%04d",dateCal.get(Calendar.YEAR));
-        String sHour = String.format(Locale.ROOT,"%02d",dateCal.get(Calendar.HOUR_OF_DAY));
-        String sMinute = String.format(Locale.ROOT,"%02d",dateCal.get(Calendar.MINUTE));
-        String sSecond = String.format(Locale.ROOT,"%02d",dateCal.get(Calendar.SECOND));
+        String sD = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.DAY_OF_MONTH));
+        String sM = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.MONTH) + 1);
+        String sY = String.format(Locale.ROOT, "%04d", dateCal.get(Calendar.YEAR));
+        String sHour = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.HOUR_OF_DAY));
+        String sMinute = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.MINUTE));
+        String sSecond = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.SECOND));
         return sD + "." + sM + "." + sY + "  " + sHour + ":" + sMinute + ":" + sSecond;
     }
     

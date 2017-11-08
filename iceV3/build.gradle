@@ -41,5 +41,10 @@ dependencies {
     compile 'com.android.support:design:25.4.0'
     compile 'net.sourceforge.jtds:jtds:1.2.8'
     compile 'com.hynnet:sqljdbc4-chs:4.0.2206.100'
+    compile 'com.google.android.gms:play-services-location:11.6.0'
+    compile 'com.google.android.gms:play-services-maps:11.6.0'
+    compile 'com.google.maps.android:android-maps-utils:0.5'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.google.code.gson:gson:2.8.2'
 }
 

@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3.remote.sql;
+package by.ingman.sevenlis.ice_v3.services;
 
 import android.app.IntentService;
 import android.content.ContentValues;
@@ -20,8 +20,9 @@ import java.util.Date;
 import by.ingman.sevenlis.ice_v3.classes.Answer;
 import by.ingman.sevenlis.ice_v3.classes.Order;
 import by.ingman.sevenlis.ice_v3.classes.OrderItem;
-import by.ingman.sevenlis.ice_v3.local.sql.DBHelper;
-import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
+import by.ingman.sevenlis.ice_v3.local.DBHelper;
+import by.ingman.sevenlis.ice_v3.local.DBLocal;
+import by.ingman.sevenlis.ice_v3.remote.ConnectionFactory;
 import by.ingman.sevenlis.ice_v3.utils.NotificationsUtil;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
@@ -29,15 +30,15 @@ public class ExchangeDataService extends IntentService {
     public static final String CHANNEL = "by.ingman.sevenlis.ice_v3." + ExchangeDataService.class.getSimpleName() + ".broadcastChannel";
     public static final String CHANNEL_ORDERS_UPDATES = "by.ingman.sevenlis.ice_v3." + ExchangeDataService.class.getSimpleName() + ".broadcastOrdersUpdatesChannel";
     public static final String MESSAGE_ON_BROADCAST_KEY = ".ExchangeDataService.message_on_broadcast_key";
-
+    private static boolean isConnected;
     private DBHelper dbHelper;
     private DBLocal dbLocal;
     private NotificationsUtil notifUtils;
-
-    private static boolean isConnected;
-
-    public ExchangeDataService() { super(ExchangeDataService.class.getSimpleName()); }
-
+    
+    public ExchangeDataService() {
+        super(ExchangeDataService.class.getSimpleName());
+    }
+    
     @Override
     public void onCreate() {
         super.onCreate();
@@ -46,89 +47,89 @@ public class ExchangeDataService extends IntentService {
         isConnected = isConnect();
         notifUtils = new NotificationsUtil(this);
     }
-
+    
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SettingsUtils.Runtime.setUpdateInProgress(this,false);
+        SettingsUtils.Runtime.setUpdateInProgress(this, false);
     }
-
+    
     private boolean isConnect() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         return ni != null && ni.isConnected();
     }
-
+    
     @Override
     protected void onHandleIntent(Intent intent) {
         if (isConnected) doExchangeData();
     }
-
+    
     private void doExchangeData() {
         if (SettingsUtils.Runtime.getUpdateInProgress(this)) return;
-
-        SettingsUtils.Runtime.setUpdateInProgress(this,true);
+        
+        SettingsUtils.Runtime.setUpdateInProgress(this, true);
         try {
             updateRests();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        
         try {
             updateDebts();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        
         try {
             updateClients();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        
         try {
             sentUnsentOrders();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        
         try {
             receiveAnswers();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        SettingsUtils.Runtime.setUpdateInProgress(this,false);
+        SettingsUtils.Runtime.setUpdateInProgress(this, false);
     }
-
+    
     private void sendBroadcastMessage(String channel, String messageBroadcast) {
         Intent intent = new Intent(channel);
-        intent.putExtra(MESSAGE_ON_BROADCAST_KEY,messageBroadcast);
-
+        intent.putExtra(MESSAGE_ON_BROADCAST_KEY, messageBroadcast);
+        
         sendBroadcast(intent);
     }
-
+    
     private void updateDebts() throws SQLException {
         Connection conn;
         String messageOnBroadcast = "";
-
+        
         ArrayList<ContentValues> cvList = new ArrayList<>();
-
+        
         long internalDate = 0;
         SQLiteDatabase dbr = dbHelper.getReadableDatabase();
-        Cursor cursor = dbr.query(true,DBLocal.TABLE_DEBTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
+        Cursor cursor = dbr.query(true, DBLocal.TABLE_DEBTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
         if (cursor.moveToFirst()) {
             internalDate = cursor.getLong(cursor.getColumnIndex("date_unload"));
         }
         cursor.close();
         dbr.close();
-
+        
         long externalDate = 0;
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT TOP 1 datetime_unload FROM debts");
                 ResultSet rs = stat.executeQuery();
-
+                
                 if (rs != null && rs.next()) {
                     externalDate = rs.getTimestamp("datetime_unload").getTime();
                 }
@@ -143,11 +144,11 @@ public class ExchangeDataService extends IntentService {
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
-
+        
         if (internalDate >= externalDate) return;
-
+        
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
-
+        
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
@@ -155,14 +156,14 @@ public class ExchangeDataService extends IntentService {
                 ResultSet rs = stat.executeQuery();
                 while (rs != null && rs.next()) {
                     ContentValues cv = new ContentValues();
-                    cv.put("code_k",rs.getString("code_k"));
-                    cv.put("name_k",rs.getString("name_k"));
-                    cv.put("code_mk",rs.getString("code_mk"));
-                    cv.put("rating",rs.getString("rating"));
-                    cv.put("debt",rs.getDouble("debt"));
-                    cv.put("overdue",rs.getDouble("overdue"));
-                    cv.put("date_unload",rs.getTimestamp("datetime_unload").getTime());
-                    cv.put("search_uppercase",rs.getString("name_k").toUpperCase());
+                    cv.put("code_k", rs.getString("code_k"));
+                    cv.put("name_k", rs.getString("name_k"));
+                    cv.put("code_mk", rs.getString("code_mk"));
+                    cv.put("rating", rs.getString("rating"));
+                    cv.put("debt", rs.getDouble("debt"));
+                    cv.put("overdue", rs.getDouble("overdue"));
+                    cv.put("date_unload", rs.getTimestamp("datetime_unload").getTime());
+                    cv.put("search_uppercase", rs.getString("name_k").toUpperCase());
                     cvList.add(cv);
                 }
                 messageOnBroadcast += "Обновление таблицы задолженностей контрагентов завершено.";
@@ -177,14 +178,14 @@ public class ExchangeDataService extends IntentService {
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
-
+        
         SQLiteDatabase dbw = dbHelper.getWritableDatabase();
         try {
             dbw.beginTransaction();
             dbw.delete(DBLocal.TABLE_DEBTS, null, null);
-
+            
             for (ContentValues cv : cvList) {
-                dbw.insert(DBLocal.TABLE_DEBTS,null,cv);
+                dbw.insert(DBLocal.TABLE_DEBTS, null, cv);
             }
             dbw.setTransactionSuccessful();
         } catch (Exception e) {
@@ -194,35 +195,35 @@ public class ExchangeDataService extends IntentService {
             dbw.endTransaction();
         }
         dbw.close();
-
+        
         sendBroadcastMessage(CHANNEL, messageOnBroadcast);
-
+        
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
     }
-
+    
     private void updateRests() throws SQLException {
         Connection conn;
         String messageOnBroadcast = "";
-
+        
         ArrayList<ContentValues> cvList = new ArrayList<>();
-
+        
         long internalDate = 0;
         SQLiteDatabase dbr = dbHelper.getReadableDatabase();
-        Cursor cursor = dbr.query(true,DBLocal.TABLE_RESTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
+        Cursor cursor = dbr.query(true, DBLocal.TABLE_RESTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
         if (cursor.moveToFirst()) {
             internalDate = cursor.getLong(cursor.getColumnIndex("date_unload"));
         }
         cursor.close();
         dbr.close();
-
+        
         long externalDate = 0;
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT TOP 1 datetime_unload FROM rests");
                 ResultSet rs = stat.executeQuery();
-
+                
                 if (rs != null && rs.next()) {
                     externalDate = rs.getTimestamp("datetime_unload").getTime();
                 }
@@ -237,11 +238,11 @@ public class ExchangeDataService extends IntentService {
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
-
+        
         if (internalDate >= externalDate) return;
-
+        
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
-
+        
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
@@ -249,17 +250,17 @@ public class ExchangeDataService extends IntentService {
                 ResultSet rs = stat.executeQuery();
                 while (rs != null && rs.next()) {
                     ContentValues cv = new ContentValues();
-                    cv.put("code_s",rs.getString("code_s"));
-                    cv.put("name_s",rs.getString("name_s"));
-                    cv.put("code_p",rs.getString("code_p"));
-                    cv.put("name_p",rs.getString("name_p"));
-                    cv.put("packs",rs.getDouble("packs"));
-                    cv.put("amount",rs.getDouble("amount"));
-                    cv.put("price",rs.getDouble("price"));
-                    cv.put("gross_weight",rs.getDouble("gross_weight"));
-                    cv.put("amt_in_pack",rs.getDouble("amt_in_pack"));
-                    cv.put("date_unload",rs.getTimestamp("datetime_unload").getTime());
-                    cv.put("search_uppercase",rs.getString("name_p").toUpperCase());
+                    cv.put("code_s", rs.getString("code_s"));
+                    cv.put("name_s", rs.getString("name_s"));
+                    cv.put("code_p", rs.getString("code_p"));
+                    cv.put("name_p", rs.getString("name_p"));
+                    cv.put("packs", rs.getDouble("packs"));
+                    cv.put("amount", rs.getDouble("amount"));
+                    cv.put("price", rs.getDouble("price"));
+                    cv.put("gross_weight", rs.getDouble("gross_weight"));
+                    cv.put("amt_in_pack", rs.getDouble("amt_in_pack"));
+                    cv.put("date_unload", rs.getTimestamp("datetime_unload").getTime());
+                    cv.put("search_uppercase", rs.getString("name_p").toUpperCase());
                     cvList.add(cv);
                 }
                 messageOnBroadcast += "Обновление таблицы остатков товаров завершено.";
@@ -274,14 +275,14 @@ public class ExchangeDataService extends IntentService {
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
-
+        
         SQLiteDatabase dbw = dbHelper.getWritableDatabase();
         try {
             dbw.beginTransaction();
             dbw.delete(DBLocal.TABLE_RESTS, null, null);
-
+            
             for (ContentValues cv : cvList) {
-                dbw.insert(DBLocal.TABLE_RESTS,null,cv);
+                dbw.insert(DBLocal.TABLE_RESTS, null, cv);
             }
             dbw.setTransactionSuccessful();
         } catch (Exception e) {
@@ -291,35 +292,35 @@ public class ExchangeDataService extends IntentService {
             dbw.endTransaction();
         }
         dbw.close();
-
+        
         sendBroadcastMessage(CHANNEL, messageOnBroadcast);
-
+        
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
     }
-
+    
     private void updateClients() throws SQLException {
         Connection conn;
         String messageOnBroadcast = "";
-
+        
         ArrayList<ContentValues> cvList = new ArrayList<>();
-
+        
         long internalDate = 0;
         SQLiteDatabase dbr = dbHelper.getReadableDatabase();
-        Cursor cursor = dbr.query(true,DBLocal.TABLE_CONTRAGENTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
+        Cursor cursor = dbr.query(true, DBLocal.TABLE_CONTRAGENTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
         if (cursor.moveToFirst()) {
             internalDate = cursor.getLong(cursor.getColumnIndex("date_unload"));
         }
         cursor.close();
         dbr.close();
-
+        
         long externalDate = 0;
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT TOP 1 datetime_unload FROM clients");
                 ResultSet rs = stat.executeQuery();
-
+                
                 if (rs != null && rs.next()) {
                     externalDate = rs.getTimestamp("datetime_unload").getTime();
                 }
@@ -334,11 +335,11 @@ public class ExchangeDataService extends IntentService {
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
-
+        
         if (internalDate >= externalDate) return;
-
+        
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
-
+        
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
@@ -346,17 +347,17 @@ public class ExchangeDataService extends IntentService {
                 ResultSet rs = stat.executeQuery();
                 while (rs != null && rs.next()) {
                     ContentValues cv = new ContentValues();
-                    cv.put("code_k",rs.getString("code_k"));
-                    cv.put("name_k",rs.getString("name_k"));
-                    cv.put("code_mk",rs.getString("code_mk"));
-                    cv.put("name_mk",rs.getString("name_mk"));
-                    cv.put("code_r",rs.getString("code_r"));
-                    cv.put("name_r",rs.getString("name_r"));
-                    cv.put("code_mr",rs.getString("code_mr"));
-                    cv.put("name_mr",rs.getString("name_mr"));
-                    cv.put("date_unload",rs.getTimestamp("datetime_unload").getTime());
-                    cv.put("client_uppercase",rs.getString("name_k").toUpperCase());
-                    cv.put("point_uppercase",rs.getString("name_r").toUpperCase());
+                    cv.put("code_k", rs.getString("code_k"));
+                    cv.put("name_k", rs.getString("name_k"));
+                    cv.put("code_mk", rs.getString("code_mk"));
+                    cv.put("name_mk", rs.getString("name_mk"));
+                    cv.put("code_r", rs.getString("code_r"));
+                    cv.put("name_r", rs.getString("name_r"));
+                    cv.put("code_mr", rs.getString("code_mr"));
+                    cv.put("name_mr", rs.getString("name_mr"));
+                    cv.put("date_unload", rs.getTimestamp("datetime_unload").getTime());
+                    cv.put("client_uppercase", rs.getString("name_k").toUpperCase());
+                    cv.put("point_uppercase", rs.getString("name_r").toUpperCase());
                     cvList.add(cv);
                 }
                 messageOnBroadcast += "Обновление таблицы контрагентов и разгрузок завершено.";
@@ -371,14 +372,14 @@ public class ExchangeDataService extends IntentService {
         } else {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
-
+        
         SQLiteDatabase dbw = dbHelper.getWritableDatabase();
         try {
             dbw.beginTransaction();
             dbw.delete(DBLocal.TABLE_CONTRAGENTS, null, null);
-
+            
             for (ContentValues cv : cvList) {
-                dbw.insert(DBLocal.TABLE_CONTRAGENTS,null,cv);
+                dbw.insert(DBLocal.TABLE_CONTRAGENTS, null, cv);
             }
             dbw.setTransactionSuccessful();
         } catch (Exception e) {
@@ -388,32 +389,32 @@ public class ExchangeDataService extends IntentService {
             dbw.endTransaction();
         }
         dbw.close();
-
+        
         sendBroadcastMessage(CHANNEL, messageOnBroadcast);
-
+        
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
     }
-
+    
     private void sentUnsentOrders() throws SQLException {
         Connection conn;
         boolean success = false;
         int[] batchResults = new int[]{};
         String messageOnBroadcast = "";
         String managerName = SettingsUtils.Settings.getManagerName(this);
-
+        
         ArrayList<Order> orderUnsentList = dbLocal.getUnsentOrdersList();
         if (orderUnsentList.size() == 0) return;
-
+        
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
-
+        
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
                 String statementString = "INSERT INTO orders (order_id, name_m, order_date, is_advertising, code_k, name_k, code_r, name_r, code_s, name_s, code_p, name_p, amt_packs, amount, comments, in_datetime, adv_type) " +
-                                                     "VALUES (?,        ?,      ?,          ?,              ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,         ?,      ?,        ?,           ?)";
+                        "VALUES (?,        ?,      ?,          ?,              ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,         ?,      ?,        ?,           ?)";
                 PreparedStatement stat = conn.prepareStatement(statementString);
-
+                
                 for (Order order : orderUnsentList) {
                     for (OrderItem orderItem : order.orderItems) {
                         stat.setString(1, order.orderUid);
@@ -433,13 +434,13 @@ public class ExchangeDataService extends IntentService {
                         stat.setString(15, order.comment);
                         stat.setTimestamp(16, new Timestamp(new Date().getTime()));
                         stat.setInt(17, order.advType);
-
+                        
                         stat.addBatch();
                     }
                 }
                 batchResults = stat.executeBatch();
                 success = true;
-
+                
             } catch (Exception e) {
                 e.printStackTrace();
                 success = false;
@@ -470,18 +471,18 @@ public class ExchangeDataService extends IntentService {
                 }
             }
         }
-
+        
         if (success) {
             messageOnBroadcast += "Все не отправленные заявки отправлены";
             dbLocal.setUnsetOrdersAsSent(orderUnsentList);
         }
-
+        
         sendBroadcastMessage(CHANNEL_ORDERS_UPDATES, messageOnBroadcast);
-
+        
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
     }
-
+    
     private boolean isAnyBatchFailed(int[] results) {
         boolean isFailed = false;
         for (int r : results) {
@@ -492,7 +493,7 @@ public class ExchangeDataService extends IntentService {
         }
         return isFailed;
     }
-
+    
     public Answer getRemoteAnswer(String orderUid) throws Exception {
         Connection conn = new ConnectionFactory(this).getConnection();
         Answer answer = null;
@@ -518,14 +519,14 @@ public class ExchangeDataService extends IntentService {
         }
         return answer;
     }
-
+    
     private void receiveAnswers() throws Exception {
         boolean answersReceived = false;
         ArrayList<String> orderUnansweredUids = dbLocal.getUnansweredOrdersUids();
         if (orderUnansweredUids.size() == 0) return;
-
+        
         //notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ANSWERS_ID);
-
+        
         for (String orderUid : orderUnansweredUids) {
             Answer answer = getRemoteAnswer(orderUid);
             if (answer != null) {
@@ -533,13 +534,13 @@ public class ExchangeDataService extends IntentService {
                 answersReceived = true;
             }
         }
-
+        
         //notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ANSWERS_ID);
-
+        
         if (answersReceived) {
             sendBroadcastMessage(CHANNEL_ORDERS_UPDATES, "Ответы на заявки получены");
             notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ANSWERS_ID, "Получен ответ", "Получены ответы на отправленные заявки");
         }
-
+        
     }
 }

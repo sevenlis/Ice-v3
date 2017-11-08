@@ -8,8 +8,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <!-- <uses-permission android:name="android.permission.INSTALL_PACKAGES"/> -->
     <!-- <uses-permission android:name="android.permission.VIBRATE"/> -->
 
@@ -23,42 +25,48 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppBaseTheme">
-        <activity android:name=".MainActivity">
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyANPU61RZAQxzgc-yy8lOvd41gdwZUiUes"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".OrderActivity">
+        <activity android:name=".activities.OrderActivity">
         </activity>
-        <activity android:name=".SettingsActivity">
+        <activity android:name=".activities.SettingsActivity">
         </activity>
-        <activity android:name=".UpdateDataActivity"
+        <activity android:name=".activities.UpdateDataActivity"
                   android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".SelectContragentActivity">
+        <activity android:name=".activities.SelectContragentActivity">
         </activity>
-        <activity android:name=".SelectSalespointActivity">
+        <activity android:name=".activities.SelectSalespointActivity">
         </activity>
-        <activity android:name=".SelectOrderItemActivity">
+        <activity android:name=".activities.SelectOrderItemActivity">
         </activity>
-        <activity android:name=".SearchProductActivity">
+        <activity android:name=".activities.SearchProductActivity">
         </activity>
 
         <service
-            android:name=".remote.sql.UpdateDataService"
+            android:name=".services.UpdateDataService"
             android:enabled="true"/>
         <service
-            android:name=".remote.sql.ExchangeDataService"
+            android:name=".services.ExchangeDataService"
             android:enabled="true"/>
         <service
-            android:name=".remote.sql.CheckApkUpdate"
+            android:name=".remote.CheckApkUpdate"
             android:enabled="true"/>
 
-        <activity android:name=".OrderViewActivity">
+        <activity android:name=".activities.OrderViewActivity">
         </activity>
-        <activity android:name=".AboutActivity"
+        <activity android:name=".activities.AboutActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
     </application>

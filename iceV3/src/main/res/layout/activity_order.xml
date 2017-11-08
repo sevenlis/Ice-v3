@@ -4,7 +4,7 @@
                 android:id="@+id/activity_order"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="by.ingman.sevenlis.ice_v3.OrderActivity"
+                tools:context="by.ingman.sevenlis.ice_v3.activities.OrderActivity"
                 android:orientation="vertical">
 
     <RelativeLayout

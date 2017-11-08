@@ -11,7 +11,7 @@
     android:paddingLeft="@dimen/default_gap"
     android:paddingRight="@dimen/default_gap"
     android:paddingTop="@dimen/default_gap"
-    tools:context="by.ingman.sevenlis.ice_v3.SelectOrderItemActivity">
+    tools:context="by.ingman.sevenlis.ice_v3.activities.SelectOrderItemActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

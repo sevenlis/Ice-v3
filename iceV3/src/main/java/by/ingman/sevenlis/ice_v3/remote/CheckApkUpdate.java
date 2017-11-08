@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3.remote.sql;
+package by.ingman.sevenlis.ice_v3.remote;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -27,52 +27,56 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import by.ingman.sevenlis.ice_v3.MainActivity;
 import by.ingman.sevenlis.ice_v3.R;
-import by.ingman.sevenlis.ice_v3.UpdateDataActivity;
+import by.ingman.sevenlis.ice_v3.activities.MainActivity;
+import by.ingman.sevenlis.ice_v3.activities.UpdateDataActivity;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class CheckApkUpdate extends IntentService {
-    public CheckApkUpdate() {  super(CheckApkUpdate.class.getSimpleName()); }
-
     private static final int NOTIFY_ID = 398;
     private static NotificationManager notificationManager;
-
+    public CheckApkUpdate() {
+        super(CheckApkUpdate.class.getSimpleName());
+    }
+    
     @Override
     public void onCreate() {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         super.onCreate();
     }
-
+    
     @Override
     protected void onHandleIntent(Intent intent) {
         File versionInfoFile = initVersionInfoFile();
         if (!isConnected() || versionInfoFile == null) return;
-
-        try { getVersionInfoFileRemote(versionInfoFile);
-        } catch (IOException e) { e.printStackTrace(); }
-
+        
+        try {
+            getVersionInfoFileRemote(versionInfoFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
         int curVersionCode = getVersionCodeLocal();
         int newVersionCode = readVersionCodeFromFile(versionInfoFile);
         double curVersionName = Double.valueOf(getVersionNameLocal());
         double newVersionName = Double.valueOf(readVersionNameFromFile(versionInfoFile));
-
+        
         if (curVersionCode < newVersionCode || curVersionName < newVersionName) {
             sendUpdateAvailableNotification(newVersionCode, newVersionName);
         }
         stopSelf();
     }
-
+    
     private void sendUpdateAvailableNotification(int newVersionCode, double newVersionName) {
         Notification.Builder mBuilder = new Notification.Builder(this)
                 .setTicker("Доступно обновление")
                 .setSmallIcon(R.drawable.ic_info_white)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ice_pict))
                 .setContentTitle("Доступно обновление")
-                .setContentText("Доступно обновление до версии " + FormatsUtils.getNumberFormatted(newVersionCode,0).trim() + " (" + FormatsUtils.getNumberFormatted(newVersionName,3).trim() + ")");
+                .setContentText("Доступно обновление до версии " + FormatsUtils.getNumberFormatted(newVersionCode, 0).trim() + " (" + FormatsUtils.getNumberFormatted(newVersionName, 3).trim() + ")");
         Intent resultIntent = new Intent(this, UpdateDataActivity.class);
-
+        
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         // Adds the back stack
         stackBuilder.addParentStack(MainActivity.class);
@@ -81,14 +85,14 @@ public class CheckApkUpdate extends IntentService {
         // Gets a PendingIntent containing the entire back stack
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
-
+        
         notificationManager.notify(NOTIFY_ID, mBuilder.build());
     }
-
+    
     public void cancelUpdateAvailableNotification() {
         notificationManager.cancel(NOTIFY_ID);
     }
-
+    
     private int readVersionCodeFromFile(File versionInfoFile) {
         int versionCode = 1;
         try {
@@ -108,7 +112,7 @@ public class CheckApkUpdate extends IntentService {
         }
         return versionCode;
     }
-
+    
     private String readVersionNameFromFile(File versionInfoFile) {
         String versionName = "0.000";
         try {
@@ -128,43 +132,49 @@ public class CheckApkUpdate extends IntentService {
         }
         return versionName;
     }
-
+    
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
-
+    
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return super.onBind(intent);
     }
-
+    
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
-
+    
     private boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         return ni != null && ni.isConnected();
     }
-
+    
     private int getVersionCodeLocal() {
         int versionCode = 1;
-        try { versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) { e.printStackTrace(); }
+        try {
+            versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
         return versionCode;
     }
-
+    
     private String getVersionNameLocal() {
         String versionName = "0.000";
-        try { versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) { e.printStackTrace(); }
+        try {
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
         return versionName;
     }
-
+    
     @Nullable
     private File initVersionInfoFile() {
         File appFolder = new File(String.format("%s%s%s", getApplicationContext().getFilesDir().getAbsolutePath(), File.separator, SettingsUtils.APP_FOLDER));
@@ -193,10 +203,10 @@ public class CheckApkUpdate extends IntentService {
         }
         return mFile;
     }
-
+    
     private void getVersionInfoFileRemote(File versionInfoFile) throws IOException {
         HttpURLConnection connection;
-        String versionUrl = SettingsUtils.Settings.getApkUpdateUrl(this).replace("iceV3.apk","version.info");
+        String versionUrl = SettingsUtils.Settings.getApkUpdateUrl(this).replace("iceV3.apk", "version.info");
         URL url = new URL(versionUrl);
         connection = (HttpURLConnection) url.openConnection();
         connection.connect();
@@ -207,12 +217,13 @@ public class CheckApkUpdate extends IntentService {
         }
         OutputStream out = new FileOutputStream(versionInfoFile);
         InputStream in = connection.getInputStream();
-        byte data[] = new byte[1024]; int count;
+        byte data[] = new byte[1024];
+        int count;
         while ((count = in.read(data)) != -1) {
             out.write(data, 0, count);
         }
         out.flush();
         out.close();
     }
-
+    
 }

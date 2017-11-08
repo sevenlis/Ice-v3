@@ -1,8 +1,10 @@
-package by.ingman.sevenlis.ice_v3;
+package by.ingman.sevenlis.ice_v3.activities;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+
+import by.ingman.sevenlis.ice_v3.R;
 
 public class SettingsActivity extends PreferenceActivity {
     @Override
@@ -14,7 +16,7 @@ public class SettingsActivity extends PreferenceActivity {
         SettingsFragment settingsFragment = new SettingsFragment();
         getFragmentManager().beginTransaction().replace(android.R.id.content, settingsFragment).commit();
     }
-
+    
     public static class SettingsFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {

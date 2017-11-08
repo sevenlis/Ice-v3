@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3.remote.sql;
+package by.ingman.sevenlis.ice_v3.remote;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -14,40 +14,42 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class ConnectionFactory {
+    private static Connection connection;
     private Context ctx;
-
+    
     public ConnectionFactory(Context context) {
         this.ctx = context;
-
+        
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
-
+    
     private boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
+        NetworkInfo ni = cm != null ? cm.getActiveNetworkInfo() : null;
         return ni != null && ni.isConnected();
     }
-
+    
     public Connection getConnection() {
         if (!isConnected()) return null;
-
-        String user     = SettingsUtils.RemoteDB.getUserName(ctx);
-        String password = SettingsUtils.RemoteDB.getPassword(ctx);
-
-        Connection connection = null;
+        
         try {
-            connection = DriverManager.getConnection(getConnectionURL(), user, password);
-            connection.setAutoCommit(false);
+            if (connection == null) {
+                String user = SettingsUtils.RemoteDB.getUserName(ctx);
+                String password = SettingsUtils.RemoteDB.getPassword(ctx);
+                connection = DriverManager.getConnection(getConnectionURL(), user, password);
+                connection.setAutoCommit(false);
+            }
         } catch (Exception e) {
+            connection = null;
             e.printStackTrace();
         }
         return connection;
     }
-
+    
     @NonNull
     private String getConnectionURL() {
         String urlFormat;
@@ -59,7 +61,7 @@ public class ConnectionFactory {
         String host = SettingsUtils.RemoteDB.getHost(ctx);
         String port = SettingsUtils.RemoteDB.getPort(ctx);
         String baseName = SettingsUtils.RemoteDB.getDBName(ctx);
-
+        
         return MessageFormat.format(urlFormat, host, port, baseName, instance);
     }
 }

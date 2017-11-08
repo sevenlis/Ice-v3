@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3;
+package by.ingman.sevenlis.ice_v3.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,8 +18,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import by.ingman.sevenlis.ice_v3.R;
+import by.ingman.sevenlis.ice_v3.adapters.CustomOrderListAdapter;
 import by.ingman.sevenlis.ice_v3.classes.Order;
-import by.ingman.sevenlis.ice_v3.local.sql.DBLocal;
+import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class MainActivityPageFragment extends Fragment {
@@ -46,26 +48,26 @@ public class MainActivityPageFragment extends Fragment {
             long dateMillis = savedInstanceState.getLong("orderDateLong");
             orderDateCal.setTimeInMillis(dateMillis);
         }
-        ctx                     = getActivity().getApplicationContext();
-        mHandler                = new Handler();
-        ordersList              = new ArrayList<>();
-        customOrderListAdapter  = new CustomOrderListAdapter(ctx, ordersList);
-        footerNoAdv             = new View(ctx);
-        footerIsAdv             = new View(ctx);
-        footerSummary           = new View(ctx);
-        layoutInflater          = getLayoutInflater();
+        ctx = getActivity().getApplicationContext();
+        mHandler = new Handler();
+        ordersList = new ArrayList<>();
+        customOrderListAdapter = new CustomOrderListAdapter(ctx, ordersList);
+        footerNoAdv = new View(ctx);
+        footerIsAdv = new View(ctx);
+        footerSummary = new View(ctx);
+        layoutInflater = getLayoutInflater();
     }
     
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putLong("orderDateLong", orderDateCal.getTimeInMillis());
+        super.onSaveInstanceState(outState);
     }
     
     @Override
     public void onAttach(Context context) {
-        super.onAttach(context);
         this.ctx = context;
+        super.onAttach(context);
     }
     
     @Override
@@ -86,7 +88,7 @@ public class MainActivityPageFragment extends Fragment {
         listViewOrders.setVisibility(View.VISIBLE);
         
         refreshOrdersList(true);
-    
+        
         return resultView;
     }
     
@@ -134,23 +136,23 @@ public class MainActivityPageFragment extends Fragment {
         listViewOrders.removeFooterView(footerIsAdv);
         listViewOrders.removeFooterView(footerSummary);
         if (ordersList.size() != 0) {
-            footerNoAdv     = createFooterSummary("Итого без рекламы:",0);
-            footerIsAdv     = createFooterSummary("Итого реклама:",1);
-            footerSummary   = createFooterSummary("Итого:",-1);
-    
-            listViewOrders.addFooterView(footerNoAdv,null,false);
-            listViewOrders.addFooterView(footerIsAdv,null,false);
-            listViewOrders.addFooterView(footerSummary,null,false);
+            footerNoAdv = createFooterSummary("Итого без рекламы:", 0);
+            footerIsAdv = createFooterSummary("Итого реклама:", 1);
+            footerSummary = createFooterSummary("Итого:", -1);
+            
+            listViewOrders.addFooterView(footerNoAdv, null, false);
+            listViewOrders.addFooterView(footerIsAdv, null, false);
+            listViewOrders.addFooterView(footerSummary, null, false);
         }
+    }
+    
+    public Calendar getOrderDateCal() {
+        return this.orderDateCal;
     }
     
     public void setOrderDateCal(Calendar orderDateCal) {
         this.orderDateCal = orderDateCal;
         FormatsUtils.roundDayToStart(this.orderDateCal);
-    }
-    
-    public Calendar getOrderDateCal() {
-        return this.orderDateCal;
     }
     
     private void viewOrder(Order order) {
@@ -165,18 +167,18 @@ public class MainActivityPageFragment extends Fragment {
         
         ((TextView) v.findViewById(R.id.textViewCaption)).setText(caption);
         
-        double sumPacks     = 0;
-        double sumAmount    = 0;
-        double sumSumma     = 0;
-        double sumWeight    = 0;
+        double sumPacks = 0d;
+        double sumAmount = 0d;
+        double sumSumma = 0d;
+        double sumWeight = 0d;
         for (Order order : ordersList) {
             if (isAdv != -1 && order.getIsAdvInteger() != isAdv) {
                 continue;
             }
-            sumPacks    += order.packs;
-            sumAmount   += order.quantity;
-            sumSumma    += order.summa;
-            sumWeight   += order.weight;
+            sumPacks += order.packs;
+            sumAmount += order.quantity;
+            sumSumma += order.summa;
+            sumWeight += order.weight;
         }
         String mText;
         

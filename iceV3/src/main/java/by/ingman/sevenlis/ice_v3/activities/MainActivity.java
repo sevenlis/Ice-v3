@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3;
+package by.ingman.sevenlis.ice_v3.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,29 +13,26 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import by.ingman.sevenlis.ice_v3.R;
+import by.ingman.sevenlis.ice_v3.adapters.MainActivityPagerAdapter;
 import by.ingman.sevenlis.ice_v3.classes.CustomPagerTabStrip;
 import by.ingman.sevenlis.ice_v3.classes.ExchangeDataIntents;
-import by.ingman.sevenlis.ice_v3.remote.sql.CheckApkUpdate;
-import by.ingman.sevenlis.ice_v3.remote.sql.ExchangeDataService;
+import by.ingman.sevenlis.ice_v3.remote.CheckApkUpdate;
+import by.ingman.sevenlis.ice_v3.services.ExchangeDataService;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.NotificationsUtil;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class MainActivity extends AppCompatActivity {
-    private Context ctx;
-    
     private static final int REQUEST_CODE_NEW_ORDER = 0;
-    
     private static ExchangeDataIntents exchangeDataIntents;
     private static CheckApkUpdate chkApkUpdate;
-    
+    private static ArrayList<MainActivityPageFragment> fragmentArrayList = new ArrayList<>();
+    private Context ctx;
     private NotificationsUtil notifUtils;
     private ViewPager viewPager;
     private CustomPagerTabStrip customPagerTabStrip;
     private MainActivityPageFragment currentFragment;
-    private static ArrayList<MainActivityPageFragment> fragmentArrayList = new ArrayList<>();
-    
-    
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -83,32 +80,40 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(ctx, OrderActivity.class);
                 intent.putExtra("longDate", newOrderDateCal.getTimeInMillis());
                 startActivityForResult(intent, REQUEST_CODE_NEW_ORDER);
-            } break;
+            }
+            break;
             case R.id.settings: {
                 Intent intent = new Intent(ctx, SettingsActivity.class);
                 startActivity(intent);
-            } break;
+            }
+            break;
             case R.id.update_data: {
                 Intent intent = new Intent(ctx, UpdateDataActivity.class);
                 startActivity(intent);
-            } break;
+            }
+            break;
             case R.id.stopExchangeData: {
                 stopExchangeDataService();
-            } break;
+            }
+            break;
             case R.id.startExchangeData: {
                 startExchangeDataService();
-            }  break;
+            }
+            break;
             case R.id.refresh_list: {
                 refreshCurrentFragment();
-            } break;
+            }
+            break;
             case R.id.return_today: {
                 currentFragment = findMainActivityFragment(Calendar.getInstance());
                 viewPager.setCurrentItem(fragmentArrayList.indexOf(currentFragment));
-            } break;
+            }
+            break;
             case R.id.about_app: {
                 Intent intent = new Intent(ctx, AboutActivity.class);
                 startActivity(intent);
-            } break;
+            }
+            break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -146,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             getActionBar().setTitle(R.string.app_name);
             getActionBar().setSubtitle("Журнал заявок");
         }
-    
+        
         Calendar now = Calendar.getInstance();
         FormatsUtils.roundDayToStart(now);
         
@@ -158,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             Calendar nDate = Calendar.getInstance();
             nDate.add(Calendar.DATE, i);
             FormatsUtils.roundDayToStart(nDate);
-    
+            
             MainActivityPageFragment fragment = new MainActivityPageFragment();
             fragment.setOrderDateCal(nDate);
             fragmentArrayList.add(fragment);
@@ -167,13 +172,13 @@ public class MainActivity extends AppCompatActivity {
                 currentFragment = fragment;
             }
         }
-    
+        
         if (savedInstanceState != null) {
             long dateMillis = savedInstanceState.getLong("orderDateLong");
             now.setTimeInMillis(dateMillis);
             currentFragment = findMainActivityFragment(now);
         }
-    
+        
         MainActivityPagerAdapter mainActivityPagerAdapter = new MainActivityPagerAdapter(getSupportFragmentManager(), fragmentArrayList);
         
         viewPager = (ViewPager) findViewById(R.id.main_pager);
@@ -182,9 +187,9 @@ public class MainActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-    
+            
             }
-    
+            
             @Override
             public void onPageSelected(int position) {
                 currentFragment = fragmentArrayList.get(position);
@@ -193,19 +198,19 @@ public class MainActivity extends AppCompatActivity {
                     customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
                 }
             }
-    
+            
             @Override
             public void onPageScrollStateChanged(int state) {
                 
             }
         });
-    
+        
         customPagerTabStrip = (CustomPagerTabStrip) findViewById(R.id.pager_title_strip);
         if (customPagerTabStrip != null) {
             customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
             customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
         }
-    
+        
         registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
         
         startService(new Intent(ctx, CheckApkUpdate.class));
@@ -216,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("currentDateMillis",currentFragment.getOrderDateCal().getTimeInMillis());
+        outState.putLong("currentDateMillis", currentFragment.getOrderDateCal().getTimeInMillis());
     }
     
     private void startExchangeDataService() {

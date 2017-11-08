@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3;
+package by.ingman.sevenlis.ice_v3.activities;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -18,7 +18,6 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -34,10 +33,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 
+import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Product;
-import by.ingman.sevenlis.ice_v3.local.sql.DBHelper;
-import by.ingman.sevenlis.ice_v3.remote.sql.ConnectionFactory;
-import by.ingman.sevenlis.ice_v3.remote.sql.UpdateDataService;
+import by.ingman.sevenlis.ice_v3.local.DBHelper;
+import by.ingman.sevenlis.ice_v3.remote.ConnectionFactory;
+import by.ingman.sevenlis.ice_v3.services.UpdateDataService;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
@@ -62,7 +62,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                         
                         pressedButton = (Button) findViewById(intent.getExtras().getInt(UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY));
                         if (pressedButton != null) pressedButton.setEnabled(true);
-    
+                        
                         pressedButton = (Button) findViewById(intent.getExtras().getInt(UpdateDataService.EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY));
                         if (pressedButton != null) pressedButton.setEnabled(true);
                     }
@@ -108,7 +108,7 @@ public class UpdateDataActivity extends AppCompatActivity {
         pressedButton.setEnabled(false);
         Intent intent = new Intent(ctx, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_RESTS_VALUE);
-        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY,pressedButton.getId());
+        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY, pressedButton.getId());
         startService(intent);
     }
     
@@ -121,7 +121,7 @@ public class UpdateDataActivity extends AppCompatActivity {
         pressedButton.setEnabled(false);
         Intent intent = new Intent(ctx, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_VALUE);
-        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY,pressedButton.getId());
+        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY, pressedButton.getId());
         startService(intent);
     }
     
@@ -134,10 +134,10 @@ public class UpdateDataActivity extends AppCompatActivity {
         pressedButton.setEnabled(false);
         Intent intent = new Intent(ctx, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_VALUE);
-        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY,pressedButton.getId());
+        intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY, pressedButton.getId());
         startService(intent);
     }
-
+    
     public void updateAPK(View view) {
         if (!isConnected()) {
             Toast.makeText(ctx, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
@@ -218,7 +218,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                     
                     if (rs_count.next()) {
                         rsSize = rs_count.getInt("count_rs");
-                        publishProgress(rsCount,rsSize);
+                        publishProgress(rsCount, rsSize);
                     }
                     
                     PreparedStatement stat = connection.prepareStatement("SELECT * FROM orders WHERE UPPER(name_m) = '" + managerName + "' AND order_date > CAST('" + fDate + "' as datetime) ORDER BY in_datetime");
@@ -275,7 +275,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                     progressDialog.setMessage("Получение ответов на загруженные заявки...");
                 }
             });
-    
+            
             int daysAhead = SettingsUtils.Settings.getOrderLogDepth(ctx);
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -daysAhead);
@@ -291,7 +291,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                     
                     if (rs_count.next()) {
                         rsSize = rs_count.getInt("count_rs");
-                        publishProgress(rsCount,rsSize);
+                        publishProgress(rsCount, rsSize);
                     }
                     
                     PreparedStatement stat = connection.prepareStatement("SELECT * FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE UPPER(O.name_m) = '" + managerName + "' AND O.order_date > CAST('" + fDate + "' as datetime)) ORDER BY R.datetime_unload");
@@ -319,9 +319,9 @@ public class UpdateDataActivity extends AppCompatActivity {
         
         @Override
         protected void onProgressUpdate(Integer... values) {
-            int progress    = values[0];
-            int maximum     = values[1];
-            setProgress(progressDialog,progress,maximum);
+            int progress = values[0];
+            int maximum = values[1];
+            setProgress(progressDialog, progress, maximum);
         }
         
         @Override
@@ -392,11 +392,9 @@ public class UpdateDataActivity extends AppCompatActivity {
     class UpdateAPKTask extends AsyncTask<Void, Integer, Void> {
         private static final int batchSize = 4096;
         private static final int progressSizeDivider = 1024;
-        
-        private String errorMessage = null;
-        
         private final File appFolder = new File(String.format("%s%s%s", Environment.getExternalStorageDirectory(), File.separator, SettingsUtils.APP_FOLDER));
         private final File apkFile = new File(String.format("%s%s%s", appFolder.getAbsolutePath(), File.separator, "iceV3.apk"));
+        private String errorMessage = null;
         
         @Override
         protected Void doInBackground(Void... params) {
@@ -500,7 +498,7 @@ public class UpdateDataActivity extends AppCompatActivity {
         protected void onProgressUpdate(Integer... values) {
             int progress = values[0] / progressSizeDivider;
             int maximum = values[1] / progressSizeDivider;
-            setProgress(progressDialog,progress,maximum);
+            setProgress(progressDialog, progress, maximum);
         }
         
         private void startUpdateIntent(File apkFile) {

@@ -7,20 +7,20 @@ import java.util.Locale;
 
 public class FormatsUtils {
     public static String getDateFormatted(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("E. dd.MM.yyyy г.",Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("E. dd.MM.yyyy г.", Locale.getDefault());
         return sdf.format(date);
         /*return  String.format(Locale.ROOT, "%02d", date.getDate()) + "." +
                 String.format(Locale.ROOT, "%02d", date.getMonth() + 1)    + "." +
                 String.format(Locale.ROOT, "%04d", date.getYear() + 1900)  + " г.";*/
     }
-
+    
     public static String getDateFormatted(Date date, String formatString) {
-        SimpleDateFormat sdf = new SimpleDateFormat(formatString,Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(formatString, Locale.getDefault());
         return sdf.format(date);
     }
-
+    
     public static String getDateFormattedWithSeconds(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("E. dd.MM.yyyy HH:mm:ss",Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("E. dd.MM.yyyy HH:mm:ss", Locale.getDefault());
         return sdf.format(date);
         /*return  String.format(Locale.ROOT, "%02d", date.getDate()) + "." +
                 String.format(Locale.ROOT, "%02d", date.getMonth() + 1)    + "." +
@@ -29,11 +29,11 @@ public class FormatsUtils {
                 String.format(Locale.ROOT, "%02d", date.getMinutes()) + ":" +
                 String.format(Locale.ROOT, "%02d", date.getSeconds());*/
     }
-
+    
     public static String getNumberFormatted(double number, int num) {
-        return String.format(Locale.getDefault(),"%." + String.valueOf(num) + "f",number);
+        return String.format(Locale.getDefault(), "%." + String.valueOf(num) + "f", number);
     }
-
+    
     public static Calendar roundDayToStart(Calendar c) {
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
@@ -41,7 +41,7 @@ public class FormatsUtils {
         c.set(Calendar.MILLISECOND, 0);
         return c;
     }
-
+    
     public static Calendar roundDayToEnd(Calendar c) {
         c.set(Calendar.HOUR_OF_DAY, 23);
         c.set(Calendar.MINUTE, 59);
@@ -49,16 +49,16 @@ public class FormatsUtils {
         c.set(Calendar.MILLISECOND, 999);
         return c;
     }
-
+    
     public double roundDigit(double d, int z) {
         if (z == 0) return Math.round(d);
-        double zz = Math.pow(10,z);
+        double zz = Math.pow(10, z);
         return Math.round(d * zz) / zz;
     }
-
+    
     public double roundDigit(float d, int z) {
         if (z == 0) return Math.round(d);
-        double zz = Math.pow(10,z);
+        double zz = Math.pow(10, z);
         return Math.round(d * zz) / zz;
     }
 }
