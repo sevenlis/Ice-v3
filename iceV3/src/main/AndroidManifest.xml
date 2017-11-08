@@ -31,28 +31,29 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
+
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activities.OrderActivity">
-        </activity>
-        <activity android:name=".activities.SettingsActivity">
-        </activity>
-        <activity android:name=".activities.UpdateDataActivity"
-                  android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".activities.SelectContragentActivity">
-        </activity>
-        <activity android:name=".activities.SelectSalespointActivity">
-        </activity>
-        <activity android:name=".activities.SelectOrderItemActivity">
-        </activity>
-        <activity android:name=".activities.SearchProductActivity">
-        </activity>
+
+        <activity
+            android:name=".activities.OrderActivity"/>
+        <activity
+            android:name=".activities.SettingsActivity"/>
+        <activity
+            android:name=".activities.UpdateDataActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.SelectContragentActivity"/>
+        <activity
+            android:name=".activities.SelectSalespointActivity"/>
+        <activity
+            android:name=".activities.SelectOrderItemActivity"/>
+        <activity
+            android:name=".activities.SearchProductActivity"/>
 
         <service
             android:name=".services.UpdateDataService"
@@ -64,11 +65,11 @@
             android:name=".remote.CheckApkUpdate"
             android:enabled="true"/>
 
-        <activity android:name=".activities.OrderViewActivity">
-        </activity>
-        <activity android:name=".activities.AboutActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog">
-        </activity>
+        <activity
+            android:name=".activities.OrderViewActivity"/>
+        <activity
+            android:name=".activities.AboutActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"/>
     </application>
 
 </manifest>
