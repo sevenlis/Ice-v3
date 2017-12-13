@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3.classes;
+package by.ingman.sevenlis.ice_v3.intents;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

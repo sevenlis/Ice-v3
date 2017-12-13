@@ -3,10 +3,20 @@ package by.ingman.sevenlis.ice_v3.utils;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import by.ingman.sevenlis.ice_v3.R;
 
 public class SettingsUtils {
     public static final String APP_FOLDER = "iceV3";
+    
+    public static final String LOCATION_TRACKING_TYPE_ALWAYS = "always";
+    public static final String LOCATION_TRACKING_TYPE_PERIOD = "periodically";
+    
+    public static final String LOCATION_TRACKING_PROVIDER_GPS = "gps";
+    public static final String LOCATION_TRACKING_PROVIDER_NETWORK = "network";
+    public static final String LOCATION_TRACKING_PROVIDER_PASSIVE = "passive";
     
     private static final String PREF_LAST_UPDATE_DATE = "PREF_LAST_UPDATE_DATE";
     private static final String PREF_UPDATE_IN_PROGRESS = "PREF_UPDATE_IN_PROGRESS";
@@ -16,11 +26,15 @@ public class SettingsUtils {
     private static final String PREF_DEFAULT_STOREHOUSE_CODE = "storehouseDefaultCode";
     private static final String PREF_NOTIFICATIONS_ENABLED = "updateNotificationsEnabled";
     private static final String PREF_DATA_UPDATE_INTERVAL = "exchangeFrequency";
+    private static final String PREF_LOCATION_TRACKING_INTERVAL = "locationTrackingFrequency";
+    private static final String PREF_LOCATION_TRACKING_TYPE = "locationTrackingTypeKey";
     private static final String PREF_APK_UPDATE_URL = "apkUpdateUrl";
     private static final String PREF_ORDER_DAYS_AHEAD = "orderDaysAhead";
     private static final String PREF_ORDER_LOG_DEPTH = "orderLogDepth";
     private static final String PREF_ITEM_SEARCH_INPUT_NUMERIC = "itemSearchInputNumeric";
     private static final String PREF_EXCHANGE_SHUTDOWN_ON_EXIT = "exchangeShutdownOnExit";
+    private static final String PREF_LOCATION_TRACKING_SHUTDOWN_ON_EXIT = "locationTrackingShutdownOnExit";
+    private static final String PREF_LOCATION_TRACKING_PROVIDERS = "locationTrackingProvidersKey";
     
     private static final String PREF_REMOTE_DB_HOST = "host";
     private static final String PREF_REMOTE_DB_PORT = "port";
@@ -70,6 +84,24 @@ public class SettingsUtils {
         
         public static int getDataUpdateInterval(Context ctx) {
             return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_DATA_UPDATE_INTERVAL, "30"));
+        }
+    
+        public static int getLocationTrackingInterval(Context ctx) {
+            return Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_LOCATION_TRACKING_INTERVAL, "10"));
+        }
+    
+        public static String getLocationTrackingType(Context ctx) {
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_LOCATION_TRACKING_TYPE, LOCATION_TRACKING_TYPE_ALWAYS);
+        }
+        
+        public static Set<String> getLocationTrackingProviders(Context ctx) {
+            HashSet<String> defaults = new HashSet<>();
+            defaults.add(LOCATION_TRACKING_PROVIDER_GPS);
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getStringSet(PREF_LOCATION_TRACKING_PROVIDERS, defaults);
+        }
+    
+        public static boolean getLocationTrackingShutdownOnExit(Context ctx) {
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(PREF_LOCATION_TRACKING_SHUTDOWN_ON_EXIT, false);
         }
         
         public static String getApkUpdateUrl(Context ctx) {

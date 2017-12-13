@@ -24,7 +24,7 @@
     <string name="pref_exchange_frequency_title">Интервал обновления данных</string>
     <string name="pref_exchange_frequency_summ">Интервал в секундах</string>
     <string name="pref_exchange_shutdown_on_exit_title">Останавливать сервис обновлений</string>
-    <string name="pref_exchange_shutdown_on_exit">Останавливать сервис обновлений при выходе из программы</string>
+    <string name="pref_exchange_shutdown_on_exit">Останавливать сервис обмена данными</string>
     <string name="pref_apk_update_url_title">Путь к обновленному приложению</string>
     <string name="pref_apk_update_url_summ">Ссылка на обновленный apk-файл приложения</string>
     <string name="pref_cat_DB_options_title">Настройки подключения к удаленной БД</string>
@@ -36,6 +36,10 @@
     <string name="pref_db_username_summ">Имя пользователя для доступа к БД</string>
     <string name="pref_db_password_title">Пароль пользователя БД</string>
     <string name="pref_instanceDB_title">Именованный экземпляр сервера</string>
+    <string name="pref_gps_tracking_title">Настройки GPS логгирования</string>
+    <string name="pref_gps_type_title">Тип опроса местоположения</string>
+    <string name="pref_location_tracking_shutdown_on_exit">Останавливать сервис GPS логгирования</string>
+    <string name="pref_on_exit">При выходе из программы</string>
     <string-array name="adv_types_strings">
         <item>Обычная РА</item>
         <item>Perfect Store</item>
@@ -48,6 +52,26 @@
         <item>Отправлена</item>
         <item>Получен ответ</item>
     </string-array>
+    <string-array name="location_tracking_type_names">
+        <item>Слежение за местоположением</item>
+        <item>Запрос текущего местоположения</item>
+    </string-array>
+    <string-array name="location_tracking_type_values">
+        <item>always</item>
+        <item>periodically</item>
+    </string-array>
+    <string-array name="location_tracking_providers_names">
+        <item>Датчик GPS телефона</item>
+        <item>Данные сетей GSM</item>
+        <item>Пассивный режим</item>
+    </string-array>
+    <string name="location_tracking_providers_title">Используемые поставщики местоположения</string>
+    <string-array name="location_tracking_providers_values">
+        <item>gps</item>
+        <item>network</item>
+        <item>passive</item>
+    </string-array>
+    <string name="location_tracking_providers_default">gps</string>
     <string name="notif_error_updating">Ошибка обновления данных</string>
     <string name="notif_update_data_title">Обновление данных</string>
     <string name="notif_update_data_complete_title">Обновление завершено</string>
@@ -117,4 +141,6 @@
     <string name="order_condition">Состояние заявки</string>
     <string name="comment">Комментарий</string>
     <string name="datetime">Дата время</string>
+    <string name="title_activity_maps">Карта</string>
+    <string name="show_location">Местоположение</string>
 </resources>

@@ -56,7 +56,7 @@ public class ExchangeDataService extends IntentService {
     
     private boolean isConnect() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
+        NetworkInfo ni = cm != null ? cm.getActiveNetworkInfo() : null;
         return ni != null && ni.isConnected();
     }
     

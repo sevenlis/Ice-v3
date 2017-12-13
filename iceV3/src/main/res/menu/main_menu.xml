@@ -22,6 +22,9 @@
           app:title="@string/settings"/>
     <item android:title="@string/update_data"
           android:id="@+id/update_data"/>
+    <item
+        android:id="@+id/show_location"
+        android:title="@string/show_location"/>
     <group android:id="@+id/exchangeServiceMenuGroup">
         <item android:title="Остановить автообновление"
               android:id="@+id/stopExchangeData"

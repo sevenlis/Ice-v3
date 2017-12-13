@@ -1,4 +1,4 @@
-package by.ingman.sevenlis.ice_v3.activities;
+package by.ingman.sevenlis.ice_v3.activities.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,8 +17,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.R;
+import by.ingman.sevenlis.ice_v3.activities.OrderViewActivity;
 import by.ingman.sevenlis.ice_v3.adapters.CustomOrderListAdapter;
 import by.ingman.sevenlis.ice_v3.classes.Order;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
@@ -55,7 +57,7 @@ public class MainActivityPageFragment extends Fragment {
         footerNoAdv = new View(ctx);
         footerIsAdv = new View(ctx);
         footerSummary = new View(ctx);
-        layoutInflater = getLayoutInflater();
+        layoutInflater = this.getLayoutInflater();
     }
     
     @Override
@@ -87,43 +89,33 @@ public class MainActivityPageFragment extends Fragment {
         progressBarLoad.setVisibility(View.GONE);
         listViewOrders.setVisibility(View.VISIBLE);
         
-        refreshOrdersList(true);
+        refreshOrdersList();
         
         return resultView;
     }
     
-    public void refreshOrdersList(final Boolean showProgress) {
+    public void refreshOrdersList() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (showProgress) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBarLoad.setVisibility(View.VISIBLE);
-                            listViewOrders.setVisibility(View.GONE);
-                        }
-                    });
-                }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBarLoad.setVisibility(View.VISIBLE);
+                        listViewOrders.setVisibility(View.GONE);
+                    }
+                });
                 
-                DBLocal dbLocalThread = new DBLocal(ctx);
-                final ArrayList<Order> newOrdersList = dbLocalThread.getOrdersList(orderDateCal);
-                
-                if (showProgress) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            customOrderListAdapter.updateOrdersList(newOrdersList);
-                            
-                            progressBarLoad.setVisibility(View.GONE);
-                            listViewOrders.setVisibility(View.VISIBLE);
-                        }
-                    });
-                }
+                final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
                 
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        customOrderListAdapter.updateOrdersList(orders);
+                        
+                        progressBarLoad.setVisibility(View.GONE);
+                        listViewOrders.setVisibility(View.VISIBLE);
+    
                         refreshOrdersListView();
                     }
                 });
@@ -161,7 +153,7 @@ public class MainActivityPageFragment extends Fragment {
         startActivity(orderViewIntent);
     }
     
-    View createFooterSummary(String caption, int isAdv) {
+    private View createFooterSummary(String caption, int isAdv) {
         if (ordersList == null) ordersList = new ArrayList<>();
         View v = layoutInflater.inflate(R.layout.order_item_list_footer_summary, null, false);
         

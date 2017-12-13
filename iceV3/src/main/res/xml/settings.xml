@@ -2,34 +2,34 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
+        android:defaultValue="@string/pref_manager_name_default"
         android:key="managerName"
         android:summary="@string/pref_manager_db_summ"
-        android:title="@string/pref_manager_db"
-        android:defaultValue="@string/pref_manager_name_default" />
+        android:title="@string/pref_manager_db"/>
 
     <EditTextPreference
+        android:defaultValue="@string/pref_storehouse_code_default"
+        android:inputType="number"
         android:key="storehouseDefaultCode"
         android:summary="@string/pref_default_storehouse_summ"
-        android:title="@string/pref_default_storehouse_title"
-        android:inputType="number"
-        android:defaultValue="@string/pref_storehouse_code_default" />
+        android:title="@string/pref_default_storehouse_title"/>
 
     <EditTextPreference
-        android:defaultValue="10"
-        android:key="orderDaysAhead"
-        android:title="@string/pref_order_days_ahead_title"
-        android:summary="@string/pref_order_days_ahead_summ"
-        android:inputType="number"
         android:id="@+id/orderDaysAheadRestrict"
+        android:defaultValue="10"
+        android:inputType="number"
+        android:key="orderDaysAhead"
+        android:summary="@string/pref_order_days_ahead_summ"
+        android:title="@string/pref_order_days_ahead_title"
         />
 
     <EditTextPreference
-        android:defaultValue="30"
-        android:key="orderLogDepth"
-        android:title="@string/pref_order_log_depth_title"
-        android:summary="@string/pref_order_log_depth_summ"
-        android:inputType="number"
         android:id="@+id/orderLogDepth"
+        android:defaultValue="30"
+        android:inputType="number"
+        android:key="orderLogDepth"
+        android:summary="@string/pref_order_log_depth_summ"
+        android:title="@string/pref_order_log_depth_title"
         />
 
     <CheckBoxPreference
@@ -40,32 +40,61 @@
 
     <CheckBoxPreference
         android:defaultValue="true"
-        android:title="@string/item_search_input_numeric"
         android:key="itemSearchInputNumeric"
-        android:summary="@string/item_search_input_numeric_summ"/>
+        android:summary="@string/item_search_input_numeric_summ"
+        android:title="@string/item_search_input_numeric"/>
     <PreferenceScreen
         android:key="screen_sys_opt"
+        android:persistent="false"
         android:summary="@string/pref_screen_sys_options_summ"
-        android:title="@string/pref_screen_sys_options_title"
-        android:persistent="false">
+        android:title="@string/pref_screen_sys_options_title">
 
         <EditTextPreference
             android:defaultValue="30"
+            android:inputType="number"
             android:key="exchangeFrequency"
             android:summary="@string/pref_exchange_frequency_summ"
-            android:title="@string/pref_exchange_frequency_title"
-            android:inputType="number"/>
+            android:title="@string/pref_exchange_frequency_title"/>
 
         <CheckBoxPreference
             android:defaultValue="false"
-            android:title="@string/pref_exchange_shutdown_on_exit_title"
             android:key="exchangeShutdownOnExit"
-            android:summary="@string/pref_exchange_shutdown_on_exit"/>
+            android:summary="@string/pref_on_exit"
+            android:title="@string/pref_exchange_shutdown_on_exit_title"/>
         <EditTextPreference
             android:defaultValue="@string/pref_apk_update_url"
             android:key="apkUpdateUrl"
             android:summary="@string/pref_apk_update_url_summ"
             android:title="@string/pref_apk_update_url_title"/>
+
+        <PreferenceScreen
+            android:key="gps_tracking_screen"
+            android:title="@string/pref_gps_tracking_title">
+            <EditTextPreference
+                android:defaultValue="10"
+                android:inputType="number"
+                android:key="locationTrackingFrequency"
+                android:summary="@string/pref_exchange_frequency_summ"
+                android:title="@string/pref_exchange_frequency_title"/>
+            <ListPreference
+                android:defaultValue="always"
+                android:entries="@array/location_tracking_type_names"
+                android:entryValues="@array/location_tracking_type_values"
+                android:key="locationTrackingTypeKey"
+                android:title="@string/pref_gps_type_title"/>
+            <MultiSelectListPreference
+                android:defaultValue="@string/location_tracking_providers_default"
+                android:entries="@array/location_tracking_providers_names"
+                android:entryValues="@array/location_tracking_providers_values"
+                android:key="locationTrackingProvidersKey"
+                android:title="@string/location_tracking_providers_title"/>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="locationTrackingShutdownOnExit"
+                android:summary="@string/pref_on_exit"
+                android:title="@string/pref_location_tracking_shutdown_on_exit"/>
+        </PreferenceScreen>
+
 
         <PreferenceCategory
             android:key="catDB"
@@ -102,8 +131,8 @@
                 android:defaultValue="@string/pref_passDB_default"
                 android:inputType="textPassword"
                 android:key="passwordDB"
-                android:title="@string/pref_db_password_title"
-                android:password="true"/>
+                android:password="true"
+                android:title="@string/pref_db_password_title"/>
         </PreferenceCategory>
     </PreferenceScreen>
 

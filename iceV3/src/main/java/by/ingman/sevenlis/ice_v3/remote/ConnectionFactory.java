@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,10 +37,11 @@ public class ConnectionFactory {
     public Connection getConnection() {
         if (!isConnected()) return null;
         
+        String user = SettingsUtils.RemoteDB.getUserName(ctx);
+        String password = SettingsUtils.RemoteDB.getPassword(ctx);
+        
         try {
-            if (connection == null) {
-                String user = SettingsUtils.RemoteDB.getUserName(ctx);
-                String password = SettingsUtils.RemoteDB.getPassword(ctx);
+            if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(getConnectionURL(), user, password);
                 connection.setAutoCommit(false);
             }

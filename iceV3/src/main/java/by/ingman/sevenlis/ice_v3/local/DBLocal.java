@@ -5,11 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.location.Location;
 import android.text.TextUtils;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.classes.Answer;
 import by.ingman.sevenlis.ice_v3.classes.Contragent;
@@ -27,13 +31,14 @@ public class DBLocal {
     public static final String TABLE_CONTRAGENTS = "contragents";
     static final String TABLE_ORDERS = "orders";
     static final String TABLE_ANSWERS = "answers";
+    static final String TABLE_LOCATION = "location";
     private Context ctx;
     
     public DBLocal(Context context) {
         this.ctx = context;
     }
     
-    public ArrayList<Order> getOrdersList(Calendar dateCal) {
+    public List<Order> getOrdersList(Calendar dateCal) {
         DBHelper dbHelper = new DBHelper(ctx);
         
         Calendar dayStart = (Calendar) dateCal.clone();
@@ -45,7 +50,7 @@ public class DBLocal {
         Long dayStartMillis = dayStart.getTimeInMillis();
         Long dayEndMillis = dayEnd.getTimeInMillis();
         
-        ArrayList<String> ordersUids = new ArrayList<>();
+        List<String> ordersUids = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true, TABLE_ORDERS, new String[]{"order_id"}, "order_date >= ? AND order_date <= ?", new String[]{String.valueOf(dayStartMillis), String.valueOf(dayEndMillis)}, null, null, null, null);
         while (cursor.moveToNext())
@@ -53,7 +58,7 @@ public class DBLocal {
         cursor.close();
         db.close();
         
-        ArrayList<Order> ordersList = new ArrayList<>();
+        List<Order> ordersList = new ArrayList<>();
         for (String orderUid : ordersUids) {
             ordersList.add(getOrder(orderUid));
         }
@@ -122,7 +127,7 @@ public class DBLocal {
         
         ArrayList<OrderItem> orderItems = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ORDERS, null, "order_id = ?", new String[]{orderUid}, null, null, null, null);
+        Cursor cursor = db.query(false, TABLE_ORDERS, null, "order_id = ?", new String[]{orderUid}, null, null, null, null);
         while (cursor.moveToNext()) {
             Product product = new Product(cursor.getString(cursor.getColumnIndex("code_p")), cursor.getString(cursor.getColumnIndex("name_p")),
                     cursor.getDouble(cursor.getColumnIndex("weight_p")), cursor.getDouble(cursor.getColumnIndex("price_p")),
@@ -233,7 +238,7 @@ public class DBLocal {
         
         String value = "";
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(DBLocal.TABLE_DEBTS, null, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
+        Cursor cursor = db.query(true, DBLocal.TABLE_DEBTS, new String[]{"rating"}, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
         if (cursor.moveToFirst()) {
             value = cursor.getString(cursor.getColumnIndex("rating"));
         }
@@ -247,7 +252,7 @@ public class DBLocal {
         
         double value = 0;
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(DBLocal.TABLE_DEBTS, null, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
+        Cursor cursor = db.query(true, DBLocal.TABLE_DEBTS, new String[]{"debt"}, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
         if (cursor.moveToFirst()) {
             value = cursor.getDouble(cursor.getColumnIndex("debt"));
         }
@@ -261,7 +266,7 @@ public class DBLocal {
         
         double value = 0;
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(DBLocal.TABLE_DEBTS, null, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
+        Cursor cursor = db.query(true, DBLocal.TABLE_DEBTS, new String[]{"overdue"}, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
         if (cursor.moveToFirst()) {
             value = cursor.getDouble(cursor.getColumnIndex("overdue"));
         }
@@ -276,7 +281,7 @@ public class DBLocal {
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(DBLocal.TABLE_RESTS, null, "code_s = ? AND code_p = ? AND name_p = ?", new String[]{code_s, product.code, product.name}, null, null, null, "1");
+        Cursor cursor = db.query(true, DBLocal.TABLE_RESTS, new String[]{"amount"}, "code_s = ? AND code_p = ? AND name_p = ?", new String[]{code_s, product.code, product.name}, null, null, null, "1");
         if (cursor.moveToFirst()) {
             value = cursor.getDouble(cursor.getColumnIndex("amount"));
         }
@@ -291,7 +296,7 @@ public class DBLocal {
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(DBLocal.TABLE_ORDERS, new String[]{"amount"}, "code_s = ? AND code_p = ? AND name_p = ? AND status <> 2", new String[]{code_s, product.code, product.name}, null, null, null, null);
+        Cursor cursor = db.query(true, DBLocal.TABLE_ORDERS, new String[]{"amount"}, "code_s = ? AND code_p = ? AND name_p = ? AND status <> 2", new String[]{code_s, product.code, product.name}, null, null, null, null);
         if (cursor.moveToFirst()) {
             value += cursor.getDouble(cursor.getColumnIndex("amount"));
         }
@@ -307,7 +312,7 @@ public class DBLocal {
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        cursor = db.query(DBLocal.TABLE_RESTS, null, "code_s = ? AND code_p = ? AND name_p = ?", new String[]{code_s, product.code, product.name}, null, null, null, "1");
+        cursor = db.query(true, DBLocal.TABLE_RESTS, new String[]{"packs"}, "code_s = ? AND code_p = ? AND name_p = ?", new String[]{code_s, product.code, product.name}, null, null, null, "1");
         if (cursor.moveToFirst()) {
             value = cursor.getDouble(cursor.getColumnIndex("packs"));
         }
@@ -324,7 +329,7 @@ public class DBLocal {
         double value = 0;
         String code_s = SettingsUtils.Settings.getDefaultStoreHouseCode(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        cursor = db.query(DBLocal.TABLE_ORDERS, new String[]{"amt_packs"}, "code_s = ? AND code_p = ? AND name_p = ? AND status <> 2", new String[]{code_s, product.code, product.name}, null, null, null, null);
+        cursor = db.query(true, DBLocal.TABLE_ORDERS, new String[]{"amt_packs"}, "code_s = ? AND code_p = ? AND name_p = ? AND status <> 2", new String[]{code_s, product.code, product.name}, null, null, null, null);
         while (cursor.moveToNext()) {
             value += cursor.getDouble(cursor.getColumnIndex("amt_packs"));
         }
@@ -507,5 +512,70 @@ public class DBLocal {
         cursor.close();
         db.close();
         return answer;
+    }
+    
+    public void saveLocation(double lat, double lon, long time) {
+        DBHelper dbHelper = new DBHelper(ctx);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("latitude", lat);
+        cv.put("longitude", lon);
+        cv.put("time", time);
+        cv.put("time_update", Calendar.getInstance().getTimeInMillis());
+        try {
+            db.beginTransaction();
+            db.insert(DBLocal.TABLE_LOCATION, null, cv);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+        db.close();
+    }
+    
+    public LatLng getStartRoutePosition(long time) {
+        double latitude = 0d;
+        double longitude = 0d;
+        
+        DBHelper dbHelper = new DBHelper(ctx);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(DBLocal.TABLE_LOCATION, null, "time <= ?", new String[]{String.valueOf(time)}, null, null, "time DESC", "1");
+        if (cursor.moveToFirst()) {
+            latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
+            longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+        }
+        cursor.close();
+        db.close();
+        
+        return new LatLng(latitude,longitude);
+    }
+    
+    public ArrayList<LatLng> getRoutePositions(long time) {
+        ArrayList<LatLng> positions = new ArrayList<>();
+        
+        Calendar startTime = Calendar.getInstance();
+        startTime.setTimeInMillis(time);
+        FormatsUtils.roundDayToStart(startTime);
+        
+        Calendar endTime = Calendar.getInstance();
+        endTime.setTimeInMillis(time);
+        FormatsUtils.roundDayToEnd(endTime);
+    
+        DBHelper dbHelper = new DBHelper(ctx);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(DBLocal.TABLE_LOCATION, null, "time between ? and ?", new String[]{String.valueOf(startTime.getTimeInMillis()),String.valueOf(endTime.getTimeInMillis())}, null, null, "time ASC", null);
+        while (cursor.moveToNext()) {
+            LatLng latLng = new LatLng(cursor.getDouble(cursor.getColumnIndex("latitude")),cursor.getDouble(cursor.getColumnIndex("longitude")));
+            positions.add(latLng);
+        }
+        cursor.close();
+        db.close();
+        
+        if (positions.size() == 0) {
+            positions.add(getStartRoutePosition(time));
+        }
+        
+        return positions;
     }
 }

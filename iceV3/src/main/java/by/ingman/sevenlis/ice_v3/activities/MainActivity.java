@@ -14,11 +14,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import by.ingman.sevenlis.ice_v3.R;
+import by.ingman.sevenlis.ice_v3.activities.fragments.MainActivityPageFragment;
 import by.ingman.sevenlis.ice_v3.adapters.MainActivityPagerAdapter;
 import by.ingman.sevenlis.ice_v3.classes.CustomPagerTabStrip;
-import by.ingman.sevenlis.ice_v3.classes.ExchangeDataIntents;
+import by.ingman.sevenlis.ice_v3.intents.ExchangeDataIntents;
+import by.ingman.sevenlis.ice_v3.intents.LocationTrackerTaskIntents;
 import by.ingman.sevenlis.ice_v3.remote.CheckApkUpdate;
 import by.ingman.sevenlis.ice_v3.services.ExchangeDataService;
+import by.ingman.sevenlis.ice_v3.services.LocationTrackingService;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.NotificationsUtil;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
@@ -26,6 +29,7 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_NEW_ORDER = 0;
     private static ExchangeDataIntents exchangeDataIntents;
+    private static LocationTrackerTaskIntents locationTrackerTaskIntents;
     private static CheckApkUpdate chkApkUpdate;
     private static ArrayList<MainActivityPageFragment> fragmentArrayList = new ArrayList<>();
     private Context ctx;
@@ -114,6 +118,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
             break;
+            case R.id.show_location: {
+                Intent intent = new Intent(ctx, MapsActivity.class);
+                startActivity(intent);
+            }
+            break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -140,9 +149,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        ctx = getApplicationContext();
+        ctx = this.getApplicationContext();
         notifUtils = new NotificationsUtil(ctx);
         exchangeDataIntents = new ExchangeDataIntents();
+        locationTrackerTaskIntents = new LocationTrackerTaskIntents();
         chkApkUpdate = new CheckApkUpdate();
         
         if (getActionBar() != null) {
@@ -210,12 +220,6 @@ public class MainActivity extends AppCompatActivity {
             customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
             customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
         }
-        
-        registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
-        
-        startService(new Intent(ctx, CheckApkUpdate.class));
-        
-        startExchangeDataService();
     }
     
     @Override
@@ -233,6 +237,60 @@ public class MainActivity extends AppCompatActivity {
         exchangeDataIntents.stopExchangeDataServiceAlarm(ctx);
     }
     
+    private void startLocationTrackerService() {
+        Intent intent;
+        String locationTrackingType = SettingsUtils.Settings.getLocationTrackingType(ctx);
+        switch (locationTrackingType) {
+            case SettingsUtils.LOCATION_TRACKING_TYPE_ALWAYS:
+                intent = new Intent(ctx, LocationTrackingService.class);
+                break;
+            case SettingsUtils.LOCATION_TRACKING_TYPE_PERIOD:
+                intent = LocationTrackerTaskIntents.getLocationTrackerTaskIntent(ctx);
+                locationTrackerTaskIntents.startLocationTrackerServiceTaskAlarm(ctx);
+                break;
+            default:
+                return;
+        }
+        startService(intent);
+    }
+    
+    private void stopLocationTrackerService() {
+        Intent intent;
+        String locationTrackingType = SettingsUtils.Settings.getLocationTrackingType(ctx);
+        switch (locationTrackingType) {
+            case SettingsUtils.LOCATION_TRACKING_TYPE_ALWAYS:
+                intent = new Intent(ctx, LocationTrackingService.class);
+                break;
+            case SettingsUtils.LOCATION_TRACKING_TYPE_PERIOD:
+                intent = LocationTrackerTaskIntents.getLocationTrackerTaskIntent(ctx);
+                locationTrackerTaskIntents.stopLocationTrackerServiceTaskAlarm(ctx);
+                break;
+            default:
+                return;
+        }
+        stopService(intent);
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+    
+        registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
+    
+        startService(new Intent(ctx, CheckApkUpdate.class));
+    
+        stopExchangeDataService();
+        startExchangeDataService();
+    
+        stopLocationTrackerService();
+        startLocationTrackerService();
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+    
     @Override
     protected void onDestroy() {
         unregisterReceiver(broadcastReceiver);
@@ -240,13 +298,16 @@ public class MainActivity extends AppCompatActivity {
             stopExchangeDataService();
             notifUtils.dismissAllUpdateNotifications();
         }
+        if (SettingsUtils.Settings.getLocationTrackingShutdownOnExit(ctx)) {
+            stopLocationTrackerService();
+        }
         chkApkUpdate.cancelUpdateAvailableNotification();
         super.onDestroy();
     }
     
     private void refreshCurrentFragment() {
         if (currentFragment == null) return;
-        currentFragment.refreshOrdersList(true);
+        currentFragment.refreshOrdersList();
     }
     
 }

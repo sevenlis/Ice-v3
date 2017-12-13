@@ -46,5 +46,6 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.5'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.squareup.retrofit:retrofit:1.7.1'
 }
 

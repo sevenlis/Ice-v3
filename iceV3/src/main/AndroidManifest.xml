@@ -26,8 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppBaseTheme">
         <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyANPU61RZAQxzgc-yy8lOvd41gdwZUiUes"/>
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDPlKnFjNuVMB2SJ49QaAJPrydgWlq6z78"/>
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
@@ -35,25 +35,23 @@
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".activities.OrderActivity"/>
-        <activity
-            android:name=".activities.SettingsActivity"/>
+        <activity android:name=".activities.OrderActivity"/>
+        <activity android:name=".activities.SettingsActivity"/>
         <activity
             android:name=".activities.UpdateDataActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".activities.SelectContragentActivity"/>
+        <activity android:name=".activities.SelectSalespointActivity"/>
+        <activity android:name=".activities.SelectOrderItemActivity"/>
+        <activity android:name=".activities.SearchProductActivity"/>
+        <activity android:name=".activities.OrderViewActivity"/>
         <activity
-            android:name=".activities.SelectContragentActivity"/>
-        <activity
-            android:name=".activities.SelectSalespointActivity"/>
-        <activity
-            android:name=".activities.SelectOrderItemActivity"/>
-        <activity
-            android:name=".activities.SearchProductActivity"/>
+            android:name=".activities.AboutActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"/>
 
         <service
             android:name=".services.UpdateDataService"
@@ -64,12 +62,20 @@
         <service
             android:name=".remote.CheckApkUpdate"
             android:enabled="true"/>
+        <service
+            android:name=".services.LocationTrackerIntentServiceTask"
+            android:enabled="true"/>
+        <service
+            android:name=".services.LocationTrackingService"
+            android:enabled="true"/>
 
         <activity
-            android:name=".activities.OrderViewActivity"/>
-        <activity
-            android:name=".activities.AboutActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"/>
+            android:name=".activities.MapsActivity"
+            android:label="@string/title_activity_maps">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="by.ingman.sevenlis.ice_v3.activities.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 
-import by.ingman.sevenlis.ice_v3.activities.MainActivityPageFragment;
+import by.ingman.sevenlis.ice_v3.activities.fragments.MainActivityPageFragment;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class MainActivityPagerAdapter extends FragmentStatePagerAdapter {

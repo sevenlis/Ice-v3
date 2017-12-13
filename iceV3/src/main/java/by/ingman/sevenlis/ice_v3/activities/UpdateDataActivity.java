@@ -95,7 +95,7 @@ public class UpdateDataActivity extends AppCompatActivity {
     
     private boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
+        NetworkInfo ni = cm != null ? cm.getActiveNetworkInfo() : null;
         return ni != null && ni.isConnected();
     }
     
@@ -186,12 +186,14 @@ public class UpdateDataActivity extends AppCompatActivity {
         
         @Override
         protected Void doInBackground(Void... params) {
+            SettingsUtils.Runtime.setUpdateInProgress(ctx, true);
             try {
                 getOrdersFromRemote();
                 getAnswersFromRemote();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            SettingsUtils.Runtime.setUpdateInProgress(ctx, false);
             return null;
         }
         
@@ -398,14 +400,14 @@ public class UpdateDataActivity extends AppCompatActivity {
         
         @Override
         protected Void doInBackground(Void... params) {
+            SettingsUtils.Runtime.setUpdateInProgress(ctx, true);
+            
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     progressDialog = showProgressDialog("Получение файла обновления...");
                 }
             });
-            
-            SettingsUtils.Runtime.setUpdateInProgress(ctx, true);
             
             InputStream input = null;
             OutputStream output = null;
@@ -491,6 +493,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                 
                 if (connection != null) connection.disconnect();
             }
+            SettingsUtils.Runtime.setUpdateInProgress(ctx, false);
             return null;
         }
         
@@ -502,7 +505,6 @@ public class UpdateDataActivity extends AppCompatActivity {
         }
         
         private void startUpdateIntent(File apkFile) {
-            SettingsUtils.Runtime.setUpdateInProgress(ctx, false);
             if (apkFile != null && apkFile.exists()) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");

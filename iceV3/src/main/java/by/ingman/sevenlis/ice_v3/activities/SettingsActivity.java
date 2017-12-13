@@ -13,8 +13,7 @@ public class SettingsActivity extends PreferenceActivity {
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        SettingsFragment settingsFragment = new SettingsFragment();
-        getFragmentManager().beginTransaction().replace(android.R.id.content, settingsFragment).commit();
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
     }
     
     public static class SettingsFragment extends PreferenceFragment {

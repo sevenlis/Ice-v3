@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import by.ingman.sevenlis.ice_v3.R;
@@ -22,10 +23,10 @@ public class CustomOrderListAdapter extends BaseAdapter {
     public CustomOrderListAdapter(Context context, ArrayList<Order> orders) {
         this.ctx = context;
         this.objects = orders;
-        this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.layoutInflater = LayoutInflater.class.cast(ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
     }
     
-    public void updateOrdersList(ArrayList<Order> orders) {
+    public void updateOrdersList(List<Order> orders) {
         this.objects.clear();
         this.objects.addAll(orders);
         this.notifyDataSetChanged();

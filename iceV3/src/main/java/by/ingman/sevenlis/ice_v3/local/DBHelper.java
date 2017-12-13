@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "iceDBv3";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -92,6 +92,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "client_uppercase text,"
                 + "point_uppercase text,"
                 + "date_unload integer not null" + ");");
+    
+        db.execSQL("create table " + DBLocal.TABLE_LOCATION + " ("
+                + "_id integer primary key autoincrement,"
+                + "latitude real not null,"
+                + "longitude real not null,"
+                + "time integer not null,"
+                + "time_update integer not null"
+                + ");");
     }
     
     @Override
@@ -152,6 +160,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_RESTS);
         db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_DEBTS);
         db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_CONTRAGENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_LOCATION);
         onCreate(db);
         
         for (ContentValues cv : ordersDataArray) {
