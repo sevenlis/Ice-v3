@@ -127,7 +127,7 @@ public class ExchangeDataService extends IntentService {
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
-                PreparedStatement stat = conn.prepareStatement("SELECT TOP 1 datetime_unload FROM debts");
+                PreparedStatement stat = conn.prepareStatement("SELECT TOP (1) datetime_unload FROM debts");
                 ResultSet rs = stat.executeQuery();
                 
                 if (rs != null && rs.next()) {
@@ -221,7 +221,7 @@ public class ExchangeDataService extends IntentService {
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
-                PreparedStatement stat = conn.prepareStatement("SELECT TOP 1 datetime_unload FROM rests");
+                PreparedStatement stat = conn.prepareStatement("SELECT TOP (1) datetime_unload FROM rests");
                 ResultSet rs = stat.executeQuery();
                 
                 if (rs != null && rs.next()) {
@@ -318,7 +318,7 @@ public class ExchangeDataService extends IntentService {
         conn = new ConnectionFactory(this).getConnection();
         if (conn != null) {
             try {
-                PreparedStatement stat = conn.prepareStatement("SELECT TOP 1 datetime_unload FROM clients");
+                PreparedStatement stat = conn.prepareStatement("SELECT TOP (1) datetime_unload FROM clients");
                 ResultSet rs = stat.executeQuery();
                 
                 if (rs != null && rs.next()) {

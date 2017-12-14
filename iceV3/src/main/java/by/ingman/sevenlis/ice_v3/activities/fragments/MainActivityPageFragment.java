@@ -38,6 +38,7 @@ public class MainActivityPageFragment extends Fragment {
     private Handler mHandler;
     private CustomOrderListAdapter customOrderListAdapter;
     private ArrayList<Order> ordersList;
+    private ViewGroup container;
     
     @SuppressLint("RestrictedApi")
     @Override
@@ -74,6 +75,8 @@ public class MainActivityPageFragment extends Fragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.container = container;
+        
         View resultView = inflater.inflate(R.layout.activity_main_page, container, false);
         
         listViewOrders = (ListView) resultView.findViewById(R.id.listViewOrders);
@@ -98,27 +101,27 @@ public class MainActivityPageFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressBarLoad.setVisibility(View.VISIBLE);
-                        listViewOrders.setVisibility(View.GONE);
-                    }
-                });
-                
-                final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
-                
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        customOrderListAdapter.updateOrdersList(orders);
-                        
-                        progressBarLoad.setVisibility(View.GONE);
-                        listViewOrders.setVisibility(View.VISIBLE);
-    
-                        refreshOrdersListView();
-                    }
-                });
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    progressBarLoad.setVisibility(View.VISIBLE);
+                    listViewOrders.setVisibility(View.GONE);
+                }
+            });
+            
+            final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
+            
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    customOrderListAdapter.updateOrdersList(orders);
+                    
+                    progressBarLoad.setVisibility(View.GONE);
+                    listViewOrders.setVisibility(View.VISIBLE);
+
+                    refreshOrdersListView();
+                }
+            });
             }
         }).start();
     }
@@ -155,7 +158,7 @@ public class MainActivityPageFragment extends Fragment {
     
     private View createFooterSummary(String caption, int isAdv) {
         if (ordersList == null) ordersList = new ArrayList<>();
-        View v = layoutInflater.inflate(R.layout.order_item_list_footer_summary, null, false);
+        View v = layoutInflater.inflate(R.layout.order_item_list_footer_summary, this.container, false);
         
         ((TextView) v.findViewById(R.id.textViewCaption)).setText(caption);
         

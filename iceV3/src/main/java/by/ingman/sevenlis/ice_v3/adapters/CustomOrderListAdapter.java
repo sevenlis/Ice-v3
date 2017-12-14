@@ -7,8 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -19,11 +21,15 @@ public class CustomOrderListAdapter extends BaseAdapter {
     private Context ctx;
     private LayoutInflater layoutInflater;
     private ArrayList<Order> objects;
+    private static String[] advTypesStrings;
+    private static String[] orderStatuses;
     
     public CustomOrderListAdapter(Context context, ArrayList<Order> orders) {
         this.ctx = context;
         this.objects = orders;
         this.layoutInflater = LayoutInflater.class.cast(ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
+        advTypesStrings = ctx.getResources().getStringArray(R.array.adv_types_strings);
+        orderStatuses = ctx.getResources().getStringArray(R.array.order_statuses);
     }
     
     public void updateOrdersList(List<Order> orders) {
@@ -90,25 +96,14 @@ public class CustomOrderListAdapter extends BaseAdapter {
     }
     
     private String getDateTimeUnloadString(Order order) {
-        Calendar dateCal = Calendar.getInstance();
-        dateCal.setTimeInMillis(order.dateUnload);
-        String sD = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.DAY_OF_MONTH));
-        String sM = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.MONTH) + 1);
-        String sY = String.format(Locale.ROOT, "%04d", dateCal.get(Calendar.YEAR));
-        String sHour = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.HOUR_OF_DAY));
-        String sMinute = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.MINUTE));
-        String sSecond = String.format(Locale.ROOT, "%02d", dateCal.get(Calendar.SECOND));
-        return sD + "." + sM + "." + sY + "  " + sHour + ":" + sMinute + ":" + sSecond;
+        return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss",Locale.getDefault()).format(new Date(order.dateUnload));
     }
     
     private String getAdvTypeString(Order order) {
-        String[] advTypesStrings = ctx.getResources().getStringArray(R.array.adv_types_strings);
-        if (!order.isAdvertising) return "";
-        return advTypesStrings[order.advType];
+        return !order.isAdvertising ? "" : advTypesStrings[order.advType];
     }
     
     private String getOrderStatusString(int idx) {
-        String[] orderStatuses = ctx.getResources().getStringArray(R.array.order_statuses);
         return orderStatuses[idx];
     }
 }

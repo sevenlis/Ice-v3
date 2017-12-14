@@ -9,13 +9,13 @@ android {
         }
     }
     compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.1'
     defaultConfig {
         applicationId "by.ingman.sevenlis.ice_v3"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 4
-        versionName '4.002'
+        versionCode 5
+        versionName '5.001'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
