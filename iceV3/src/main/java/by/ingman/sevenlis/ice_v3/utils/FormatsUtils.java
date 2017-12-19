@@ -31,7 +31,7 @@ public class FormatsUtils {
     }
     
     public static String getNumberFormatted(double number, int num) {
-        return String.format(Locale.getDefault(), "%." + String.valueOf(num) + "f", number);
+        return String.format("%." + String.valueOf(num) + "f", number);
     }
     
     public static Calendar roundDayToStart(Calendar c) {
@@ -50,13 +50,13 @@ public class FormatsUtils {
         return c;
     }
     
-    public double roundDigit(double d, int z) {
+    public static double roundDigit(double d, int z) {
         if (z == 0) return Math.round(d);
         double zz = Math.pow(10, z);
         return Math.round(d * zz) / zz;
     }
     
-    public double roundDigit(float d, int z) {
+    public static double roundDigit(float d, int z) {
         if (z == 0) return Math.round(d);
         double zz = Math.pow(10, z);
         return Math.round(d * zz) / zz;

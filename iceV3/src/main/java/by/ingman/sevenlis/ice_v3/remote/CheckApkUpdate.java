@@ -151,7 +151,7 @@ public class CheckApkUpdate extends IntentService {
     
     private boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
+        NetworkInfo ni = cm != null ? cm.getActiveNetworkInfo() : null;
         return ni != null && ni.isConnected();
     }
     

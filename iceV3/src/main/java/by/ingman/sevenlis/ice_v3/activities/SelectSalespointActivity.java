@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Point;
@@ -28,7 +29,7 @@ public class SelectSalespointActivity extends AppCompatActivity {
     public static final String CONTRAGENT_NAME_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_NAME_KEY";
     public static final String SALESPOINT_CODE_VALUE_KEY = "by.ingman.sevenlis.ice_v3.SALESPOINT_CODE_VALUE_KEY";
     public static final String SALESPOINT_NAME_VALUE_KEY = "by.ingman.sevenlis.ice_v3.SALESPOINT_NAME_VALUE_KEY";
-    private ArrayList<Point> pointsList;
+    private List<Point> pointsList;
     private DBLocal dbLocal = new DBLocal(this);
     private String mContragentCode;
     private String mContragentName;
@@ -117,9 +118,9 @@ public class SelectSalespointActivity extends AppCompatActivity {
     private class CustomListAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;
-        ArrayList<Point> objects;
+        List<Point> objects;
         
-        CustomListAdapter(Context context, ArrayList<Point> objects) {
+        CustomListAdapter(Context context, List<Point> objects) {
             this.ctx = context;
             this.objects = objects;
             this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
