@@ -144,6 +144,11 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
     
+    private MainActivityPageFragment getCurrentFragment() {
+        if (currentFragment == null) currentFragment = new MainActivityPageFragment();
+        return currentFragment;
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar now = Calendar.getInstance();
         FormatsUtils.roundDayToStart(now);
         
-        currentFragment = new MainActivityPageFragment();
+        currentFragment = getCurrentFragment();
         currentFragment.setOrderDateCal(now);
         
         MainActivity.fragmentArrayList.clear();
@@ -306,8 +311,6 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void refreshCurrentFragment() {
-        if (currentFragment == null) return;
-        currentFragment.refreshOrdersList();
+        getCurrentFragment().refreshOrdersList();
     }
-    
 }

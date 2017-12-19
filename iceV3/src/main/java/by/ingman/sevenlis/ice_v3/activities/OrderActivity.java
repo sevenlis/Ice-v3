@@ -33,7 +33,6 @@ import by.ingman.sevenlis.ice_v3.classes.Order;
 import by.ingman.sevenlis.ice_v3.classes.OrderItem;
 import by.ingman.sevenlis.ice_v3.classes.Point;
 import by.ingman.sevenlis.ice_v3.classes.Product;
-import by.ingman.sevenlis.ice_v3.classes.Storehouse;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
@@ -47,20 +46,20 @@ public class OrderActivity extends AppCompatActivity {
     public static final int LIST_ITEM_CONTEXT_MENU_CHANGE = 5;
     private static final int OPTIONS_MENU_ADD_ORDER_ITEM_ID = 0;
     private static final int OPTIONS_MENU_SET_ORDER_DATE_ITEM_ID = 1;
-    Order mOrder;
-    Spinner advTypesSpinner;
-    CheckBox isAdvCheckBox;
-    Calendar orderDateCalendar;
-    DatePickerDialog.OnDateSetListener onDateSetListener;
-    TextView textViewOrderDate;
-    Contragent mContragent;
-    Point mPoint;
-    Storehouse mStorehouse;
-    ArrayList<OrderItem> mOrderItems;
-    DBLocal dbLocal;
-    View footerSummary;
-    View footerSubmit;
+    private Order mOrder;
+    private Spinner advTypesSpinner;
+    private CheckBox isAdvCheckBox;
+    private Calendar orderDateCalendar;
+    private DatePickerDialog.OnDateSetListener onDateSetListener;
+    private TextView textViewOrderDate;
+    private Contragent mContragent;
+    private Point mPoint;
+    private ArrayList<OrderItem> mOrderItems;
+    private DBLocal dbLocal;
+    private View footerSummary;
+    private View footerSubmit;
     private Context ctx;
+    private ViewGroup orderViewGroup = null;
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,8 +120,7 @@ public class OrderActivity extends AppCompatActivity {
         
         mOrder = new Order(ctx);
         mOrderItems = new ArrayList<>();
-        
-        mStorehouse = mOrder.storehouse;
+    
         advTypesSpinner = (Spinner) findViewById(R.id.spinner_advType);
         isAdvCheckBox = (CheckBox) findViewById(R.id.checkBox_isAdv);
         advTypesSpinner.setSelection(mOrder.advType);
@@ -179,8 +177,6 @@ public class OrderActivity extends AppCompatActivity {
             
             this.mPoint = mOrder.point;
             ((TextView) findViewById(R.id.textView_point)).setText(this.mPoint.name);
-            
-            this.mStorehouse = mOrder.storehouse;
             
             this.orderDateCalendar.setTime(mOrder.orderDate);
             textViewOrderDateRefresh();
@@ -243,23 +239,13 @@ public class OrderActivity extends AppCompatActivity {
     
     public void onClick(View view) {
         switch (view.getId()) {
-            case (R.id.textView_contragent): {
-                startContragentSelection();
-            }
-            break;
+            case (R.id.textView_contragent):
             case (R.id.textView_contr_label): {
                 startContragentSelection();
             }
             break;
             
-            case (R.id.textView_point): {
-                if (mContragent == null) {
-                    Toast.makeText(this, "Не выбран Контрагент!", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                startSalespointSelection();
-            }
-            break;
+            case (R.id.textView_point):
             case (R.id.textView_point_label): {
                 if (mContragent == null) {
                     Toast.makeText(this, "Не выбран Контрагент!", Toast.LENGTH_SHORT).show();
@@ -268,6 +254,7 @@ public class OrderActivity extends AppCompatActivity {
                 startSalespointSelection();
             }
             break;
+            
             case (R.id.buttonSubmitOrder): {
                 EditText editTextComment = (EditText) findViewById(R.id.editTextComment);
                 if (editTextComment != null) mOrder.comment = editTextComment.getText().toString();
@@ -278,6 +265,7 @@ public class OrderActivity extends AppCompatActivity {
                 setResult(RESULT_OK, answerIntent);
                 finish();
             }
+            break;
         }
     }
     
@@ -421,8 +409,8 @@ public class OrderActivity extends AppCompatActivity {
         popupMenu.show();
     }
     
-    View createFooterSummary() {
-        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_summary, null);
+    private View createFooterSummary() {
+        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_summary, orderViewGroup);
         
         double sumPacks = 0;
         double sumAmount = 0;
@@ -451,8 +439,8 @@ public class OrderActivity extends AppCompatActivity {
         return v;
     }
     
-    View createFooterSubmit() {
-        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_submit, null);
+    private View createFooterSubmit() {
+        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_submit, orderViewGroup);
         
         EditText editTextComment = (EditText) v.findViewById(R.id.editTextComment);
         editTextComment.setText(mOrder.comment);
@@ -498,7 +486,7 @@ public class OrderActivity extends AppCompatActivity {
         CustomListViewAdapter(Context context, ArrayList<OrderItem> objects) {
             this.ctx = context;
             this.objects = objects;
-            this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            this.layoutInflater = LayoutInflater.class.cast(ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
         }
         
         @Override
@@ -518,6 +506,8 @@ public class OrderActivity extends AppCompatActivity {
         
         @Override
         public View getView(int i, View customView, ViewGroup viewGroup) {
+            orderViewGroup = viewGroup;
+            
             View view = customView;
             if (view == null) {
                 view = layoutInflater.inflate(R.layout.order_item_list_item, viewGroup, false);

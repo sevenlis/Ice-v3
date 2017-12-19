@@ -71,6 +71,8 @@ public class SelectSalespointActivity extends AppCompatActivity {
         if (getIntent().getExtras() != null) {
             mContragentCode = getIntent().getExtras().getString(CONTRAGENT_CODE_KEY);
             mContragentName = getIntent().getExtras().getString(CONTRAGENT_NAME_KEY);
+            
+            TextView.class.cast(findViewById(R.id.textContragent)).setText(mContragentName);
         }
         
         refreshPointsList();
@@ -149,7 +151,7 @@ public class SelectSalespointActivity extends AppCompatActivity {
             return view;
         }
         
-        Point getPoint(int i) {
+        private Point getPoint(int i) {
             return (Point) getItem(i);
         }
     }

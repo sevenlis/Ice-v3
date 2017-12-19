@@ -19,11 +19,11 @@ import by.ingman.sevenlis.ice_v3.classes.Order;
 public class CustomOrderListAdapter extends BaseAdapter {
     private Context ctx;
     private LayoutInflater layoutInflater;
-    private ArrayList<Order> objects;
+    private List<Order> objects;
     private static String[] advTypesStrings;
     private static String[] orderStatuses;
     
-    public CustomOrderListAdapter(Context context, ArrayList<Order> orders) {
+    public CustomOrderListAdapter(Context context, List<Order> orders) {
         this.ctx = context;
         this.objects = orders;
         this.layoutInflater = LayoutInflater.class.cast(ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE));

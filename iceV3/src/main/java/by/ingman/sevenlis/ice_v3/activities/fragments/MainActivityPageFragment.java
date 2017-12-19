@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ import by.ingman.sevenlis.ice_v3.classes.Order;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
-public class MainActivityPageFragment extends Fragment {
+public class MainActivityPageFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private Context ctx;
     private Calendar orderDateCal;
     private ListView listViewOrders;
@@ -37,8 +38,9 @@ public class MainActivityPageFragment extends Fragment {
     private LayoutInflater layoutInflater;
     private Handler mHandler;
     private CustomOrderListAdapter customOrderListAdapter;
-    private ArrayList<Order> ordersList;
+    private List<Order> ordersList;
     private ViewGroup container;
+    private SwipeRefreshLayout swipeRefreshLayout;
     
     @SuppressLint("RestrictedApi")
     @Override
@@ -91,10 +93,26 @@ public class MainActivityPageFragment extends Fragment {
         progressBarLoad = (ProgressBar) resultView.findViewById(R.id.progressBarLoad);
         progressBarLoad.setVisibility(View.GONE);
         listViewOrders.setVisibility(View.VISIBLE);
-        
+    
+        swipeRefreshLayout = SwipeRefreshLayout.class.cast(resultView.findViewById(R.id.refresh_list));
+        swipeRefreshLayout.setOnRefreshListener(MainActivityPageFragment.this);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
+    
         refreshOrdersList();
         
         return resultView;
+    }
+    
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(true);
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                refreshOrdersList();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
     
     public void refreshOrdersList() {

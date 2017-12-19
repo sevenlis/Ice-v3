@@ -24,11 +24,11 @@ import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class OrderViewActivity extends AppCompatActivity {
-    
-    DBLocal dbLocal;
-    View footerSummary;
-    View footerSubmit;
+    private DBLocal dbLocal;
+    private View footerSummary;
+    private View footerSubmit;
     private Order mOrder;
+    private ViewGroup orderViewGroup = null;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +93,8 @@ public class OrderViewActivity extends AppCompatActivity {
         });
     }
     
-    View createFooterSummary() {
-        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_summary, null);
+    private View createFooterSummary() {
+        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_summary, orderViewGroup);
         
         double sumPacks = 0;
         double sumAmount = 0;
@@ -123,8 +123,8 @@ public class OrderViewActivity extends AppCompatActivity {
         return v;
     }
     
-    View createFooterSubmit() {
-        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_submit, null);
+    private View createFooterSubmit() {
+        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_submit, orderViewGroup);
         
         EditText editTextComment = (EditText) v.findViewById(R.id.editTextComment);
         editTextComment.setVisibility(View.GONE);
@@ -174,6 +174,8 @@ public class OrderViewActivity extends AppCompatActivity {
         
         @Override
         public View getView(int i, View customView, ViewGroup viewGroup) {
+            orderViewGroup = viewGroup;
+            
             View view = customView;
             if (view == null) {
                 view = layoutInflater.inflate(R.layout.order_item_list_item, viewGroup, false);

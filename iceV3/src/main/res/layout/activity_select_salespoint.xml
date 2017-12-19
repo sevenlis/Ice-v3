@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_salespoint_select"
     android:layout_width="match_parent"
@@ -13,10 +12,18 @@
     tools:context="by.ingman.sevenlis.ice_v3.activities.SelectSalespointActivity">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/linFilter">
+
+        <TextView
+            android:id="@+id/textContragent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="10sp"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -24,7 +31,7 @@
             android:ems="13"
             android:id="@+id/etFilter"
             android:layout_weight="0.2"
-            android:layout_height="50dp"
+            android:layout_height="0dp"
             android:textColorLink="@color/colorPrimaryDark"
             android:textColorHint="@color/colorPrimaryDark"
             android:textColorHighlight="@color/colorPrimaryDark"/>

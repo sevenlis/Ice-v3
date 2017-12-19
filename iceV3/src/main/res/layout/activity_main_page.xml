@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/scrollView"
-                tools:context="by.ingman.sevenlis.ice_v3.activities.MainActivity">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="by.ingman.sevenlis.ice_v3.activities.MainActivity">
 
-        <ProgressBar
-            android:id="@+id/progressBarLoad"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
+    <ProgressBar
+        android:id="@+id/progressBarLoad"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:indeterminate="true"
+        android:minWidth="@dimen/width_100dp"/>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminate="true"/>
+            android:id="@+id/refresh_list">
 
-        <ListView
-            android:id="@+id/listViewOrders"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/progressBarLoad">
-        </ListView>
+            <ListView
+                android:id="@+id/listViewOrders"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </ListView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
