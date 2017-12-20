@@ -20,8 +20,7 @@
         android:inputType="number"
         android:key="orderDaysAhead"
         android:summary="@string/pref_order_days_ahead_summ"
-        android:title="@string/pref_order_days_ahead_title"
-        />
+        android:title="@string/pref_order_days_ahead_title"/>
 
     <EditTextPreference
         android:id="@+id/orderLogDepth"
@@ -29,8 +28,7 @@
         android:inputType="number"
         android:key="orderLogDepth"
         android:summary="@string/pref_order_log_depth_summ"
-        android:title="@string/pref_order_log_depth_title"
-        />
+        android:title="@string/pref_order_log_depth_title"/>
 
     <CheckBoxPreference
         android:defaultValue="true"
@@ -70,18 +68,18 @@
         <PreferenceScreen
             android:key="gps_tracking_screen"
             android:title="@string/pref_gps_tracking_title">
-            <EditTextPreference
-                android:defaultValue="10"
-                android:inputType="number"
-                android:key="locationTrackingFrequency"
-                android:summary="@string/pref_exchange_frequency_summ"
-                android:title="@string/pref_exchange_frequency_title"/>
             <ListPreference
                 android:defaultValue="always"
                 android:entries="@array/location_tracking_type_names"
                 android:entryValues="@array/location_tracking_type_values"
                 android:key="locationTrackingTypeKey"
                 android:title="@string/pref_gps_type_title"/>
+            <EditTextPreference
+                android:defaultValue="10"
+                android:inputType="number"
+                android:key="locationTrackingFrequency"
+                android:summary="@string/pref_exchange_frequency_summ"
+                android:title="@string/pref_exchange_frequency_title"/>
             <MultiSelectListPreference
                 android:defaultValue="@string/location_tracking_providers_default"
                 android:entries="@array/location_tracking_providers_names"
@@ -96,8 +94,8 @@
         </PreferenceScreen>
 
 
-        <PreferenceCategory
-            android:key="catDB"
+        <PreferenceScreen
+            android:key="remote_DB_settings"
             android:summary="@string/pref_cat_DB_options_summ"
             android:title="@string/pref_cat_DB_options_title">
 
@@ -133,7 +131,7 @@
                 android:key="passwordDB"
                 android:password="true"
                 android:title="@string/pref_db_password_title"/>
-        </PreferenceCategory>
+        </PreferenceScreen>
     </PreferenceScreen>
 
 </PreferenceScreen>

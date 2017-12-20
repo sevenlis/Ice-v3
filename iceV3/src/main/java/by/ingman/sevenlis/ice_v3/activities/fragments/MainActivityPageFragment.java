@@ -98,53 +98,57 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
         swipeRefreshLayout.setOnRefreshListener(MainActivityPageFragment.this);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
     
-        refreshOrdersList();
+        refreshOrdersList(true);
         
         return resultView;
     }
     
     @Override
     public void onRefresh() {
-        swipeRefreshLayout.setRefreshing(true);
-        swipeRefreshLayout.post(new Runnable() {
+        swipeRefreshLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                refreshOrdersList();
-                swipeRefreshLayout.setRefreshing(false);
+                refreshOrdersList(false);
             }
-        });
+        },0L);
     }
     
-    public void refreshOrdersList() {
+    public void refreshOrdersList(final boolean showProgress) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    progressBarLoad.setVisibility(View.VISIBLE);
-                    listViewOrders.setVisibility(View.GONE);
-                }
-            });
-            
-            final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
-            
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    customOrderListAdapter.updateOrdersList(orders);
-                    
-                    progressBarLoad.setVisibility(View.GONE);
-                    listViewOrders.setVisibility(View.VISIBLE);
-
-                    refreshOrdersListView();
-                }
-            });
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listViewOrders.setVisibility(View.GONE);
+                        if (showProgress) {
+                            progressBarLoad.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+                
+                final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
+                
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        customOrderListAdapter.updateOrdersList(orders);
+    
+                        listViewOrders.setVisibility(View.VISIBLE);
+                        if (showProgress) {
+                            progressBarLoad.setVisibility(View.GONE);
+                        }
+    
+                        refreshOrdersListViewFooters();
+                        
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
             }
         }).start();
     }
     
-    public void refreshOrdersListView() {
+    public void refreshOrdersListViewFooters() {
         listViewOrders.removeFooterView(footerNoAdv);
         listViewOrders.removeFooterView(footerIsAdv);
         listViewOrders.removeFooterView(footerSummary);

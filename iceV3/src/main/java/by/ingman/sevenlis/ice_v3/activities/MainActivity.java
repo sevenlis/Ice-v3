@@ -225,6 +225,10 @@ public class MainActivity extends AppCompatActivity {
             customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
             customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
         }
+    
+        startExchangeDataService();
+    
+        startLocationTrackerService();
     }
     
     @Override
@@ -279,16 +283,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-    
         registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
-    
         startService(new Intent(ctx, CheckApkUpdate.class));
-    
-        stopExchangeDataService();
-        startExchangeDataService();
-    
-        stopLocationTrackerService();
-        startLocationTrackerService();
     }
     
     @Override
@@ -311,6 +307,6 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void refreshCurrentFragment() {
-        getCurrentFragment().refreshOrdersList();
+        getCurrentFragment().refreshOrdersList(true);
     }
 }

@@ -14,6 +14,11 @@ public class SettingsUtils {
     public static final String LOCATION_TRACKING_TYPE_ALWAYS = "always";
     public static final String LOCATION_TRACKING_TYPE_PERIOD = "periodically";
     
+    public static final String PREF_LOCATION_TRACKING_TYPE = "locationTrackingTypeKey";
+    public static final String PREF_LOCATION_TRACKING_INTERVAL = "locationTrackingFrequency";
+    
+    private static final String PREF_LOCATION_TRACKING_PROVIDERS = "locationTrackingProvidersKey";
+    
     public static final String LOCATION_TRACKING_PROVIDER_GPS = "gps";
     public static final String LOCATION_TRACKING_PROVIDER_NETWORK = "network";
     public static final String LOCATION_TRACKING_PROVIDER_PASSIVE = "passive";
@@ -26,15 +31,12 @@ public class SettingsUtils {
     private static final String PREF_DEFAULT_STOREHOUSE_CODE = "storehouseDefaultCode";
     private static final String PREF_NOTIFICATIONS_ENABLED = "updateNotificationsEnabled";
     private static final String PREF_DATA_UPDATE_INTERVAL = "exchangeFrequency";
-    private static final String PREF_LOCATION_TRACKING_INTERVAL = "locationTrackingFrequency";
-    private static final String PREF_LOCATION_TRACKING_TYPE = "locationTrackingTypeKey";
     private static final String PREF_APK_UPDATE_URL = "apkUpdateUrl";
     private static final String PREF_ORDER_DAYS_AHEAD = "orderDaysAhead";
     private static final String PREF_ORDER_LOG_DEPTH = "orderLogDepth";
     private static final String PREF_ITEM_SEARCH_INPUT_NUMERIC = "itemSearchInputNumeric";
     private static final String PREF_EXCHANGE_SHUTDOWN_ON_EXIT = "exchangeShutdownOnExit";
     private static final String PREF_LOCATION_TRACKING_SHUTDOWN_ON_EXIT = "locationTrackingShutdownOnExit";
-    private static final String PREF_LOCATION_TRACKING_PROVIDERS = "locationTrackingProvidersKey";
     
     private static final String PREF_REMOTE_DB_HOST = "host";
     private static final String PREF_REMOTE_DB_PORT = "port";

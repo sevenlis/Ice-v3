@@ -34,18 +34,16 @@ public class LocationTrackingService extends Service {
     @SuppressLint("MissingPermission")
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (getLocationPermissions()) {
-            long updateFreq = SettingsUtils.Settings.getLocationTrackingInterval(ctx) * 1000;
-            
             Set<String> providers = SettingsUtils.Settings.getLocationTrackingProviders(ctx);
             
             if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_GPS)) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, updateFreq, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener);
             }
             if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_NETWORK)) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, updateFreq, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener);
             }
             if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_PASSIVE)) {
-                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, updateFreq, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0L, 0f, locationListener);
             }
         }
         return super.onStartCommand(intent, flags, startId);
