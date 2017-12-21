@@ -26,7 +26,7 @@ public class SettingsActivity extends PreferenceActivity {
     
             final Preference intervalPreference = this.findPreference(SettingsUtils.PREF_LOCATION_TRACKING_INTERVAL);
             intervalPreference.setEnabled(SettingsUtils.Settings.getLocationTrackingType(getActivity().getApplication().getBaseContext()).equals(SettingsUtils.LOCATION_TRACKING_TYPE_PERIOD));
-            Preference typePreference = this.findPreference(SettingsUtils.PREF_LOCATION_TRACKING_TYPE);
+            final Preference typePreference = this.findPreference(SettingsUtils.PREF_LOCATION_TRACKING_TYPE);
             typePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {

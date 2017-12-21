@@ -229,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
         startExchangeDataService();
     
         startLocationTrackerService();
+    
+        registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
     }
     
     @Override
@@ -283,7 +285,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(broadcastReceiver, new IntentFilter(ExchangeDataService.CHANNEL_ORDERS_UPDATES));
         startService(new Intent(ctx, CheckApkUpdate.class));
     }
     
