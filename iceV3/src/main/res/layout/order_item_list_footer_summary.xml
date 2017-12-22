@@ -7,12 +7,13 @@
     >
 
     <TextView
-        android:text="Итого:"
+        android:id="@+id/textViewCaption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textViewCaption"
         android:layout_marginLeft="@dimen/default_gap"
         android:layout_marginRight="@dimen/default_gap"
+        android:text="Итого:"
+        android:textColor="@color/colorPrimaryDark"
         />
 
     <LinearLayout
@@ -36,8 +37,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tvPacks"
                 android:background="?attr/colorButtonNormal"
-                android:layout_weight="1"
                 android:paddingLeft="@dimen/default_gap"
+                android:paddingRight="@dimen/default_gap"
                 android:paddingTop="@dimen/margin_4dp"/>
 
             <TextView
@@ -46,8 +47,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tvMass"
                 android:background="?attr/colorButtonNormal"
-                android:layout_weight="1"
                 android:paddingLeft="@dimen/default_gap"
+                android:paddingRight="@dimen/default_gap"
                 android:paddingBottom="@dimen/margin_4dp"/>
         </LinearLayout>
 
@@ -63,8 +64,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tvAmount"
                 android:background="?attr/colorButtonNormal"
-                android:layout_weight="1"
                 android:paddingLeft="@dimen/default_gap"
+                android:paddingRight="@dimen/default_gap"
                 android:paddingTop="@dimen/margin_4dp"/>
 
             <TextView
@@ -73,8 +74,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tvSum"
                 android:background="?attr/colorButtonNormal"
-                android:layout_weight="1"
                 android:paddingLeft="@dimen/default_gap"
+                android:paddingRight="@dimen/default_gap"
                 android:paddingBottom="@dimen/margin_4dp"/>
         </LinearLayout>
     </LinearLayout>

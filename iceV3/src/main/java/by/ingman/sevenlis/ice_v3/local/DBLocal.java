@@ -551,7 +551,7 @@ public class DBLocal {
         return new LatLng(latitude,longitude);
     }
     
-    public ArrayList<LatLng> getRoutePositions(long time) {
+    public Iterable<LatLng> getRoutePositions(long time) {
         ArrayList<LatLng> positions = new ArrayList<>();
         
         Calendar startTime = Calendar.getInstance();

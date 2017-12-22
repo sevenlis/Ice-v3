@@ -31,7 +31,7 @@ public class FormatsUtils {
     }
     
     public static String getNumberFormatted(double number, int num) {
-        return String.format("%." + String.valueOf(num) + "f", number);
+        return String.format("%." + String.valueOf(num) + "f", number).trim().replace(",",".");
     }
     
     public static Calendar roundDayToStart(Calendar c) {

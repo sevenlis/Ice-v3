@@ -21,6 +21,9 @@ import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class LocationTrackingService extends Service {
+    public static final String LOCATION_CHANGE_CHANNEL_ACTION = "by.ingman.sevenlis.ice_v3." + LocationTrackingService.class.getSimpleName() + ".broadcastLocationChangeChannel";
+    public static final String LOCATION_CHANGE_LATITUDE_KEY = LOCATION_CHANGE_CHANNEL_ACTION + ".Latitude";
+    public static final String LOCATION_CHANGE_LONGITUDE_KEY = LOCATION_CHANGE_CHANNEL_ACTION + ".Longitude";
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Context ctx;
@@ -36,10 +39,12 @@ public class LocationTrackingService extends Service {
         if (getLocationPermissions()) {
             Set<String> providers = SettingsUtils.Settings.getLocationTrackingProviders(ctx);
             
-            if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_GPS)) {
+            if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_GPS) &
+                    ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener);
             }
-            if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_NETWORK)) {
+            if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_NETWORK) &
+                    ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener);
             }
             if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_PASSIVE)) {
@@ -57,6 +62,11 @@ public class LocationTrackingService extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 saveLocationInDataBase(location);
+                
+                Intent intent = new Intent(LOCATION_CHANGE_CHANNEL_ACTION);
+                intent.putExtra(LOCATION_CHANGE_LATITUDE_KEY,location.getLatitude());
+                intent.putExtra(LOCATION_CHANGE_LONGITUDE_KEY,location.getLongitude());
+                sendBroadcast(intent);
             }
             
             @Override
