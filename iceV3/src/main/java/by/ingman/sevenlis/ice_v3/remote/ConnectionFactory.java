@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,7 +14,6 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class ConnectionFactory {
-    private static Connection connection;
     private Context ctx;
     
     public ConnectionFactory(Context context) {
@@ -35,20 +33,21 @@ public class ConnectionFactory {
     }
     
     public Connection getConnection() {
+        Connection connection;
+        
         if (!isConnected()) return null;
         
         String user = SettingsUtils.RemoteDB.getUserName(ctx);
         String password = SettingsUtils.RemoteDB.getPassword(ctx);
         
         try {
-            if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection(getConnectionURL(), user, password);
-                connection.setAutoCommit(false);
-            }
+            connection = DriverManager.getConnection(getConnectionURL(), user, password);
+            connection.setAutoCommit(false);
         } catch (Exception e) {
             connection = null;
             e.printStackTrace();
         }
+        
         return connection;
     }
     

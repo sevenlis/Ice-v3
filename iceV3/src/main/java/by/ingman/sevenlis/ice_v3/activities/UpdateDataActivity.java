@@ -50,7 +50,8 @@ public class UpdateDataActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(UpdateDataService.CHANNEL)) {
+            String action = intent.getAction();
+            if (action != null && action.equals(UpdateDataService.CHANNEL)) {
                 if (intent.getExtras() != null) {
                     if (intent.getExtras().getInt(UpdateDataService.EXTRA_ACTION_KEY) == UpdateDataService.EXTRA_ACTION_SEND_MESSAGE) {
                         String messageOnBroadcast = intent.getExtras().getString(UpdateDataService.MESSAGE_ON_BROADCAST_KEY);

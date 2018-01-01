@@ -153,7 +153,7 @@ public class UpdateDataService extends IntentService {
             return;
         }
         
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         try {
             db.beginTransaction();
             db.delete(DBLocal.TABLE_CONTRAGENTS, null, null);
@@ -207,7 +207,7 @@ public class UpdateDataService extends IntentService {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
         
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         try {
             db.beginTransaction();
             db.delete(DBLocal.TABLE_DEBTS, null, null);
@@ -265,7 +265,7 @@ public class UpdateDataService extends IntentService {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
         
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         try {
             db.beginTransaction();
             db.delete(DBLocal.TABLE_RESTS, null, null);

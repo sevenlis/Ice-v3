@@ -7,11 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.CompoundButtonCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -42,7 +47,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatePickerDialog.OnDateSetListener onDateSetListener;
     private Calendar curDateCalendar;
     private MenuItem menuItemDate;
-    private MenuItem menuItemFollow;
+    private CheckBox checkBoxFollow;
     private DBLocal dbLocal;
     private BroadcastReceiver locationChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -53,7 +58,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (extras != null) {
                     double lat = extras.getDouble(LocationTrackingService.LOCATION_CHANGE_LATITUDE_KEY);
                     double lon = extras.getDouble(LocationTrackingService.LOCATION_CHANGE_LONGITUDE_KEY);
-                    if (menuItemFollow.isChecked()) {
+                    if (checkBoxFollow.isChecked()) {
                         followLocation(new LatLng(lat, lon));
                     }
                 }
@@ -85,11 +90,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         dbLocal = new DBLocal(ctx);
         polylineOptions = new PolylineOptions();
         registerReceiver(locationChangeReceiver,new IntentFilter(LocationTrackingService.LOCATION_CHANGE_CHANNEL_ACTION));
+        
+        checkBoxFollow = new CheckBox(ctx);
+        checkBoxFollow.setText(R.string.map_follow_my_location);
+        checkBoxFollow.setTextColor(getResources().getColor(R.color.white));
+        int states[][] = {{android.R.attr.state_checked}, {}};
+        int colors[]   = {getResources().getColor(R.color.white), getResources().getColor(R.color.white)};
+        CompoundButtonCompat.setButtonTintList(checkBoxFollow, new ColorStateList(states, colors));
+        checkBoxFollow.setChecked(false);
+        checkBoxFollow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                        ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mMap.setMyLocationEnabled(!isChecked);
+                }
+                if (isChecked) {
+                    trackPolyline.remove();
+                    polylineOptions = new PolylineOptions();
+                    //polylineOptions.add(mMap.getCameraPosition().target);
+                    trackPolyline = mMap.addPolyline(polylineOptions);
+                } else {
+                    showRoute(curDateCalendar);
+                }
+            }
+        });
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menuItemDate = menu.add(FormatsUtils.getDateFormatted(curDateCalendar.getTime()));
+        getMenuInflater().inflate(R.menu.maps_menu,menu);
+        menuItemDate = menu.findItem(R.id.menu_item_date);
+        menuItemDate.setTitle(FormatsUtils.getDateFormatted(curDateCalendar.getTime()));
         menuItemDate.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menuItemDate.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -102,28 +134,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
-        menuItemFollow = menu.add(R.string.map_follow_my_location);
-        menuItemFollow.setCheckable(true).setChecked(false);
-        menuItemFollow.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                menuItemFollow.setChecked(!menuItemFollow.isChecked());
-                if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                        ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mMap.setMyLocationEnabled(!menuItemFollow.isChecked());
-                }
-                if (menuItemFollow.isChecked()) {
-                    trackPolyline.remove();
-                    polylineOptions = new PolylineOptions();
-                    //polylineOptions.add(mMap.getCameraPosition().target);
-                    trackPolyline = mMap.addPolyline(polylineOptions);
-                } else {
-                    showRoute(curDateCalendar);
-                }
-                return false;
-            }
-        });
         
+        MenuItem menuItemFollow = menu.findItem(R.id.menu_item_follow);
+        menuItemFollow.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menuItemFollow.setActionView(View.class.cast(checkBoxFollow));
+       
         return super.onCreateOptionsMenu(menu);
     }
     
