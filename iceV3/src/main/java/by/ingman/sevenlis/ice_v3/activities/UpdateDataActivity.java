@@ -213,7 +213,7 @@ public class UpdateDataActivity extends AppCompatActivity {
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             
             int rsSize = 0, rsCount = 0;
-            Connection connection = new ConnectionFactory(ctx).getConnection();
+            Connection connection = new ConnectionFactory().getConnection(ctx);
             if (connection != null) {
                 try {
                     PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) as count_rs FROM orders WHERE UPPER(name_m) = '" + managerName + "' AND order_date > CAST('" + fDate + "' as datetime)");
@@ -286,7 +286,7 @@ public class UpdateDataActivity extends AppCompatActivity {
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             
             int rsSize = 0, rsCount = 0;
-            Connection connection = new ConnectionFactory(ctx).getConnection();
+            Connection connection = new ConnectionFactory().getConnection(ctx);
             if (connection != null) {
                 try {
                     PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(0) AS count_rs FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE UPPER(O.name_m) = '" + managerName + "' AND O.order_date > CAST('" + fDate + "' as datetime))");

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
@@ -14,11 +15,7 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class ConnectionFactory {
-    private Context ctx;
-    
-    public ConnectionFactory(Context context) {
-        this.ctx = context;
-        
+    public ConnectionFactory() {
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -26,33 +23,26 @@ public class ConnectionFactory {
         }
     }
     
-    private boolean isConnected() {
+    private boolean isConnected(Context ctx) {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm != null ? cm.getActiveNetworkInfo() : null;
         return ni != null && ni.isConnected();
     }
     
-    public Connection getConnection() {
-        Connection connection;
-        
-        if (!isConnected()) return null;
-        
+    public Connection getConnection(Context ctx) throws SQLException {
+        if (!isConnected(ctx)) return null;
+    
         String user = SettingsUtils.RemoteDB.getUserName(ctx);
         String password = SettingsUtils.RemoteDB.getPassword(ctx);
         
-        try {
-            connection = DriverManager.getConnection(getConnectionURL(), user, password);
-            connection.setAutoCommit(false);
-        } catch (Exception e) {
-            connection = null;
-            e.printStackTrace();
-        }
+        Connection connection = DriverManager.getConnection(getConnectionURL(ctx), user, password);
+        connection.setAutoCommit(false);
         
         return connection;
     }
     
     @NonNull
-    private String getConnectionURL() {
+    private String getConnectionURL(Context ctx) {
         String urlFormat;
         urlFormat = "jdbc:jtds:sqlserver://{0}:{1}/{2}";
         String instance = SettingsUtils.RemoteDB.getInstance(ctx);

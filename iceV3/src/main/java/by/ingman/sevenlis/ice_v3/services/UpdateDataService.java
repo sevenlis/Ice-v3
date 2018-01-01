@@ -118,7 +118,7 @@ public class UpdateDataService extends IntentService {
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
         
         ArrayList<ContentValues> clientsList = new ArrayList<>();
-        Connection conn = new ConnectionFactory(this).getConnection();
+        Connection conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM clients ORDER BY name_k, code_k");
@@ -177,7 +177,7 @@ public class UpdateDataService extends IntentService {
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
         
         ArrayList<ContentValues> debtsList = new ArrayList<>();
-        Connection conn = new ConnectionFactory(this).getConnection();
+        Connection conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM debts ORDER BY name_k, code_k");
@@ -232,7 +232,7 @@ public class UpdateDataService extends IntentService {
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
         
         ArrayList<ContentValues> restsList = new ArrayList<>();
-        Connection conn = new ConnectionFactory(this).getConnection();
+        Connection conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM rests ORDER BY code_p, name_p");

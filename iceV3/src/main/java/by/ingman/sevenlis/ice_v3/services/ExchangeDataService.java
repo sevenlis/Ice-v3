@@ -124,7 +124,7 @@ public class ExchangeDataService extends IntentService {
         dbr.close();
         
         long externalDate = 0;
-        conn = new ConnectionFactory(this).getConnection();
+        conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT TOP (1) datetime_unload FROM debts");
@@ -149,7 +149,7 @@ public class ExchangeDataService extends IntentService {
         
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
         
-        conn = new ConnectionFactory(this).getConnection();
+        conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM debts ORDER BY name_k, code_k");
@@ -218,7 +218,7 @@ public class ExchangeDataService extends IntentService {
         dbr.close();
         
         long externalDate = 0;
-        conn = new ConnectionFactory(this).getConnection();
+        conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT TOP (1) datetime_unload FROM rests");
@@ -243,7 +243,7 @@ public class ExchangeDataService extends IntentService {
         
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
         
-        conn = new ConnectionFactory(this).getConnection();
+        conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM rests ORDER BY code_p, name_p");
@@ -315,7 +315,7 @@ public class ExchangeDataService extends IntentService {
         dbr.close();
         
         long externalDate = 0;
-        conn = new ConnectionFactory(this).getConnection();
+        conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT TOP (1) datetime_unload FROM clients");
@@ -340,7 +340,7 @@ public class ExchangeDataService extends IntentService {
         
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
         
-        conn = new ConnectionFactory(this).getConnection();
+        conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 PreparedStatement stat = conn.prepareStatement("SELECT * FROM clients ORDER BY name_k, code_k");
@@ -408,7 +408,7 @@ public class ExchangeDataService extends IntentService {
         
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
         
-        conn = new ConnectionFactory(this).getConnection();
+        conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
                 String statementString = "INSERT INTO orders (order_id, name_m, order_date, is_advertising, code_k, name_k, code_r, name_r, code_s, name_s, code_p, name_p, amt_packs, amount, comments, in_datetime, adv_type) " +
@@ -495,7 +495,7 @@ public class ExchangeDataService extends IntentService {
     }
     
     public Answer getRemoteAnswer(String orderUid) throws Exception {
-        Connection conn = new ConnectionFactory(this).getConnection();
+        Connection conn = new ConnectionFactory().getConnection(this);
         Answer answer = null;
         if (conn != null) {
             try {
