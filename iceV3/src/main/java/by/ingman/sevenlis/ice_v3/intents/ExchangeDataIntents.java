@@ -4,6 +4,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 
 import by.ingman.sevenlis.ice_v3.services.ExchangeDataService;

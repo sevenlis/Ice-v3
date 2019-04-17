@@ -12,9 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/default_gap"
         android:layout_marginRight="@dimen/default_gap"
+        android:fontFamily="monospace"
         android:text="Итого:"
-        android:textColor="@color/colorPrimaryDark"
-        />
+        android:textColor="@color/colorPrimaryDark" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -32,51 +32,57 @@
             android:layout_weight="1">
 
             <TextView
-                android:text="Количество упаковок"
+                android:id="@+id/tvPacks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvPacks"
                 android:background="?attr/colorButtonNormal"
+                android:fontFamily="monospace"
                 android:paddingLeft="@dimen/default_gap"
+                android:paddingTop="@dimen/margin_4dp"
                 android:paddingRight="@dimen/default_gap"
-                android:paddingTop="@dimen/margin_4dp"/>
+                android:text="Количество упаковок" />
 
             <TextView
-                android:text="Масса продукции"
+                android:id="@+id/tvMass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvMass"
                 android:background="?attr/colorButtonNormal"
+                android:fontFamily="monospace"
                 android:paddingLeft="@dimen/default_gap"
                 android:paddingRight="@dimen/default_gap"
-                android:paddingBottom="@dimen/margin_4dp"/>
+                android:paddingBottom="@dimen/margin_4dp"
+                android:text="Масса продукции" />
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
-                android:text="Количество единиц"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/tvAmount"
-                android:background="?attr/colorButtonNormal"
-                android:paddingLeft="@dimen/default_gap"
-                android:paddingRight="@dimen/default_gap"
-                android:paddingTop="@dimen/margin_4dp"/>
-
-            <TextView
-                android:text="Сумма"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvSum"
                 android:background="?attr/colorButtonNormal"
+                android:fontFamily="monospace"
+                android:gravity="end"
+                android:paddingLeft="@dimen/default_gap"
+                android:paddingTop="@dimen/margin_4dp"
+                android:paddingRight="@dimen/default_gap"
+                android:text="Количество единиц" />
+
+            <TextView
+                android:id="@+id/tvSum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorButtonNormal"
+                android:fontFamily="monospace"
+                android:gravity="end"
                 android:paddingLeft="@dimen/default_gap"
                 android:paddingRight="@dimen/default_gap"
-                android:paddingBottom="@dimen/margin_4dp"/>
+                android:paddingBottom="@dimen/margin_4dp"
+                android:text="Сумма" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

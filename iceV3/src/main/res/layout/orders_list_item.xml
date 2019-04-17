@@ -25,13 +25,13 @@
             android:id="@+id/textView_orderId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
             android:layout_weight="0.55"
             android:text="@string/uid_uid"
             android:textAlignment="viewEnd"
             android:textColor="@color/colorAccent"
             android:textSize="10sp"
-            tools:ignore="SmallSp"/>
+            tools:ignore="SmallSp"
+            android:gravity="end" />
     </LinearLayout>
 
     <LinearLayout
@@ -79,9 +79,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:gravity="end"
             android:text="@string/packs_amount"
             android:textStyle="normal|bold"
-            android:theme="@style/order_list_item_Summary"/>
+            android:theme="@style/order_list_item_Summary" />
     </LinearLayout>
 
     <LinearLayout
@@ -107,9 +108,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:gravity="end"
             android:text="@string/amount"
             android:textStyle="normal|bold"
-            android:theme="@style/order_list_item_Summary"/>
+            android:theme="@style/order_list_item_Summary" />
     </LinearLayout>
 
     <LinearLayout
@@ -145,6 +147,7 @@
             android:layout_weight="1"
             android:text="@string/order_condition"
             android:textAlignment="viewEnd"
+            android:gravity="end"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="12sp"/>
     </LinearLayout>
@@ -175,6 +178,7 @@
             android:layout_weight="1"
             android:text="@string/datetime"
             android:textAlignment="viewEnd"
+            android:gravity="end"
             android:textColor="@color/colorAccent"
             android:textSize="12sp"/>
     </LinearLayout>

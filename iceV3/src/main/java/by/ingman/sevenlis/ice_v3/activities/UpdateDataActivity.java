@@ -12,9 +12,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +41,7 @@ import by.ingman.sevenlis.ice_v3.local.DBHelper;
 import by.ingman.sevenlis.ice_v3.remote.ConnectionFactory;
 import by.ingman.sevenlis.ice_v3.services.UpdateDataService;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
+import by.ingman.sevenlis.ice_v3.utils.GenericFileProvider;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class UpdateDataActivity extends AppCompatActivity {
@@ -172,6 +175,7 @@ public class UpdateDataActivity extends AppCompatActivity {
         if (progress == 0) {
             progressDialog.setIndeterminate(false);
             progressDialog.setMax(maximum);
+            progressDialog.setProgress(progress);
         }
         if (maximum != 0) {
             double percent = ((double) progress / (double) maximum) * 100;
@@ -227,35 +231,33 @@ public class UpdateDataActivity extends AppCompatActivity {
                     PreparedStatement stat = connection.prepareStatement("SELECT * FROM orders WHERE UPPER(name_m) = '" + managerName + "' AND order_date > CAST('" + fDate + "' as datetime) ORDER BY in_datetime");
                     ResultSet rs = stat.executeQuery();
                     while (rs != null && rs.next()) {
-                        Product product = getProduct(rs.getString("code_p"), rs.getString("name_p"));
-                        
                         ContentValues cv = new ContentValues();
-                        cv.put("order_id", rs.getString("order_id"));
-                        cv.put("name_m", rs.getString("name_m"));
-                        cv.put("order_date", rs.getTimestamp("order_date").getTime());
-                        cv.put("is_advertising", rs.getInt("is_advertising"));
-                        cv.put("adv_type", rs.getInt("adv_type"));
-                        cv.put("code_k", rs.getString("code_k"));
-                        cv.put("name_k", rs.getString("name_k"));
-                        cv.put("code_r", rs.getString("code_r"));
-                        cv.put("name_r", rs.getString("name_r"));
-                        cv.put("code_s", rs.getString("code_s"));
-                        cv.put("name_s", rs.getString("name_s"));
-                        cv.put("code_p", rs.getString("code_p"));
-                        cv.put("name_p", rs.getString("name_p"));
-                        cv.put("weight_p", product.weight);
-                        cv.put("price_p", product.price);
-                        cv.put("num_in_pack_p", product.num_in_pack);
-                        cv.put("amount", rs.getDouble("amount"));
-                        cv.put("amt_packs", rs.getDouble("amt_packs"));
-                        cv.put("weight", rs.getDouble("amount") * product.weight);
-                        cv.put("price", product.price);
-                        cv.put("summa", rs.getDouble("amount") * product.price);
-                        cv.put("comments", rs.getString("comments"));
-                        cv.put("status", 2);
-                        cv.put("processed", 1);
-                        cv.put("sent", 1);
-                        cv.put("date_unload", rs.getTimestamp("in_datetime").getTime());
+                        cv.put("order_id",          rs.getString("order_id"));
+                        cv.put("name_m",            rs.getString("name_m"));
+                        cv.put("order_date",        rs.getTimestamp("order_date").getTime());
+                        cv.put("is_advertising",    rs.getInt("is_advertising"));
+                        cv.put("adv_type",          rs.getInt("adv_type"));
+                        cv.put("code_k",            rs.getString("code_k"));
+                        cv.put("name_k",            rs.getString("name_k"));
+                        cv.put("code_r",            rs.getString("code_r"));
+                        cv.put("name_r",            rs.getString("name_r"));
+                        cv.put("code_s",            rs.getString("code_s"));
+                        cv.put("name_s",            rs.getString("name_s"));
+                        cv.put("code_p",            rs.getString("code_p"));
+                        cv.put("name_p",            rs.getString("name_p"));
+                        cv.put("weight_p",          rs.getDouble("weight_p"));
+                        cv.put("price_p",           rs.getDouble("price_p"));
+                        cv.put("num_in_pack_p",     rs.getDouble("num_in_pack_p"));
+                        cv.put("amount",            rs.getDouble("amount"));
+                        cv.put("amt_packs",         rs.getDouble("amt_packs"));
+                        cv.put("weight",            rs.getDouble("weight"));
+                        cv.put("price",             rs.getDouble("price"));
+                        cv.put("summa",             rs.getDouble("summa"));
+                        cv.put("comments",          rs.getString("comments"));
+                        cv.put("status",            2);
+                        cv.put("processed",         1);
+                        cv.put("sent",              1);
+                        cv.put("date_unload",       rs.getTimestamp("in_datetime").getTime());
                         
                         putOrderToLocalDB(cv);
                         
@@ -301,10 +303,10 @@ public class UpdateDataActivity extends AppCompatActivity {
                     ResultSet rs = stat.executeQuery();
                     while (rs != null && rs.next()) {
                         ContentValues cv = new ContentValues();
-                        cv.put("order_id", rs.getString("order_id"));
-                        cv.put("description", rs.getString("description"));
-                        cv.put("date_unload", rs.getTimestamp("datetime_unload").getTime());
-                        cv.put("result", rs.getInt("result"));
+                        cv.put("order_id",      rs.getString("order_id"));
+                        cv.put("description",   rs.getString("description"));
+                        cv.put("date_unload",   rs.getTimestamp("datetime_unload").getTime());
+                        cv.put("result",        rs.getInt("result"));
                         
                         putAnswerToLocalDB(cv);
                         
@@ -507,10 +509,19 @@ public class UpdateDataActivity extends AppCompatActivity {
         
         private void startUpdateIntent(File apkFile) {
             if (apkFile != null && apkFile.exists()) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Uri apkUri = GenericFileProvider.getUriForFile(getApplicationContext(),getApplicationContext().getPackageName() + ".provider",apkFile);
+                    Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                    intent.setData(apkUri);
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(intent);
+                } else {
+                    Uri apkUri = Uri.fromFile(apkFile);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
             } else {
                 Toast.makeText(ctx, "Файл APK не найден!", Toast.LENGTH_LONG).show();
             }

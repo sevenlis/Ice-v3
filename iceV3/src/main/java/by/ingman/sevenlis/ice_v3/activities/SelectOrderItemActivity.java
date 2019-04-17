@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import by.ingman.sevenlis.ice_v3.R;
@@ -129,7 +130,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent keyEvent) {
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    ArrayList<Product> productArrayList = getProductList();
+                    List<Product> productArrayList = getProductList();
                     if (productArrayList.size() == 1) {
                         mProduct = productArrayList.get(0);
                         refreshProductInfo();
@@ -172,7 +173,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
     
-    private ArrayList<Product> getProductList() {
+    private List<Product> getProductList() {
         String strFilter = editTextFilter.getText().toString();
         String condition = "code_s = ?";
         String[] conditionArgs = new String[]{SettingsUtils.Settings.getDefaultStoreHouseCode(this)};

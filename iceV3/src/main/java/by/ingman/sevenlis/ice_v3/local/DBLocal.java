@@ -65,10 +65,10 @@ public class DBLocal {
         return ordersList;
     }
     
-    public ArrayList<Order> getUnsentOrdersList() {
+    public List<Order> getUnsentOrdersList() {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<String> ordersUids = new ArrayList<>();
+        List<String> ordersUids = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true, TABLE_ORDERS, new String[]{"order_id"}, "sent = 0 AND status = 0 AND processed = 0", null, null, null, null, null);
         while (cursor.moveToNext())
@@ -76,17 +76,17 @@ public class DBLocal {
         cursor.close();
         db.close();
         
-        ArrayList<Order> ordersList = new ArrayList<>();
+        List<Order> ordersList = new ArrayList<>();
         for (String orderUid : ordersUids) {
             ordersList.add(getOrder(orderUid));
         }
         return ordersList;
     }
     
-    public ArrayList<String> getUnansweredOrdersUids() {
+    public List<String> getUnansweredOrdersUids() {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<String> ordersUids = new ArrayList<>();
+        List<String> ordersUids = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true, TABLE_ORDERS, new String[]{"order_id"}, "sent = 1 AND status = 1 AND processed = 0", null, null, null, null, null);
         while (cursor.moveToNext())
@@ -122,10 +122,10 @@ public class DBLocal {
         return mOrder;
     }
     
-    private ArrayList<OrderItem> getOrderItems(String orderUid) {
+    private List<OrderItem> getOrderItems(String orderUid) {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<OrderItem> orderItems = new ArrayList<>();
+        List<OrderItem> orderItems = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(false, TABLE_ORDERS, null, "order_id = ?", new String[]{orderUid}, null, null, null, null);
         while (cursor.moveToNext()) {
@@ -140,10 +140,10 @@ public class DBLocal {
         return orderItems;
     }
     
-    public ArrayList<Contragent> getContragents(String condition, String[] conditionArgs) {
+    public List<Contragent> getContragents(String condition, String[] conditionArgs) {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<Contragent> contragentArrayList = new ArrayList<>();
+        List<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor;
         if (condition.isEmpty()) {
@@ -162,10 +162,10 @@ public class DBLocal {
     }
     
     
-    public ArrayList<Contragent> getRecentContragents() {
+    public List<Contragent> getRecentContragents() {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<Contragent> contragentArrayList = new ArrayList<>();
+        List<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true, TABLE_ORDERS, new String[]{"code_k", "name_k"}, null, null, null, null, "name_k ASC", null);
         while (cursor.moveToNext()) {
@@ -177,10 +177,10 @@ public class DBLocal {
         return contragentArrayList;
     }
     
-    public ArrayList<Contragent> getContragents(String condition) {
+    public List<Contragent> getContragents(String condition) {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<Contragent> contragentArrayList = new ArrayList<>();
+        List<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(condition, null);
         while (cursor.moveToNext()) {
@@ -192,10 +192,10 @@ public class DBLocal {
         return contragentArrayList;
     }
     
-    public ArrayList<Product> getProducts(String condition, String[] conditionArgs) {
+    public List<Product> getProducts(String condition, String[] conditionArgs) {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<Product> productArrayList = new ArrayList<>();
+        List<Product> productArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor;
         if (condition.isEmpty()) {
@@ -218,10 +218,10 @@ public class DBLocal {
         return productArrayList;
     }
     
-    public ArrayList<Point> getPoints(String condition, String[] conditionArgs) {
+    public List<Point> getPoints(String condition, String[] conditionArgs) {
         DBHelper dbHelper = new DBHelper(ctx);
         
-        ArrayList<Point> pointArrayList = new ArrayList<>();
+        List<Point> pointArrayList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(true, TABLE_CONTRAGENTS, new String[]{"code_r", "name_r"}, condition, conditionArgs, null, null, null, null);
         while (cursor.moveToNext()) {
@@ -430,7 +430,7 @@ public class DBLocal {
         db.close();
     }
     
-    public void setUnsetOrdersAsSent(ArrayList<Order> ordersList) {
+    public void setUnsetOrdersAsSent(List<Order> ordersList) {
         DBHelper dbHelper = new DBHelper(ctx);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         for (Order order : ordersList) {

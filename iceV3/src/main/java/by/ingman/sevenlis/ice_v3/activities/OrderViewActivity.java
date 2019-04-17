@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Answer;
@@ -117,7 +118,7 @@ public class OrderViewActivity extends AppCompatActivity {
         mText = "Кол-во: " + FormatsUtils.getNumberFormatted(sumAmount, 0);
         ((TextView) v.findViewById(R.id.tvAmount)).setText(mText);
         
-        mText = "Сумма: " + FormatsUtils.getNumberFormatted(sumSumma, 2);
+        mText = "Сумма:  " + FormatsUtils.getNumberFormatted(sumSumma, 2);
         ((TextView) v.findViewById(R.id.tvSum)).setText(mText);
         
         return v;
@@ -149,9 +150,9 @@ public class OrderViewActivity extends AppCompatActivity {
     private class CustomListViewAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;
-        ArrayList<OrderItem> objects;
+        List<OrderItem> objects;
         
-        CustomListViewAdapter(Context context, ArrayList<OrderItem> objects) {
+        CustomListViewAdapter(Context context, List<OrderItem> objects) {
             this.ctx = context;
             this.objects = objects;
             this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -173,10 +174,9 @@ public class OrderViewActivity extends AppCompatActivity {
         }
         
         @Override
-        public View getView(int i, View customView, ViewGroup viewGroup) {
+        public View getView(int i, View view, ViewGroup viewGroup) {
             orderViewGroup = viewGroup;
             
-            View view = customView;
             if (view == null) {
                 view = layoutInflater.inflate(R.layout.order_item_list_item, viewGroup, false);
             }
@@ -189,14 +189,16 @@ public class OrderViewActivity extends AppCompatActivity {
             mText = "Упак.: " + FormatsUtils.getNumberFormatted(orderItem.packs, 1);
             ((TextView) view.findViewById(R.id.tvAmountPacks)).setText(mText);
             
-            mText = "Кол.: " + FormatsUtils.getNumberFormatted(orderItem.quantity, 0);
-            ((TextView) view.findViewById(R.id.tvAmount)).setText(mText);
-            
             mText = "Масса: " + FormatsUtils.getNumberFormatted(orderItem.weight, 3);
             ((TextView) view.findViewById(R.id.tvMass)).setText(mText);
-            
+
+            mText = "Кол.:  " + FormatsUtils.getNumberFormatted(orderItem.quantity, 0);
+            ((TextView) view.findViewById(R.id.tvAmount)).setText(mText);
+
             mText = "Сумма: " + FormatsUtils.getNumberFormatted(orderItem.summa, 2);
             ((TextView) view.findViewById(R.id.tvSum)).setText(mText);
+            
+            view.setTag(i);
             
             return view;
         }

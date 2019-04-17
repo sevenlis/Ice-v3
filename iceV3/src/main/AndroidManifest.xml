@@ -23,7 +23,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ice_icon_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/AppBaseTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -76,6 +76,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="by.ingman.sevenlis.ice_v3.activities.MainActivity"/>
         </activity>
+        <provider
+            android:name=".utils.GenericFileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
     </application>
 
 </manifest>

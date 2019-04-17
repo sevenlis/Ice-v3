@@ -81,7 +81,7 @@ public class CustomOrderListAdapter extends BaseAdapter {
         ((TextView) view.findViewById(R.id.textView_comment)).setText(order.comment);
         ((TextView) view.findViewById(R.id.textView_dateUnload)).setText(getDateTimeUnloadString(order));
         
-        TextView textViewStatus = (TextView) view.findViewById(R.id.textView_status);
+        TextView textViewStatus = view.findViewById(R.id.textView_status);
         textViewStatus.setText(getOrderStatusString(order.status));
         textViewStatus.setTextColor(order.getStatusResultColor(ctx));
         

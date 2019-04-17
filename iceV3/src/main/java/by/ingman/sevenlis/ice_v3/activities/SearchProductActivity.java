@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Product;
@@ -34,7 +35,7 @@ public class SearchProductActivity extends AppCompatActivity {
     public static final String PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY = "by.ingman.sevenlis.ice_v3.PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY";
     CheckBox checkBoxInputTypeNumeric;
     EditText editTextFilter;
-    ArrayList<Product> arrayListProducts = new ArrayList<>();
+    List<Product> arrayListProducts = new ArrayList<>();
     DBLocal dbLocal;
     
     @Override
@@ -158,9 +159,9 @@ public class SearchProductActivity extends AppCompatActivity {
     private class CustomListViewAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;
-        ArrayList<Product> objects;
+        List<Product> objects;
         
-        CustomListViewAdapter(Context context, ArrayList<Product> objects) {
+        CustomListViewAdapter(Context context, List<Product> objects) {
             this.ctx = context;
             this.objects = objects;
             this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

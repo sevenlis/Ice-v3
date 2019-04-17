@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
@@ -41,7 +42,7 @@ public class Order implements Parcelable {
     public boolean isAdvertising;
     public int advType;
     public String comment;
-    public ArrayList<OrderItem> orderItems;
+    public List<OrderItem> orderItems;
     public double quantity;
     public double packs;
     public double summa;
@@ -108,7 +109,7 @@ public class Order implements Parcelable {
         this.storehouseName = storehouse.name;
     }
     
-    public void setOrderItems(ArrayList<OrderItem> orderItems) {
+    public void setOrderItems(List<OrderItem> orderItems) {
         if (orderItems == null) return;
         this.orderItems = orderItems;
         calcQuantity();

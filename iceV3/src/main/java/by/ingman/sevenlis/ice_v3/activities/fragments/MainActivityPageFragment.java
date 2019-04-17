@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -39,7 +40,6 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
     private Handler mHandler;
     private CustomOrderListAdapter customOrderListAdapter;
     private List<Order> ordersList;
-    private ViewGroup container;
     private SwipeRefreshLayout swipeRefreshLayout;
     
     @SuppressLint("RestrictedApi")
@@ -64,7 +64,7 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
     }
     
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putLong("orderDateLong", orderDateCal.getTimeInMillis());
         super.onSaveInstanceState(outState);
     }
@@ -76,12 +76,10 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.container = container;
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View resultView = inflater.inflate(R.layout.activity_main_pager_fragment, container , false);
         
-        View resultView = inflater.inflate(R.layout.activity_main_page, container, false);
-        
-        listViewOrders = (ListView) resultView.findViewById(R.id.listViewOrders);
+        listViewOrders = resultView.findViewById(R.id.listViewOrders);
         listViewOrders.setAdapter(customOrderListAdapter);
         listViewOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,17 +88,21 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
                 viewOrder(order);
             }
         });
-        progressBarLoad = (ProgressBar) resultView.findViewById(R.id.progressBarLoad);
+        progressBarLoad = resultView.findViewById(R.id.progressBarLoad);
         progressBarLoad.setVisibility(View.GONE);
         listViewOrders.setVisibility(View.VISIBLE);
     
-        swipeRefreshLayout = SwipeRefreshLayout.class.cast(resultView.findViewById(R.id.refresh_list));
+        swipeRefreshLayout = resultView.findViewById(R.id.refresh_list);
         swipeRefreshLayout.setOnRefreshListener(MainActivityPageFragment.this);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
     
-        refreshOrdersList(true);
-        
         return resultView;
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        refreshOrdersList(true);
     }
     
     @Override
@@ -178,9 +180,10 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
         startActivity(orderViewIntent);
     }
     
+    @SuppressLint("InflateParams")
     private View createFooterSummary(String caption, int isAdv) {
         if (ordersList == null) ordersList = new ArrayList<>();
-        View v = layoutInflater.inflate(R.layout.order_item_list_footer_summary, this.container, false);
+        View v = layoutInflater.inflate(R.layout.order_item_list_footer_summary, null, false);
         
         ((TextView) v.findViewById(R.id.textViewCaption)).setText(caption);
         
@@ -208,7 +211,7 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
         mText = "Кол-во: " + FormatsUtils.getNumberFormatted(sumAmount, 0);
         ((TextView) v.findViewById(R.id.tvAmount)).setText(mText);
         
-        mText = "Сумма: " + FormatsUtils.getNumberFormatted(sumSumma, 2);
+        mText = "Сумма:  " + FormatsUtils.getNumberFormatted(sumSumma, 2);
         ((TextView) v.findViewById(R.id.tvSum)).setText(mText);
         
         return v;

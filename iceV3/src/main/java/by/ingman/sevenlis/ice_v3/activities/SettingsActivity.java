@@ -4,18 +4,28 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+    }
+    
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
     }
     
     public static class SettingsFragment extends PreferenceFragment {
@@ -38,6 +48,12 @@ public class SettingsActivity extends PreferenceActivity {
             /*if (Build.VERSION.SDK_INT <= 16) {
                 this.getPreferenceScreen().removePreference(this.findPreference("orderDaysAhead"));
             }*/
+        }
+    
+        @Override
+        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            setHasOptionsMenu(true);
+            return super.onCreateView(inflater, container, savedInstanceState);
         }
     }
 }

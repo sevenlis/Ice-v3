@@ -145,4 +145,7 @@
     <string name="show_location">Местоположение</string>
     <string name="map_follow_my_location">Показывать текущий пройденный путь</string>
     <string name="text_none">none</string>
+    <string name="product_name">Наименование продукции</string>
+    <string name="items_amount">Количество единиц</string>
+    <string name="summa">Сумма</string>
 </resources>

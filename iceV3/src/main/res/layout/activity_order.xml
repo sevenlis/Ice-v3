@@ -69,7 +69,8 @@
             android:layout_alignParentStart="true"
             android:clickable="true"
             android:onClick="onClick"
-            android:background="@color/light_grey"/>
+            android:background="@color/light_grey"
+            android:focusable="true"/>
 
         <TextView
             android:text="@string/select_salepoint"
@@ -83,7 +84,8 @@
             android:textColor="@android:color/black"
             android:clickable="true"
             android:onClick="onClick"
-            android:background="@color/light_grey"/>
+            android:background="@color/light_grey"
+            android:focusable="true"/>
 
         <CheckBox
             android:text="@string/advertising"

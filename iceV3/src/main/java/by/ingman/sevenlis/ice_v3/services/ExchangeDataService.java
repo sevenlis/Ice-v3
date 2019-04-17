@@ -8,6 +8,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.classes.Answer;
 import by.ingman.sevenlis.ice_v3.classes.Order;
@@ -34,6 +38,7 @@ public class ExchangeDataService extends IntentService {
     private DBHelper dbHelper;
     private DBLocal dbLocal;
     private NotificationsUtil notifUtils;
+    private Handler mHandler;
     
     public ExchangeDataService() {
         super(ExchangeDataService.class.getSimpleName());
@@ -403,7 +408,7 @@ public class ExchangeDataService extends IntentService {
         String messageOnBroadcast = "";
         String managerName = SettingsUtils.Settings.getManagerName(this);
         
-        ArrayList<Order> orderUnsentList = dbLocal.getUnsentOrdersList();
+        List<Order> orderUnsentList = dbLocal.getUnsentOrdersList();
         if (orderUnsentList.size() == 0) return;
         
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
@@ -411,7 +416,8 @@ public class ExchangeDataService extends IntentService {
         conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
-                String statementString = "INSERT INTO orders (order_id, name_m, order_date, is_advertising, code_k, name_k, code_r, name_r, code_s, name_s, code_p, name_p, amt_packs, amount, comments, in_datetime, adv_type) " +
+                String statementString =
+                        "INSERT INTO orders (order_id, name_m, order_date, is_advertising, code_k, name_k, code_r, name_r, code_s, name_s, code_p, name_p, amt_packs, amount, comments, in_datetime, adv_type) " +
                         "VALUES (?,        ?,      ?,          ?,              ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,         ?,      ?,        ?,           ?)";
                 PreparedStatement stat = conn.prepareStatement(statementString);
                 
@@ -522,7 +528,7 @@ public class ExchangeDataService extends IntentService {
     
     private void receiveAnswers() throws Exception {
         boolean answersReceived = false;
-        ArrayList<String> orderUnansweredUids = dbLocal.getUnansweredOrdersUids();
+        List<String> orderUnansweredUids = dbLocal.getUnansweredOrdersUids();
         if (orderUnansweredUids.size() == 0) return;
         
         //notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ANSWERS_ID);

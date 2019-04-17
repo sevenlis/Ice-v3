@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Contragent;
@@ -31,7 +32,7 @@ public class SelectContragentActivity extends AppCompatActivity {
     Boolean useRecent = false;
     ImageButton buttonRecent;
     EditText editTextFilter;
-    private ArrayList<Contragent> contragentsList;
+    private List<Contragent> contragentsList;
     private DBLocal dbLocal = new DBLocal(this);
     
     @Override
@@ -125,15 +126,16 @@ public class SelectContragentActivity extends AppCompatActivity {
         refreshContragentsList();
         if (contragentsList.size() == 0) return;
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
     
     private class CustomListAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;
-        ArrayList<Contragent> objects;
+        List<Contragent> objects;
         
-        CustomListAdapter(Context context, ArrayList<Contragent> objects) {
+        CustomListAdapter(Context context, List<Contragent> objects) {
             this.ctx = context;
             this.objects = objects;
             this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

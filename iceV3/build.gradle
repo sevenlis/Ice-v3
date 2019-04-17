@@ -8,14 +8,14 @@ android {
             storePassword 'iceV3password'
         }
     }
-    compileSdkVersion 25
-    buildToolsVersion '27.0.1'
+    compileSdkVersion 27
+    buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId "by.ingman.sevenlis.ice_v3"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 5
-        versionName '5.003'
+        versionName '5.005'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -35,17 +35,17 @@ android {
     }
 }
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:25.4.0'
-    compile 'com.android.support:support-v4:25.4.0'
-    compile 'com.android.support:design:25.4.0'
-    compile 'net.sourceforge.jtds:jtds:1.2.8'
-    compile 'com.hynnet:sqljdbc4-chs:4.0.2206.100'
-    compile 'com.google.android.gms:play-services-location:11.6.0'
-    compile 'com.google.android.gms:play-services-maps:11.6.0'
-    compile 'com.google.maps.android:android-maps-utils:0.5'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.google.code.gson:gson:2.8.2'
-    compile 'com.squareup.retrofit:retrofit:1.7.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'net.sourceforge.jtds:jtds:1.2.8'
+    implementation 'com.hynnet:sqljdbc4-chs:4.0.2206.100'
+    implementation 'com.google.android.gms:play-services-location:11.8.0'
+    implementation 'com.google.android.gms:play-services-maps:11.8.0'
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.squareup.retrofit:retrofit:1.7.1'
 }
 

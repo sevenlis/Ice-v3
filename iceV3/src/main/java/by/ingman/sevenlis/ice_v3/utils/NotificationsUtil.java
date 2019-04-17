@@ -1,11 +1,13 @@
 package by.ingman.sevenlis.ice_v3.utils;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.widget.Toast;
 
 import by.ingman.sevenlis.ice_v3.R;
@@ -21,19 +23,25 @@ public class NotificationsUtil {
     public static final int NOTIF_UPDATE_PROGRESS_ORDERS_ID = 13;
     public static final int NOTIF_UPDATE_PROGRESS_ANSWERS_ID = 14;
     
-    public static final int NOTIF_DATA_UPDATE_ERROR_ID = 20;
-    public static final int NOTIF_ORDERS_ERROR_ID = 21;
+    private static final int NOTIF_DATA_UPDATE_ERROR_ID = 20;
+    private static final int NOTIF_ORDERS_ERROR_ID = 21;
     private static final int NOTIF_ORDER_SENT_ID = 3;
     private static final int NOTIF_ORDER_ACCEPT_ID = 4;
+
+    private static final String NOTIF_CHANNEL_ID = "ICE_UPDATE_NOTIFICATION_CHANNEL";
+
+    private CharSequence channelName = "ICE-V3 update notification channel";
     
     private Context ctx;
     private NotificationManager notificationManager;
+    private Handler mHandler;
     
     public NotificationsUtil(Context context) {
         this.ctx = context;
+        mHandler = new Handler();
     }
     
-    private void showUpdateProgressNotification(int notificationId, String title, String message) {
+    private void showUpdateProgressNotification(int notificationId, String title, final String message) {
         if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
             Notification.Builder builder = setupCommonNotification(title, message, false)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
@@ -42,7 +50,12 @@ public class NotificationsUtil {
                     .setUsesChronometer(true);
             getNotificationManager().notify(notificationId, builder.build());
         } else {
-            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
     
@@ -78,7 +91,7 @@ public class NotificationsUtil {
         showUpdateProgressNotification(notificationId, title, message);
     }
     
-    public void showUpdateCompleteNotification(int notificationId, String title, String message) {
+    public void showUpdateCompleteNotification(int notificationId, String title, final String message) {
         if (SettingsUtils.Settings.getNotificationsEnabled(ctx)) {
             Notification.BigTextStyle bigTextStyle = new Notification.BigTextStyle().setBigContentTitle(title).bigText(message);
             Notification.Builder builder = setupCommonNotification(title, message, true)
@@ -86,7 +99,12 @@ public class NotificationsUtil {
                     .setSmallIcon(R.drawable.ic_action_accept);
             getNotificationManager().notify(notificationId, builder.build());
         } else {
-            Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
     
@@ -162,18 +180,33 @@ public class NotificationsUtil {
     }
     
     private Notification.Builder setupCommonNotification(String title, String message, boolean autoCancel) {
-        return new Notification.Builder(ctx)
-                .setTicker(title)
+        Notification.Builder builder;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            builder = new Notification.Builder(ctx,NOTIF_CHANNEL_ID);
+            builder.setChannelId(NOTIF_CHANNEL_ID);
+        } else {
+            builder = new Notification.Builder(ctx);
+        }
+        builder.setTicker(title)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setContentIntent(createMainIntent())
                 .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.mipmap.ice_pict))
                 .setAutoCancel(autoCancel);
+        return builder;
     }
     
     private NotificationManager getNotificationManager() {
         if (notificationManager == null) {
             notificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_LOW;
+                NotificationChannel channel = new NotificationChannel(NOTIF_CHANNEL_ID,channelName,importance);
+                channel.setVibrationPattern(new long[]{0});
+                channel.enableVibration(false);
+                assert notificationManager != null;
+                notificationManager.createNotificationChannel(channel);
+            }
         }
         return notificationManager;
     }

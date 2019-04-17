@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "iceDBv3";
@@ -106,7 +107,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Cursor cursor;
         
-        ArrayList<ContentValues> ordersDataArray = new ArrayList<>();
+        List<ContentValues> ordersDataArray = new ArrayList<>();
         cursor = db.query(DBLocal.TABLE_ORDERS, null, null, null, null, null, null, null);
         while (cursor.moveToNext()) {
             ContentValues orderData = new ContentValues();
@@ -142,7 +143,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         
-        ArrayList<ContentValues> answersDataArray = new ArrayList<>();
+        List<ContentValues> answersDataArray = new ArrayList<>();
         cursor = db.query(DBLocal.TABLE_ANSWERS, null, null, null, null, null, null, null);
         while (cursor.moveToNext()) {
             ContentValues answerData = new ContentValues();
