@@ -4,13 +4,11 @@ import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,12 +32,11 @@ public class ExchangeDataService extends IntentService {
     public static final String CHANNEL = "by.ingman.sevenlis.ice_v3." + ExchangeDataService.class.getSimpleName() + ".broadcastChannel";
     public static final String CHANNEL_ORDERS_UPDATES = "by.ingman.sevenlis.ice_v3." + ExchangeDataService.class.getSimpleName() + ".broadcastOrdersUpdatesChannel";
     public static final String MESSAGE_ON_BROADCAST_KEY = ".ExchangeDataService.message_on_broadcast_key";
+    private static int VERSION = 0;
     private static boolean isConnected;
-    private DBHelper dbHelper;
     private DBLocal dbLocal;
     private NotificationsUtil notifUtils;
-    private Handler mHandler;
-    
+
     public ExchangeDataService() {
         super(ExchangeDataService.class.getSimpleName());
     }
@@ -47,10 +44,14 @@ public class ExchangeDataService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        this.dbHelper = new DBHelper(this);
         this.dbLocal = new DBLocal(this);
         isConnected = isConnect();
         notifUtils = new NotificationsUtil(this);
+        try {
+            VERSION = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
     
     @Override
@@ -120,13 +121,13 @@ public class ExchangeDataService extends IntentService {
         ArrayList<ContentValues> cvList = new ArrayList<>();
         
         long internalDate = 0;
-        SQLiteDatabase dbr = dbHelper.getReadableDatabase();
+        SQLiteDatabase dbr = DBHelper.getDatabaseReadable(this);
         Cursor cursor = dbr.query(true, DBLocal.TABLE_DEBTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
         if (cursor.moveToFirst()) {
             internalDate = cursor.getLong(cursor.getColumnIndex("date_unload"));
         }
         cursor.close();
-        dbr.close();
+        DBHelper.closeDatabase(dbr);
         
         long externalDate = 0;
         conn = new ConnectionFactory().getConnection(this);
@@ -184,9 +185,9 @@ public class ExchangeDataService extends IntentService {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
         
-        SQLiteDatabase dbw = dbHelper.getReadableDatabase();
+        SQLiteDatabase dbw = DBHelper.getDatabaseReadable(this);
         try {
-            dbw.beginTransaction();
+            dbw.beginTransactionNonExclusive();
             dbw.delete(DBLocal.TABLE_DEBTS, null, null);
             
             for (ContentValues cv : cvList) {
@@ -199,7 +200,7 @@ public class ExchangeDataService extends IntentService {
         } finally {
             dbw.endTransaction();
         }
-        dbw.close();
+        DBHelper.closeDatabase(dbw);
         
         sendBroadcastMessage(CHANNEL, messageOnBroadcast);
         
@@ -214,15 +215,15 @@ public class ExchangeDataService extends IntentService {
         ArrayList<ContentValues> cvList = new ArrayList<>();
         
         long internalDate = 0;
-        SQLiteDatabase dbr = dbHelper.getReadableDatabase();
+        SQLiteDatabase dbr = DBHelper.getDatabaseReadable(this);
         Cursor cursor = dbr.query(true, DBLocal.TABLE_RESTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
         if (cursor.moveToFirst()) {
             internalDate = cursor.getLong(cursor.getColumnIndex("date_unload"));
         }
         cursor.close();
-        dbr.close();
+        DBHelper.closeDatabase(dbr);
         
-        long externalDate = 0;
+        long externalDate = 0L;
         conn = new ConnectionFactory().getConnection(this);
         if (conn != null) {
             try {
@@ -230,7 +231,9 @@ public class ExchangeDataService extends IntentService {
                 ResultSet rs = stat.executeQuery();
                 
                 if (rs != null && rs.next()) {
-                    externalDate = rs.getTimestamp("datetime_unload").getTime();
+                    Timestamp timestamp = rs.getTimestamp("datetime_unload");
+                    if (timestamp != null)
+                        externalDate = timestamp.getTime();
                 }
             } finally {
                 try {
@@ -281,9 +284,9 @@ public class ExchangeDataService extends IntentService {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
         
-        SQLiteDatabase dbw = dbHelper.getReadableDatabase();
+        SQLiteDatabase dbw = DBHelper.getDatabaseReadable(this);
         try {
-            dbw.beginTransaction();
+            dbw.beginTransactionNonExclusive();
             dbw.delete(DBLocal.TABLE_RESTS, null, null);
             
             for (ContentValues cv : cvList) {
@@ -296,12 +299,53 @@ public class ExchangeDataService extends IntentService {
         } finally {
             dbw.endTransaction();
         }
-        dbw.close();
+        DBHelper.closeDatabase(dbw);
         
         sendBroadcastMessage(CHANNEL, messageOnBroadcast);
         
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
+    }
+
+    private void updateAgreements() throws SQLException {
+        List<ContentValues> cvList = new ArrayList<>();
+        Connection conn = new ConnectionFactory().getConnection(this);
+        if (conn != null) {
+            try {
+                PreparedStatement stat = conn.prepareStatement("SELECT * FROM agreements ORDER BY name_k, code_k");
+                ResultSet rs = stat.executeQuery();
+                while (rs != null && rs.next()) {
+                    ContentValues cv = new ContentValues();
+                    cv.put("code_k", rs.getString("code_k"));
+                    cv.put("name_k", rs.getString("name_k"));
+                    cv.put("id", rs.getString("id"));
+                    cv.put("name", rs.getString("name"));
+                    cvList.add(cv);
+                }
+            } finally {
+                try {
+                    if (!conn.isClosed()) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        SQLiteDatabase dbw = DBHelper.getDatabaseReadable(this);
+        try {
+            dbw.beginTransactionNonExclusive();
+            dbw.delete(DBLocal.TABLE_AGREEMENTS, null, null);
+
+            for (ContentValues cv : cvList) {
+                dbw.insert(DBLocal.TABLE_AGREEMENTS, null, cv);
+            }
+            dbw.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbw.endTransaction();
+        }
+        DBHelper.closeDatabase(dbw);
     }
     
     private void updateClients() throws SQLException {
@@ -311,13 +355,13 @@ public class ExchangeDataService extends IntentService {
         ArrayList<ContentValues> cvList = new ArrayList<>();
         
         long internalDate = 0;
-        SQLiteDatabase dbr = dbHelper.getReadableDatabase();
+        SQLiteDatabase dbr = DBHelper.getDatabaseReadable(this);
         Cursor cursor = dbr.query(true, DBLocal.TABLE_CONTRAGENTS, new String[]{"date_unload"}, null, null, null, null, null, "1");
         if (cursor.moveToFirst()) {
             internalDate = cursor.getLong(cursor.getColumnIndex("date_unload"));
         }
         cursor.close();
-        dbr.close();
+        DBHelper.closeDatabase(dbr);
         
         long externalDate = 0;
         conn = new ConnectionFactory().getConnection(this);
@@ -378,9 +422,9 @@ public class ExchangeDataService extends IntentService {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
         
-        SQLiteDatabase dbw = dbHelper.getReadableDatabase();
+        SQLiteDatabase dbw = DBHelper.getDatabaseReadable(this);
         try {
-            dbw.beginTransaction();
+            dbw.beginTransactionNonExclusive();
             dbw.delete(DBLocal.TABLE_CONTRAGENTS, null, null);
             
             for (ContentValues cv : cvList) {
@@ -393,7 +437,9 @@ public class ExchangeDataService extends IntentService {
         } finally {
             dbw.endTransaction();
         }
-        dbw.close();
+        DBHelper.closeDatabase(dbw);
+
+        updateAgreements();
         
         sendBroadcastMessage(CHANNEL, messageOnBroadcast);
         
@@ -417,8 +463,62 @@ public class ExchangeDataService extends IntentService {
         if (conn != null) {
             try {
                 String statementString =
-                        "INSERT INTO orders (order_id, name_m, order_date, is_advertising, code_k, name_k, code_r, name_r, code_s, name_s, code_p, name_p, amt_packs, amount, comments, in_datetime, adv_type) " +
-                        "VALUES (?,        ?,      ?,          ?,              ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,      ?,         ?,      ?,        ?,           ?)";
+                        "INSERT INTO orders (" +
+                                "order_id, " +
+                                "name_m, " +
+                                "order_date, " +
+                                "is_advertising, " +
+                                "code_k, " +
+                                "name_k, " +
+                                "code_r, " +
+                                "name_r, " +
+                                "code_s, " +
+                                "name_s, " +
+                                "code_p, " +
+                                "name_p, " +
+                                "amt_packs, " +
+                                "amount, " +
+                                "comments, " +
+                                "in_datetime, " +
+                                "adv_type, " +
+                                "weight_p, " +
+                                "price_p, " +
+                                "num_in_pack_p, " +
+                                "weight, " +
+                                "price, " +
+                                "summa, " +
+                                "version, " +
+                                "agreementId, " +
+                                "order_type" +
+                                ")" +
+                        " VALUES (" +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?, " +
+                                "?" +
+                                ")";
                 PreparedStatement stat = conn.prepareStatement(statementString);
                 
                 for (Order order : orderUnsentList) {
@@ -440,6 +540,15 @@ public class ExchangeDataService extends IntentService {
                         stat.setString(15, order.comment);
                         stat.setTimestamp(16, new Timestamp(new Date().getTime()));
                         stat.setInt(17, order.advType);
+                        stat.setDouble(18, orderItem.product.weight);
+                        stat.setDouble(19, orderItem.product.price);
+                        stat.setDouble(20, orderItem.product.num_in_pack);
+                        stat.setDouble(21, orderItem.product.weight * orderItem.quantity);
+                        stat.setDouble(22, orderItem.product.price);
+                        stat.setDouble(23, orderItem.product.price * orderItem.quantity);
+                        stat.setInt(24, VERSION);
+                        stat.setString(25, order.agreement.getId());
+                        stat.setInt(26, order.orderType);
                         
                         stat.addBatch();
                     }
@@ -475,6 +584,7 @@ public class ExchangeDataService extends IntentService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
             }
         }
         
@@ -485,7 +595,6 @@ public class ExchangeDataService extends IntentService {
         
         sendBroadcastMessage(CHANNEL_ORDERS_UPDATES, messageOnBroadcast);
         
-        notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
     }
     
@@ -509,8 +618,7 @@ public class ExchangeDataService extends IntentService {
                 stat.setString(1, orderUid);
                 ResultSet rs = stat.executeQuery();
                 if (rs.next()) {
-                    answer = new Answer();
-                    answer.setOrderId(rs.getString("order_id"));
+                    answer = new Answer(orderUid);
                     answer.setDescription(rs.getString("description"));
                     answer.setUnloadTime(rs.getTimestamp("datetime_unload"));
                     answer.setResult(rs.getInt("result"));

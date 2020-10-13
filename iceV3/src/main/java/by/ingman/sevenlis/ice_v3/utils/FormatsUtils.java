@@ -31,9 +31,13 @@ public class FormatsUtils {
     }
     
     public static String getNumberFormatted(double number, int num) {
-        return String.format("%8." + String.valueOf(num) + "f", number).replace(",",".");
+        return String.format("%8." + num + "f", number).replace(",",".");
     }
-    
+
+    public static String getNumberFormatted(double number, int len, int num) {
+        return String.format("%" + len + "." + num + "f", number).replace(",",".");
+    }
+
     public static Calendar roundDayToStart(Calendar c) {
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);

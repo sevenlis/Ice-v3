@@ -17,6 +17,9 @@
         android:icon="@drawable/ic_cached_white"
         android:title="@string/refresh_list"
         app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/preorders_journ"
+        android:title="@string/preorders_journ"/>
     <item android:title="@string/settings"
           android:id="@+id/settings"
           app:title="@string/settings"/>

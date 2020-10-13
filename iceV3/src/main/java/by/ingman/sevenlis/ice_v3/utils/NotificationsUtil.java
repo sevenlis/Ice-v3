@@ -28,7 +28,7 @@ public class NotificationsUtil {
     private static final int NOTIF_ORDER_SENT_ID = 3;
     private static final int NOTIF_ORDER_ACCEPT_ID = 4;
 
-    private static final String NOTIF_CHANNEL_ID = "ICE_UPDATE_NOTIFICATION_CHANNEL";
+    private static final String NOTIF_CHANNEL_ID = "ICE_UPDATE_NOTIFICATION_CHANNEL_ID";
 
     private CharSequence channelName = "ICE-V3 update notification channel";
     
@@ -50,12 +50,7 @@ public class NotificationsUtil {
                     .setUsesChronometer(true);
             getNotificationManager().notify(notificationId, builder.build());
         } else {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
-                }
-            });
+            mHandler.post(() -> Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show());
         }
     }
     
@@ -99,12 +94,7 @@ public class NotificationsUtil {
                     .setSmallIcon(R.drawable.ic_action_accept);
             getNotificationManager().notify(notificationId, builder.build());
         } else {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
-                }
-            });
+            mHandler.post(() -> Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show());
         }
     }
     

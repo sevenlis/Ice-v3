@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/default_gap"
     android:paddingRight="@dimen/default_gap"
     android:paddingTop="@dimen/default_gap"
-    tools:context="by.ingman.sevenlis.ice_v3.activities.SelectSalespointActivity">
+    tools:context="by.ingman.sevenlis.ice_v3.activities.SelectSalesPointActivity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -23,7 +23,7 @@
             android:layout_height="0dp"
             android:layout_weight="0.1"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="10sp"/>
+            android:textSize="12sp"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -34,7 +34,9 @@
             android:layout_height="0dp"
             android:textColorLink="@color/colorPrimaryDark"
             android:textColorHint="@color/colorPrimaryDark"
-            android:textColorHighlight="@color/colorPrimaryDark"/>
+            android:textColorHighlight="@color/colorPrimaryDark"
+            android:autofillHints=""
+            tools:ignore="LabelFor" />
 
     </LinearLayout>
 

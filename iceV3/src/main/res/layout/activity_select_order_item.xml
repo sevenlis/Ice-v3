@@ -26,12 +26,13 @@
             android:onClick="checkBoxInputTypeOnClick"
             android:text="@string/digit_123"/>
 
-        <EditText
-            android:id="@+id/editTextFilter"
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:ems="10"
+            android:hint="@string/code_search"
             android:inputType="textPersonName"
             android:selectAllOnFocus="true"/>
     </LinearLayout>
@@ -115,9 +116,9 @@
 
         <TextView
             android:id="@+id/tvNumPcsLabel"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.6"
+            android:layout_weight="1"
             android:text="Количество штук:"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textSize="16sp"
@@ -125,36 +126,38 @@
 
         <Button
             android:id="@+id/buttonMinusPcs"
-            android:layout_width="match_parent"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:background="@drawable/ic_action_decrease"
             android:onClick="numPcsDecrease"
-            android:text="-"
-            tools:ignore="HardcodedText"/>
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:id="@+id/editTextNumPcs"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/width_100dp"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:gravity="center"
             android:inputType="number|numberDecimal"
             android:paddingTop="@dimen/default_gap"
             android:selectAllOnFocus="true"
             android:text="88.0"
             android:textAlignment="center"
             android:textSize="24sp"
-            tools:ignore="HardcodedText">
+            tools:ignore="HardcodedText,LabelFor"
+            android:autofillHints="0.0">
             <!-- <requestFocus /> -->
         </EditText>
 
         <Button
             android:id="@+id/buttonPlusPcs"
-            android:layout_width="match_parent"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:background="@drawable/ic_action_increase"
             android:onClick="numPcsIncrease"
-            android:text="+"
-            tools:ignore="HardcodedText"/>
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -166,9 +169,9 @@
 
         <TextView
             android:id="@+id/tvNumPacksLabel"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.6"
+            android:layout_weight="1"
             android:text="Количество упаковок:"
             android:textAppearance="@style/TextAppearance.AppCompat"
             android:textSize="16sp"
@@ -176,36 +179,38 @@
 
         <Button
             android:id="@+id/buttonMinus"
-            android:layout_width="match_parent"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:background="@drawable/ic_action_decrease"
             android:onClick="numPackDecrease"
-            android:text="-"
-            tools:ignore="HardcodedText"/>
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:id="@+id/editTextNumPacks"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/width_100dp"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:gravity="center"
             android:inputType="number|numberDecimal"
             android:paddingTop="@dimen/default_gap"
             android:selectAllOnFocus="true"
             android:text="88.0"
             android:textAlignment="center"
             android:textSize="24sp"
-            tools:ignore="HardcodedText">
+            tools:ignore="HardcodedText,LabelFor"
+            android:autofillHints="0.0">
             <!-- <requestFocus /> -->
         </EditText>
 
         <Button
             android:id="@+id/buttonPlus"
-            android:layout_width="match_parent"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_weight="1"
+            android:background="@drawable/ic_action_increase"
             android:onClick="numPackIncrease"
-            android:text="+"
-            tools:ignore="HardcodedText"/>
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <Button

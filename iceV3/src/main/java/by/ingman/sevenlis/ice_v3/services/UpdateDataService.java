@@ -5,13 +5,15 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.local.DBHelper;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
@@ -33,7 +35,6 @@ public class UpdateDataService extends IntentService {
     public static final String EXTRA_ACTION_COMPLETE_KEY = ".UpdateDataService.action_complete_key";
     public static String messageOnBroadcast = "";
     int button_clients_id = 0, button_rests_id = 0, button_debts_id = 0;
-    private DBHelper dbHelper;
     private NotificationsUtil notifUtils;
     
     public UpdateDataService() {
@@ -43,14 +44,14 @@ public class UpdateDataService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        dbHelper = new DBHelper(this);
         notifUtils = new NotificationsUtil(this);
     }
     
     @Override
     protected void onHandleIntent(Intent intent) {
         SettingsUtils.Runtime.setUpdateInProgress(this, true);
-        
+
+        assert intent != null;
         if (intent.getExtras() != null) {
             switch (intent.getExtras().getInt(EXTRA_ACTION_KEY)) {
                 case EXTRA_UPDATE_ALL_CLIENTS_VALUE: {
@@ -113,7 +114,48 @@ public class UpdateDataService extends IntentService {
         sendBroadcast(extraIntent);
         messageOnBroadcast = "";
     }
-    
+
+    private void updateAllAgreementsFromRemote() throws SQLException {
+        List<ContentValues> cvList = new ArrayList<>();
+        Connection conn = new ConnectionFactory().getConnection(this);
+        if (conn != null) {
+            try {
+                PreparedStatement stat = conn.prepareStatement("SELECT * FROM agreements ORDER BY name_k, code_k");
+                ResultSet rs = stat.executeQuery();
+                while (rs != null && rs.next()) {
+                    ContentValues cv = new ContentValues();
+                    cv.put("code_k", rs.getString("code_k"));
+                    cv.put("name_k", rs.getString("name_k"));
+                    cv.put("id", rs.getString("id"));
+                    cv.put("name", rs.getString("name"));
+                    cvList.add(cv);
+                }
+            } finally {
+                try {
+                    if (!conn.isClosed()) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        SQLiteDatabase dbw = DBHelper.getDatabaseReadable(this);
+        try {
+            dbw.beginTransactionNonExclusive();
+            dbw.delete(DBLocal.TABLE_AGREEMENTS, null, null);
+
+            for (ContentValues cv : cvList) {
+                dbw.insert(DBLocal.TABLE_AGREEMENTS, null, cv);
+            }
+            dbw.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dbw.endTransaction();
+        }
+        DBHelper.closeDatabase(dbw);
+    }
+
     private void updateAllContragentsFromRemote() throws SQLException {
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
         
@@ -153,9 +195,10 @@ public class UpdateDataService extends IntentService {
             return;
         }
         
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(this);
+        if (db == null) return;
         try {
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
             db.delete(DBLocal.TABLE_CONTRAGENTS, null, null);
             for (ContentValues cv : clientsList) {
                 db.insert(DBLocal.TABLE_CONTRAGENTS, null, cv);
@@ -167,8 +210,10 @@ public class UpdateDataService extends IntentService {
         } finally {
             db.endTransaction();
         }
-        db.close();
-        
+        DBHelper.closeDatabase(db);
+
+        updateAllAgreementsFromRemote();
+
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
     }
@@ -207,9 +252,10 @@ public class UpdateDataService extends IntentService {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
         
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(this);
+        if (db == null) return;
         try {
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
             db.delete(DBLocal.TABLE_DEBTS, null, null);
             
             for (ContentValues cv : debtsList) {
@@ -222,8 +268,8 @@ public class UpdateDataService extends IntentService {
         } finally {
             db.endTransaction();
         }
-        db.close();
-        
+        DBHelper.closeDatabase(db);
+
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_DEBTS_ID);
     }
@@ -265,9 +311,10 @@ public class UpdateDataService extends IntentService {
             messageOnBroadcast += "Connection to remote DB is null.";
         }
         
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(this);
+        if (db == null) return;
         try {
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
             db.delete(DBLocal.TABLE_RESTS, null, null);
             
             for (ContentValues cv : restsList) {
@@ -280,8 +327,8 @@ public class UpdateDataService extends IntentService {
         } finally {
             db.endTransaction();
         }
-        db.close();
-        
+        DBHelper.closeDatabase(db);
+
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_PRODUCTS_ID);
     }

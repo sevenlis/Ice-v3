@@ -22,7 +22,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewOrderDate"
-            android:textAlignment="center"
             android:textColor="@color/green_darker"
             android:layout_weight="1.25"/>
 
@@ -30,13 +29,28 @@
             android:text="@string/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="end"
+            android:textAlignment="gravity"
             android:id="@+id/textViewStatus"
             android:layout_weight="1"
-            android:textAlignment="viewEnd"
             android:textSize="12sp"
             android:textColor="@color/colorPrimaryDark"/>
 
     </LinearLayout>
+
+    <TextView
+        android:text="@string/storehouse_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_storehouse_label"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:text="@string/storehouse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_storehouse"
+        android:textSize="16sp"/>
 
     <TextView
         android:text="@string/contragent"
@@ -64,6 +78,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewPointName"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:text="@string/agreement_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_agreement_label"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:text="@string/agreement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView_agreement"
         android:textSize="16sp"/>
 
     <LinearLayout

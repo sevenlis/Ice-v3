@@ -7,7 +7,14 @@ public class Answer {
     private String description;
     private int result;
     private Date unloadTime;
-    
+
+    public Answer(String orderId) {
+        this.orderId = orderId;
+        this.description = "";
+        this.result = -1;
+        this.unloadTime = new Date();
+    }
+
     public String getOrderId() {
         return orderId;
     }

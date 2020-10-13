@@ -9,16 +9,14 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.CompoundButtonCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.widget.CompoundButtonCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,7 +47,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MenuItem menuItemDate;
     private CheckBox checkBoxFollow;
     private DBLocal dbLocal;
-    private BroadcastReceiver locationChangeReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver locationChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -73,19 +71,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         
         ctx = this;
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(OnMapReadyCallback.class.cast(this));
+        assert mapFragment != null;
+        mapFragment.getMapAsync(this);
         
         curDateCalendar = Calendar.getInstance();
-        onDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                if (curDateCalendar == null) {
-                    curDateCalendar = Calendar.getInstance();
-                }
-                curDateCalendar.set(year, monthOfYear, dayOfMonth);
-                menuItemDate.setTitle(FormatsUtils.getDateFormatted(curDateCalendar.getTime()));
-                showRoute(curDateCalendar);
+        onDateSetListener = (datePicker, year, monthOfYear, dayOfMonth) -> {
+            if (curDateCalendar == null) {
+                curDateCalendar = Calendar.getInstance();
             }
+            curDateCalendar.set(year, monthOfYear, dayOfMonth);
+            menuItemDate.setTitle(FormatsUtils.getDateFormatted(curDateCalendar.getTime()));
+            showRoute(curDateCalendar);
         };
         dbLocal = new DBLocal(ctx);
         polylineOptions = new PolylineOptions();
@@ -94,25 +90,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         checkBoxFollow = new CheckBox(ctx);
         checkBoxFollow.setText(R.string.map_follow_my_location);
         checkBoxFollow.setTextColor(getResources().getColor(R.color.white));
-        int states[][] = {{android.R.attr.state_checked}, {}};
-        int colors[]   = {getResources().getColor(R.color.white), getResources().getColor(R.color.white)};
+        int[][] states = {{android.R.attr.state_checked}, {}};
+        int[] colors = {getResources().getColor(R.color.white), getResources().getColor(R.color.white)};
         CompoundButtonCompat.setButtonTintList(checkBoxFollow, new ColorStateList(states, colors));
         checkBoxFollow.setChecked(false);
-        checkBoxFollow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                        ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mMap.setMyLocationEnabled(!isChecked);
-                }
-                if (isChecked) {
-                    trackPolyline.remove();
-                    polylineOptions = new PolylineOptions();
-                    //polylineOptions.add(mMap.getCameraPosition().target);
-                    trackPolyline = mMap.addPolyline(polylineOptions);
-                } else {
-                    showRoute(curDateCalendar);
-                }
+        checkBoxFollow.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                mMap.setMyLocationEnabled(!isChecked);
+            }
+            if (isChecked) {
+                trackPolyline.remove();
+                polylineOptions = new PolylineOptions();
+                //polylineOptions.add(mMap.getCameraPosition().target);
+                trackPolyline = mMap.addPolyline(polylineOptions);
+            } else {
+                showRoute(curDateCalendar);
             }
         });
     }
@@ -123,21 +116,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         menuItemDate = menu.findItem(R.id.menu_item_date);
         menuItemDate.setTitle(FormatsUtils.getDateFormatted(curDateCalendar.getTime()));
         menuItemDate.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        menuItemDate.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                DatePickerDialog dateDialog = new DatePickerDialog(ctx, onDateSetListener,
-                        curDateCalendar.get(Calendar.YEAR),
-                        curDateCalendar.get(Calendar.MONTH),
-                        curDateCalendar.get(Calendar.DAY_OF_MONTH));
-                dateDialog.show();
-                return false;
-            }
+        menuItemDate.setOnMenuItemClickListener(item -> {
+            DatePickerDialog dateDialog = new DatePickerDialog(ctx, onDateSetListener,
+                    curDateCalendar.get(Calendar.YEAR),
+                    curDateCalendar.get(Calendar.MONTH),
+                    curDateCalendar.get(Calendar.DAY_OF_MONTH));
+            dateDialog.show();
+            return false;
         });
         
         MenuItem menuItemFollow = menu.findItem(R.id.menu_item_follow);
         menuItemFollow.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        menuItemFollow.setActionView(View.class.cast(checkBoxFollow));
+        menuItemFollow.setActionView(checkBoxFollow);
        
         return super.onCreateOptionsMenu(menu);
     }
@@ -192,28 +182,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         trackPolyline = mMap.addPolyline(polylineOptions);
         marker = mMap.addMarker(new MarkerOptions().position(new LatLng(0.0d,0.0d)));
     
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                Toast.makeText(ctx, "onMapClick: " + latLng.latitude + "," + latLng.longitude, Toast.LENGTH_SHORT).show();
-                marker.remove();
-                marker = mMap.addMarker(new MarkerOptions().position(latLng));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15),1000,null);
-            }
+        mMap.setOnMapClickListener(latLng -> {
+            Toast.makeText(ctx, "onMapClick: " + latLng.latitude + "," + latLng.longitude, Toast.LENGTH_SHORT).show();
+            marker.remove();
+            marker = mMap.addMarker(new MarkerOptions().position(latLng));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15),1000,null);
         });
         
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                Toast.makeText(ctx, "onMapLongClick: " + latLng.latitude + "," + latLng.longitude, Toast.LENGTH_SHORT).show();
-            }
-        });
+        mMap.setOnMapLongClickListener(latLng -> Toast.makeText(ctx, "onMapLongClick: " + latLng.latitude + "," + latLng.longitude, Toast.LENGTH_SHORT).show());
         
-        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-                //Toast.makeText(ctx, "onCameraMove: " + mMap.getCameraPosition().target.latitude + "," + mMap.getCameraPosition().target.longitude, Toast.LENGTH_SHORT).show();
-            }
+        mMap.setOnCameraMoveListener(() -> {
+            //Toast.makeText(ctx, "onCameraMove: " + mMap.getCameraPosition().target.latitude + "," + mMap.getCameraPosition().target.longitude, Toast.LENGTH_SHORT).show();
         });
     
         if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||

@@ -3,7 +3,6 @@ package by.ingman.sevenlis.ice_v3.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -11,26 +10,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.List;
+import java.util.Objects;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Point;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 
-public class SelectSalespointActivity extends AppCompatActivity {
+public class SelectSalesPointActivity extends AppCompatActivity {
     public static final String CONTRAGENT_CODE_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_CODE_KEY";
     public static final String CONTRAGENT_NAME_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_NAME_KEY";
     public static final String SALESPOINT_CODE_VALUE_KEY = "by.ingman.sevenlis.ice_v3.SALESPOINT_CODE_VALUE_KEY";
     public static final String SALESPOINT_NAME_VALUE_KEY = "by.ingman.sevenlis.ice_v3.SALESPOINT_NAME_VALUE_KEY";
     private List<Point> pointsList;
-    private DBLocal dbLocal = new DBLocal(this);
+    private DBLocal dbLocal;
     private String mContragentCode;
     private String mContragentName;
     
@@ -38,8 +38,10 @@ public class SelectSalespointActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_salespoint);
+
+        dbLocal = new DBLocal(this);
         
-        EditText editTextFilter = (EditText) findViewById(R.id.etFilter);
+        EditText editTextFilter = findViewById(R.id.etFilter);
         
         editTextFilter.addTextChangedListener(new TextWatcher() {
             @Override
@@ -58,22 +60,19 @@ public class SelectSalespointActivity extends AppCompatActivity {
             }
         });
         
-        editTextFilter.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    refreshPointsList();
-                    return true;
-                }
-                return false;
+        editTextFilter.setOnKeyListener((view, keyCode, keyEvent) -> {
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                refreshPointsList();
+                return true;
             }
+            return false;
         });
         
         if (getIntent().getExtras() != null) {
             mContragentCode = getIntent().getExtras().getString(CONTRAGENT_CODE_KEY);
             mContragentName = getIntent().getExtras().getString(CONTRAGENT_NAME_KEY);
             
-            TextView.class.cast(findViewById(R.id.textContragent)).setText(mContragentName);
+            ((TextView) findViewById(R.id.textContragent)).setText(mContragentName);
         }
         
         refreshPointsList();
@@ -88,18 +87,15 @@ public class SelectSalespointActivity extends AppCompatActivity {
         }
         pointsList = dbLocal.getPoints(condition, conditionArgs);
         CustomListAdapter customListAdapter = new CustomListAdapter(this, pointsList);
-        ListView lvPoints = (ListView) findViewById(R.id.listPoints);
+        ListView lvPoints = findViewById(R.id.listPoints);
         lvPoints.setAdapter(customListAdapter);
-        lvPoints.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Point point = pointsList.get(i);
-                Intent answerIntent = new Intent();
-                answerIntent.putExtra(SALESPOINT_CODE_VALUE_KEY, point.code);
-                answerIntent.putExtra(SALESPOINT_NAME_VALUE_KEY, point.name);
-                setResult(RESULT_OK, answerIntent);
-                finish();
-            }
+        lvPoints.setOnItemClickListener((adapterView, view, i, l) -> {
+            Point point = pointsList.get(i);
+            Intent answerIntent = new Intent();
+            answerIntent.putExtra(SALESPOINT_CODE_VALUE_KEY, point.code);
+            answerIntent.putExtra(SALESPOINT_NAME_VALUE_KEY, point.name);
+            setResult(RESULT_OK, answerIntent);
+            finish();
         });
     }
     
@@ -112,10 +108,10 @@ public class SelectSalespointActivity extends AppCompatActivity {
         refreshPointsList();
         if (pointsList.size() == 0) return;
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        imm.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
     
-    private class CustomListAdapter extends BaseAdapter {
+    private static class CustomListAdapter extends BaseAdapter {
         Context ctx;
         LayoutInflater layoutInflater;
         List<Point> objects;

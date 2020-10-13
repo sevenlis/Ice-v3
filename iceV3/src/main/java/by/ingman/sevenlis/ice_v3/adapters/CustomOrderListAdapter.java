@@ -8,13 +8,13 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Order;
+import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class CustomOrderListAdapter extends BaseAdapter {
     private Context ctx;
@@ -22,13 +22,15 @@ public class CustomOrderListAdapter extends BaseAdapter {
     private List<Order> objects;
     private static String[] advTypesStrings;
     private static String[] orderStatuses;
+    private static String[] orderTypes;
     
     public CustomOrderListAdapter(Context context, List<Order> orders) {
         this.ctx = context;
         this.objects = orders;
-        this.layoutInflater = LayoutInflater.class.cast(ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
+        this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         advTypesStrings = ctx.getResources().getStringArray(R.array.adv_types_strings);
         orderStatuses = ctx.getResources().getStringArray(R.array.order_statuses);
+        orderTypes = ctx.getResources().getStringArray(R.array.order_types);
     }
     
     public void updateOrdersList(List<Order> orders) {
@@ -65,19 +67,27 @@ public class CustomOrderListAdapter extends BaseAdapter {
         
         ((TextView) view.findViewById(R.id.textView_date)).setText(order.getOrderDateString());
         ((TextView) view.findViewById(R.id.textView_orderId)).setText(order.orderUid);
-        ((TextView) view.findViewById(R.id.textView_сontragent)).setText(order.contragentName);
+        ((TextView) view.findViewById(R.id.textView_buyer)).setText(order.contragentName);
         ((TextView) view.findViewById(R.id.textView_point)).setText(order.pointName);
-        mText = "Кол.упак: " + order.getPacksString();
+        mText = "Упак:  " + FormatsUtils.getNumberFormatted(order.packs,1);
         ((TextView) view.findViewById(R.id.textView_qtyPacks)).setText(mText);
-        mText = "Кол.ед.:  " + order.getQuantityString();
+        mText = "Кол-во:" + FormatsUtils.getNumberFormatted(order.quantity,0);
         ((TextView) view.findViewById(R.id.textView_quantity)).setText(mText);
-        mText = "Масса: " + order.getWeightString();
+        mText = "Масса:" + FormatsUtils.getNumberFormatted(order.weight,3);
         ((TextView) view.findViewById(R.id.textView_weight)).setText(mText);
-        mText = "Сумма: " + order.getSummaString();
+        mText = "Сумма:" + FormatsUtils.getNumberFormatted(order.summa,2);
         ((TextView) view.findViewById(R.id.textView_summa)).setText(mText);
-        mText = "Реклама: " + order.getIsAdvString();
-        ((TextView) view.findViewById(R.id.textView_adv)).setText(mText);
+
+        if (order.orderType == -1) {
+            mText = getOrderTypeString(order);
+            ((TextView) view.findViewById(R.id.textView_adv)).setText(mText);
+            ((TextView) view.findViewById(R.id.textView_adv)).setTextColor(ctx.getResources().getColor(R.color.color_red));
+        } else {
+            mText = "Реклама: " + order.getIsAdvString();
+            ((TextView) view.findViewById(R.id.textView_adv)).setText(mText);
+        }
         ((TextView) view.findViewById(R.id.textView_advType)).setText(getAdvTypeString(order));
+
         ((TextView) view.findViewById(R.id.textView_comment)).setText(order.comment);
         ((TextView) view.findViewById(R.id.textView_dateUnload)).setText(getDateTimeUnloadString(order));
         
@@ -104,5 +114,16 @@ public class CustomOrderListAdapter extends BaseAdapter {
     
     private String getOrderStatusString(int idx) {
         return orderStatuses[idx];
+    }
+
+    private String getOrderTypeString(Order order) {
+        return orderTypes[getOrderTypesArrayPosition(order.orderType)];
+    }
+
+    private int getOrderTypesArrayPosition(int orderType) {
+        if (orderType == -1) {
+            return 1;
+        }
+        return 0;
     }
 }

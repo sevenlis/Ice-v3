@@ -1,8 +1,9 @@
 package by.ingman.sevenlis.ice_v3.adapters;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 
@@ -10,13 +11,14 @@ import by.ingman.sevenlis.ice_v3.activities.fragments.MainActivityPageFragment;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class MainActivityPagerAdapter extends FragmentStatePagerAdapter {
-    private ArrayList<MainActivityPageFragment> fragmentArrayList;
+    private final ArrayList<MainActivityPageFragment> fragmentArrayList;
     
     public MainActivityPagerAdapter(FragmentManager fragmentManager, ArrayList<MainActivityPageFragment> fragmentArrayList) {
-        super(fragmentManager);
+        super(fragmentManager,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.fragmentArrayList = fragmentArrayList;
     }
     
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         return this.fragmentArrayList.get(position);

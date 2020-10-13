@@ -3,7 +3,6 @@ package by.ingman.sevenlis.ice_v3.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -11,38 +10,41 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.List;
+import java.util.Objects;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Contragent;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
-public class SelectContragentActivity extends AppCompatActivity {
+public class SelectCounterPartyActivity extends AppCompatActivity {
     public static final String CONTRAGENT_CODE_VALUE_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_CODE_VALUE_KEY";
     public static final String CONTRAGENT_NAME_VALUE_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_NAME_VALUE_KEY";
     Boolean useRecent = false;
     ImageButton buttonRecent;
     EditText editTextFilter;
     private List<Contragent> contragentsList;
-    private DBLocal dbLocal = new DBLocal(this);
+    private DBLocal dbLocal;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_contragent);
+
+        dbLocal = new DBLocal(this);
         
-        buttonRecent = (ImageButton) findViewById(R.id.btnRecent);
+        buttonRecent = findViewById(R.id.btnRecent);
         
-        editTextFilter = (EditText) findViewById(R.id.etFilter);
+        editTextFilter = findViewById(R.id.etFilter);
         
         editTextFilter.addTextChangedListener(new TextWatcher() {
             @Override
@@ -61,15 +63,12 @@ public class SelectContragentActivity extends AppCompatActivity {
             }
         });
         
-        editTextFilter.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    refreshContragentsList();
-                    return true;
-                }
-                return false;
+        editTextFilter.setOnKeyListener((view, keyCode, keyEvent) -> {
+            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                refreshContragentsList();
+                return true;
             }
+            return false;
         });
         
         refreshContragentsList();
@@ -102,18 +101,15 @@ public class SelectContragentActivity extends AppCompatActivity {
         }
         
         CustomListAdapter customListAdapter = new CustomListAdapter(this, contragentsList);
-        ListView lvContragents = (ListView) findViewById(R.id.listContragents);
+        ListView lvContragents = findViewById(R.id.listContragents);
         lvContragents.setAdapter(customListAdapter);
-        lvContragents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Contragent contragent = contragentsList.get(i);
-                Intent answerIntent = new Intent();
-                answerIntent.putExtra(CONTRAGENT_CODE_VALUE_KEY, contragent.getCode());
-                answerIntent.putExtra(CONTRAGENT_NAME_VALUE_KEY, contragent.getName());
-                setResult(RESULT_OK, answerIntent);
-                finish();
-            }
+        lvContragents.setOnItemClickListener((adapterView, view, i, l) -> {
+            Contragent contragent = contragentsList.get(i);
+            Intent answerIntent = new Intent();
+            answerIntent.putExtra(CONTRAGENT_CODE_VALUE_KEY, contragent.getCode());
+            answerIntent.putExtra(CONTRAGENT_NAME_VALUE_KEY, contragent.getName());
+            setResult(RESULT_OK, answerIntent);
+            finish();
         });
     }
     
@@ -127,7 +123,7 @@ public class SelectContragentActivity extends AppCompatActivity {
         if (contragentsList.size() == 0) return;
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         assert imm != null;
-        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        imm.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
     
     private class CustomListAdapter extends BaseAdapter {

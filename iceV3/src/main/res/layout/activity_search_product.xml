@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_select_product"
     android:layout_width="match_parent"
@@ -27,13 +25,14 @@
             android:text="@string/digit_123"/>
 
         <EditText
-            android:id="@+id/editTextFilter"
+            android:id="@+id/autoCompleteTextView"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_weight="0.5"
             android:ems="10"
+            android:hint="@string/code_search"
             android:inputType="textPersonName"
-            />
+            android:autofillHints="" />
 
     </LinearLayout>
 

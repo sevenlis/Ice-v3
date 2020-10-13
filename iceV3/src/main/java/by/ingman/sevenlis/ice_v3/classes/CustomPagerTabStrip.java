@@ -1,9 +1,10 @@
 package by.ingman.sevenlis.ice_v3.classes;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerTabStrip;
 import android.util.AttributeSet;
+
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerTabStrip;
 
 import java.util.Calendar;
 

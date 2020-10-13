@@ -1,13 +1,11 @@
 package by.ingman.sevenlis.ice_v3.activities;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,29 +13,45 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
 
 import by.ingman.sevenlis.ice_v3.R;
+import by.ingman.sevenlis.ice_v3.classes.Agreement;
 import by.ingman.sevenlis.ice_v3.classes.Contragent;
 import by.ingman.sevenlis.ice_v3.classes.Order;
 import by.ingman.sevenlis.ice_v3.classes.OrderItem;
 import by.ingman.sevenlis.ice_v3.classes.Point;
 import by.ingman.sevenlis.ice_v3.classes.Product;
+import by.ingman.sevenlis.ice_v3.classes.Storehouse;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
+import by.ingman.sevenlis.ice_v3.services.ExchangeDataService;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
+import static java.util.UUID.randomUUID;
+
 public class OrderActivity extends AppCompatActivity {
+    public static final String ACTION_ORDER_COPY = OrderActivity.class.getSimpleName() + "_ACTION_ORDER_COPY";
+    public static final String ACTION_ORDER_EDIT = OrderActivity.class.getSimpleName() + "_ACTION_ORDER_EDIT";
     public static final int SELECT_CONTRAGENTS_REQUEST_CODE = 0;
     public static final int SELECT_POINT_REQUEST_CODE = 1;
     public static final int SELECT_ORDER_ITEM_REQUEST_CODE = 2;
@@ -52,7 +66,9 @@ public class OrderActivity extends AppCompatActivity {
     private Calendar orderDateCalendar;
     private DatePickerDialog.OnDateSetListener onDateSetListener;
     private TextView textViewOrderDate;
+    private Storehouse mStorehouse;
     private Contragent mContragent;
+    private Agreement mAgreement;
     private Point mPoint;
     private ArrayList<OrderItem> mOrderItems;
     private DBLocal dbLocal;
@@ -60,7 +76,8 @@ public class OrderActivity extends AppCompatActivity {
     private View footerSubmit;
     private Context ctx;
     private ViewGroup orderViewGroup = null;
-    
+    private CustomListViewAdapter customListViewAdapter;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem menuItem;
@@ -70,27 +87,25 @@ public class OrderActivity extends AppCompatActivity {
         menuItem.setIcon(R.drawable.ic_date_range_white)
                 .setTitle("ДАТА")
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Calendar cal = Calendar.getInstance();
-                DatePickerDialog dateDialog = new DatePickerDialog(ctx, onDateSetListener,
-                        cal.get(Calendar.YEAR),
-                        cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH));
-                
-                DatePicker datePicker = dateDialog.getDatePicker();
-                datePicker.setCalendarViewShown(false);
-                Calendar nowDate = FormatsUtils.roundDayToStart(Calendar.getInstance());
-                Calendar maxDate = FormatsUtils.roundDayToEnd(Calendar.getInstance());
-                maxDate.add(Calendar.DATE, SettingsUtils.Settings.getOrderDaysAhead(ctx));
-                datePicker.setMinDate(nowDate.getTimeInMillis());
-                datePicker.setMaxDate(maxDate.getTimeInMillis());
-                
-                dateDialog.show();
-                
-                return false;
-            }
+        menuItem.setOnMenuItemClickListener(item -> {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(mOrder.orderDate);
+            DatePickerDialog dateDialog = new DatePickerDialog(ctx, onDateSetListener,
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH),
+                    cal.get(Calendar.DAY_OF_MONTH));
+
+            DatePicker datePicker = dateDialog.getDatePicker();
+            datePicker.setCalendarViewShown(false);
+            Calendar nowDate = FormatsUtils.roundDayToStart(Calendar.getInstance());
+            Calendar maxDate = FormatsUtils.roundDayToEnd(Calendar.getInstance());
+            maxDate.add(Calendar.DATE, SettingsUtils.Settings.getOrderDaysAhead(ctx));
+            datePicker.setMinDate(nowDate.getTimeInMillis());
+            datePicker.setMaxDate(maxDate.getTimeInMillis());
+
+            dateDialog.show();
+
+            return false;
         });
         
         menu.add(0, OPTIONS_MENU_ADD_ORDER_ITEM_ID, Menu.NONE, "ADD");
@@ -120,9 +135,45 @@ public class OrderActivity extends AppCompatActivity {
         
         mOrder = new Order(ctx);
         mOrderItems = new ArrayList<>();
+
+        if (savedInstanceState != null) {
+            this.mOrder = savedInstanceState.getParcelable("ORDER");
+
+            this.mOrderItems = savedInstanceState.getParcelableArrayList("ORDER_ITEMS");
+            this.mOrder.orderItems = mOrderItems;
+        } else if (getIntent().getAction() != null && getIntent().getExtras() != null) {
+            if (getIntent().getAction().equals(ACTION_ORDER_EDIT) || getIntent().getAction().equals(ACTION_ORDER_COPY)) {
+                this.mOrder = dbLocal.getOrder(getIntent().getExtras().getString("order_id"));
+                this.mOrderItems = (ArrayList<OrderItem>) this.mOrder.orderItems;
+            }
+            if (getIntent().getAction().equals(ACTION_ORDER_COPY)) {
+                this.mOrder.orderUid = randomUUID().toString();
+            }
+        }
+
+        mStorehouse = mOrder.storehouse;
+        ((TextView) findViewById(R.id.textView_storehouse)).setText(mStorehouse.name);
+
+        mAgreement = mOrder.agreement;
     
-        advTypesSpinner = (Spinner) findViewById(R.id.spinner_advType);
-        isAdvCheckBox = (CheckBox) findViewById(R.id.checkBox_isAdv);
+        advTypesSpinner = findViewById(R.id.spinner_advType);
+        isAdvCheckBox = findViewById(R.id.checkBox_isAdv);
+
+        Spinner orderTypesSpinner = findViewById(R.id.spinner_orderType);
+        orderTypesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mOrder.orderType = getOrderType(i);
+                if (mOrder.orderType == -1)
+                    mOrder.isAdvertising = false;
+                setAdvVisibility();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
+        orderTypesSpinner.setSelection(getOrderTypesSpinnerPosition(mOrder));
+
         advTypesSpinner.setSelection(mOrder.advType);
         advTypesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -131,8 +182,7 @@ public class OrderActivity extends AppCompatActivity {
             }
             
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
+            public void onNothingSelected(AdapterView<?> adapterView) {}
         });
         
         setAdvTypesSpinnerState();
@@ -143,35 +193,27 @@ public class OrderActivity extends AppCompatActivity {
             orderDateCalendar.setTimeInMillis(longDate);
         }
         
-        textViewOrderDate = (TextView) findViewById(R.id.textViewDate);
+        textViewOrderDate = findViewById(R.id.textViewDate);
         
         textViewOrderDateRefresh();
         
-        footerSummary = createFooterSummary();
-        footerSubmit = createFooterSubmit();
+        footerSummary = getLayoutInflater().inflate(R.layout.order_item_list_footer_summary, orderViewGroup);
+
+        footerSubmit = getLayoutInflater().inflate(R.layout.order_item_list_footer_submit, orderViewGroup);
         
-        onDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                if (orderDateCalendar == null) {
-                    orderDateCalendar = Calendar.getInstance();
-                }
-                orderDateCalendar.set(year, monthOfYear, dayOfMonth);
-                textViewOrderDateRefresh();
+        onDateSetListener = (datePicker, year, monthOfYear, dayOfMonth) -> {
+            if (orderDateCalendar == null) {
+                orderDateCalendar = Calendar.getInstance();
             }
+            orderDateCalendar.set(year, monthOfYear, dayOfMonth);
+            textViewOrderDateRefresh();
         };
         
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
         
-        if (savedInstanceState != null) {
-            this.mOrder = savedInstanceState.getParcelable("ORDER");
-            
-            this.mOrderItems = savedInstanceState.getParcelableArrayList("ORDER_ITEMS");
-            this.mOrder.orderItems = mOrderItems;
-            refreshOrderItemsList();
-            
+        if (savedInstanceState != null || Objects.equals(getIntent().getAction(), ACTION_ORDER_EDIT) || Objects.equals(getIntent().getAction(), ACTION_ORDER_COPY)) {
             this.mContragent = mOrder.contragent;
             ((TextView) findViewById(R.id.textView_contragent)).setText(this.mContragent.getName());
             
@@ -183,14 +225,69 @@ public class OrderActivity extends AppCompatActivity {
             
             isAdvCheckBox.setChecked(mOrder.isAdvertising);
             setAdvTypesSpinnerState();
+
+            this.mAgreement = mOrder.agreement;
+            ((TextView) findViewById(R.id.textView_agreement)).setText(this.mAgreement.getName());
+
+            this.mStorehouse = mOrder.storehouse;
+            ((TextView) findViewById(R.id.textView_storehouse)).setText(this.mStorehouse.name);
         }
+
+        ListView listViewOrderItems = findViewById(R.id.lvOrderItems);
+        customListViewAdapter = new CustomListViewAdapter(this, mOrderItems);
+        listViewOrderItems.addFooterView(footerSummary, null, false);
+        listViewOrderItems.addFooterView(footerSubmit, null, false);
+        listViewOrderItems.setAdapter(customListViewAdapter);
+        listViewOrderItems.setOnItemClickListener((adapterView, view, i, l) -> {
+            final int position = (int) view.getTag();
+            final OrderItem orderItem = mOrderItems.get(position);
+            startOrderItemChange(orderItem,position);
+        });
+        listViewOrderItems.setOnItemLongClickListener((adapterView, view, i, l) -> {
+            showPopupMenu(view);
+            return true;
+        });
+
+        EditText editTextComment = footerSubmit.findViewById(R.id.editTextComment);
+        editTextComment.setText(mOrder.comment);
+
+        refreshOrderItemsList();
     }
     
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        EditText editTextComment = footerSubmit.findViewById(R.id.editTextComment);
+        if (editTextComment != null) mOrder.comment = editTextComment.getText().toString();
+
         outState.putParcelable("ORDER", mOrder);
         outState.putParcelableArrayList("ORDER_ITEMS", mOrderItems);
+    }
+
+    private int getOrderTypesSpinnerPosition(Order order) {
+        int orderType = order.orderType;
+        switch (orderType) {
+            case 1:
+                return 0;
+            case -1:
+                return 1;
+            case -20:
+                return 2;
+        }
+        return 0;
+    }
+
+    private int getOrderType(int orderTypeSpinnerPosition) {
+        switch (orderTypeSpinnerPosition) {
+            case 0:
+                return 1;
+            case 1:
+                return -1;
+            case 2:
+                return -20;
+        }
+        return 1;
     }
     
     public void isAdvOnClick(View view) {
@@ -200,6 +297,16 @@ public class OrderActivity extends AppCompatActivity {
             mOrder.advType = 0;
         }
         setAdvTypesSpinnerState();
+    }
+
+    public void setAdvVisibility() {
+        if (mOrder.orderType == 1 || mOrder.orderType == -20) {
+            isAdvCheckBox.setVisibility(View.VISIBLE);
+            advTypesSpinner.setVisibility(View.VISIBLE);
+        } else {
+            isAdvCheckBox.setVisibility(View.GONE);
+            advTypesSpinner.setVisibility(View.GONE);
+        }
     }
     
     public void setAdvTypesSpinnerState() {
@@ -213,38 +320,110 @@ public class OrderActivity extends AppCompatActivity {
     }
     
     public void startContragentSelection() {
-        Intent intent = new Intent(this, SelectContragentActivity.class);
+        Intent intent = new Intent(this, SelectCounterPartyActivity.class);
         startActivityForResult(intent, SELECT_CONTRAGENTS_REQUEST_CODE);
     }
     
     public void startSalespointSelection() {
-        Intent intent = new Intent(this, SelectSalespointActivity.class);
-        intent.putExtra(SelectSalespointActivity.CONTRAGENT_CODE_KEY, this.mContragent.getCode());
-        intent.putExtra(SelectSalespointActivity.CONTRAGENT_NAME_KEY, this.mContragent.getName());
+        Intent intent = new Intent(this, SelectSalesPointActivity.class);
+        intent.putExtra(SelectSalesPointActivity.CONTRAGENT_CODE_KEY, this.mContragent.getCode());
+        intent.putExtra(SelectSalesPointActivity.CONTRAGENT_NAME_KEY, this.mContragent.getName());
         startActivityForResult(intent, SELECT_POINT_REQUEST_CODE);
     }
     
     public void startOrderItemSelection() {
         Intent intent = new Intent(this, SelectOrderItemActivity.class);
+        intent.putExtra(SelectOrderItemActivity.STOREHOUSE_CODE_KEY, mStorehouse.code);
         startActivityForResult(intent, SELECT_ORDER_ITEM_REQUEST_CODE);
     }
     
-    public void startOrderItemChange(OrderItem orderItem) {
-        int position = mOrderItems.indexOf(orderItem);
+    public void startOrderItemChange(OrderItem orderItem, int position) {
         Intent intent = new Intent(this, SelectOrderItemActivity.class);
         intent.putExtra(SelectOrderItemActivity.ORDER_ITEM_PARCELABLE_VALUE_KEY, orderItem);
         intent.putExtra(SelectOrderItemActivity.ORDER_ITEM_POSITION_VALUE_KEY, position);
+        intent.putExtra(SelectOrderItemActivity.STOREHOUSE_CODE_KEY, mStorehouse.code);
         startActivityForResult(intent, CHANGE_ORDER_ITEM_REQUEST_CODE);
+    }
+
+    public void startAgreementSelection() {
+        final List<Agreement> agreements = dbLocal.getAgreements(mContragent);
+
+        DialogInterface.OnClickListener onClickListener = (dialogInterface, which) -> {
+            ListView listView = ((AlertDialog) dialogInterface).getListView();
+            if (which != Dialog.BUTTON_NEGATIVE && listView.getCheckedItemPosition() != -1) {
+                mAgreement = agreements.get(listView.getCheckedItemPosition());
+                ((TextView) findViewById(R.id.textView_agreement)).setText(mAgreement.getName());
+                mOrder.setAgreement(mAgreement);
+                dialogInterface.dismiss();
+            }
+        };
+
+        int checkedItem = -1;
+        for (int i = 0; i < agreements.size(); i++) {
+            if (agreements.get(i).getId().equals(mAgreement.getId()))
+                checkedItem = i;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setTitle(R.string.agreement_label);
+        builder.setPositiveButton("ВЫБРАТЬ", onClickListener);
+        builder.setNegativeButton("ОТМЕНА", onClickListener);
+        ArrayAdapter<Agreement> arrayAdapter = new ArrayAdapter<>(ctx, android.R.layout.select_dialog_singlechoice, agreements);
+        builder.setSingleChoiceItems(arrayAdapter, checkedItem, onClickListener).create().show();
+
+    }
+
+    public void startStorehouseSelection() {
+        final List<Storehouse> storehouses = dbLocal.getStorehouses();
+
+        DialogInterface.OnClickListener onClickListener = (dialogInterface, which) -> {
+            ListView listView = ((AlertDialog) dialogInterface).getListView();
+            if (which != Dialog.BUTTON_NEGATIVE && listView.getCheckedItemPosition() != -1) {
+                mStorehouse = storehouses.get(listView.getCheckedItemPosition());
+                ((TextView) findViewById(R.id.textView_storehouse)).setText(mStorehouse.name);
+                mOrder.setStorehouse(mStorehouse);
+                dialogInterface.dismiss();
+            }
+        };
+
+        int checkedItem = -1;
+        for (int i = 0; i < storehouses.size(); i++) {
+            if (storehouses.get(i).code.equals(mStorehouse.code))
+                checkedItem = i;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setTitle(R.string.storehouse_label);
+        builder.setPositiveButton("ВЫБРАТЬ", onClickListener);
+        builder.setNegativeButton("ОТМЕНА", onClickListener);
+        ArrayAdapter<Storehouse> arrayAdapter = new ArrayAdapter<>(ctx, android.R.layout.select_dialog_singlechoice, storehouses);
+        builder.setSingleChoiceItems(arrayAdapter, checkedItem, onClickListener).create().show();
     }
     
     public void onClick(View view) {
         switch (view.getId()) {
+            case (R.id.textView_storehouse):
+            case (R.id.textView_storehouse_label): {
+                startStorehouseSelection();
+            }
+            break;
+
             case (R.id.textView_contragent):
             case (R.id.textView_contr_label): {
                 startContragentSelection();
             }
             break;
-            
+
+            case (R.id.textView_agreement):
+            case (R.id.textView_agreement_label): {
+                if (mContragent == null) {
+                    Toast.makeText(this, "Не выбран Контрагент!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                startAgreementSelection();
+            }
+            break;
+
             case (R.id.textView_point):
             case (R.id.textView_point_label): {
                 if (mContragent == null) {
@@ -256,13 +435,18 @@ public class OrderActivity extends AppCompatActivity {
             break;
             
             case (R.id.buttonSubmitOrder): {
-                EditText editTextComment = (EditText) findViewById(R.id.editTextComment);
+                EditText editTextComment = findViewById(R.id.editTextComment);
                 if (editTextComment != null) mOrder.comment = editTextComment.getText().toString();
                 if (!checkDataFilling()) return;
                 dbLocal.saveOrder(mOrder);
                 Intent answerIntent = new Intent();
                 answerIntent.putExtra("orderDateMillis", orderDateCalendar.getTimeInMillis());
                 setResult(RESULT_OK, answerIntent);
+                if (Objects.equals(getIntent().getAction(), ACTION_ORDER_COPY) || Objects.equals(getIntent().getAction(), ACTION_ORDER_EDIT)) {
+                    dbLocal.deleteRemoteAnswerResult(mOrder.orderUid);
+                    Intent intent = new Intent(ExchangeDataService.CHANNEL_ORDERS_UPDATES);
+                    sendBroadcast(intent);
+                }
                 finish();
             }
             break;
@@ -294,20 +478,23 @@ public class OrderActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && data.getExtras() != null) {
             if (requestCode == SELECT_CONTRAGENTS_REQUEST_CODE) {
-                String code = data.getExtras().getString(SelectContragentActivity.CONTRAGENT_CODE_VALUE_KEY);
-                String name = data.getExtras().getString(SelectContragentActivity.CONTRAGENT_NAME_VALUE_KEY);
+                String code = data.getExtras().getString(SelectCounterPartyActivity.CONTRAGENT_CODE_VALUE_KEY);
+                String name = data.getExtras().getString(SelectCounterPartyActivity.CONTRAGENT_NAME_VALUE_KEY);
                 this.mContragent = new Contragent(code, name);
                 this.mOrder.setContragent(this.mContragent);
                 ((TextView) findViewById(R.id.textView_contragent)).setText(this.mContragent.getName());
                 this.mPoint = null;
                 this.mOrder.point = null;
-                ((TextView) findViewById(R.id.textView_point)).setText("Выберите пункт разгрузки");
+                ((TextView) findViewById(R.id.textView_point)).setText(getResources().getString(R.string.select_salepoint));
+                this.mAgreement = new Agreement("","");
+                this.mOrder.setAgreement(this.mAgreement);
+                ((TextView) findViewById(R.id.textView_agreement)).setText(getResources().getString(R.string.select_agreement));
                 startSalespointSelection();
                 return;
             }
             if (requestCode == SELECT_POINT_REQUEST_CODE) {
-                String code = data.getExtras().getString(SelectSalespointActivity.SALESPOINT_CODE_VALUE_KEY);
-                String name = data.getExtras().getString(SelectSalespointActivity.SALESPOINT_NAME_VALUE_KEY);
+                String code = data.getExtras().getString(SelectSalesPointActivity.SALESPOINT_CODE_VALUE_KEY);
+                String name = data.getExtras().getString(SelectSalesPointActivity.SALESPOINT_NAME_VALUE_KEY);
                 this.mPoint = new Point(code, name);
                 this.mOrder.setPoint(this.mPoint);
                 ((TextView) findViewById(R.id.textView_point)).setText(this.mPoint.name);
@@ -329,7 +516,21 @@ public class OrderActivity extends AppCompatActivity {
             if (requestCode == CHANGE_ORDER_ITEM_REQUEST_CODE) {
                 OrderItem oi = data.getExtras().getParcelable(SelectOrderItemActivity.ORDER_ITEM_PARCELABLE_VALUE_KEY);
                 int position = data.getExtras().getInt(SelectOrderItemActivity.ORDER_ITEM_POSITION_VALUE_KEY);
-                this.mOrderItems.set(position, oi);
+
+                int sameItemPosition = position;
+                for (OrderItem mOrderItem : mOrderItems) {
+                    assert oi != null;
+                    if (mOrderItem.getProductCode().equals(oi.getProductCode())) {
+                        sameItemPosition = mOrderItems.indexOf(mOrderItem);
+                    }
+                }
+                if (sameItemPosition == position) {
+                    this.mOrderItems.set(position, oi);
+                } else {
+                    addOrUpdateOrderItems(oi,oi.quantity);
+                    mOrderItems.remove(position);
+                }
+
                 this.mOrder.setOrderItems(this.mOrderItems);
                 refreshOrderItemsList();
                 return;
@@ -354,34 +555,10 @@ public class OrderActivity extends AppCompatActivity {
     }
     
     private void refreshOrderItemsList() {
-        EditText editTextComment = (EditText) findViewById(R.id.editTextComment);
-        if (editTextComment != null) mOrder.comment = editTextComment.getText().toString();
-        
-        ListView listViewOrderItems = (ListView) findViewById(R.id.lvOrderItems);
-        CustomListViewAdapter customListViewAdapter = new CustomListViewAdapter(this, mOrderItems);
-        listViewOrderItems.removeFooterView(footerSummary);
-        listViewOrderItems.removeFooterView(footerSubmit);
-        footerSummary = createFooterSummary();
-        footerSubmit = createFooterSubmit();
-        listViewOrderItems.addFooterView(footerSummary, null, false);
-        listViewOrderItems.addFooterView(footerSubmit, null, false);
-        listViewOrderItems.setAdapter(customListViewAdapter);
-        listViewOrderItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final int position = (int) view.getTag();
-                final OrderItem orderItem = mOrderItems.get(position);
-                startOrderItemChange(orderItem);
-            }
-            
-        });
-        listViewOrderItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                showPopupMenu(view);
-                return true;
-            }
-        });
+        customListViewAdapter.notifyDataSetChanged();
+        updateFooterSummary();
+        updateFooterSubmit();
+        setFootersVisibility();
     }
     
     private void showPopupMenu(View view) {
@@ -391,27 +568,32 @@ public class OrderActivity extends AppCompatActivity {
         popupMenu.getMenu().add(0, LIST_ITEM_CONTEXT_MENU_DEL, 0, "Удалить " + orderItem.product.code + " " + orderItem.product.name + ".");
         popupMenu.getMenu().add(0, LIST_ITEM_CONTEXT_MENU_CHANGE, 0, "Редактировать");
         popupMenu.setGravity(Gravity.END);
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case LIST_ITEM_CONTEXT_MENU_DEL:
-                        mOrderItems.remove(position);
-                        refreshOrderItemsList();
-                        break;
-                    case LIST_ITEM_CONTEXT_MENU_CHANGE:
-                        startOrderItemChange(orderItem);
-                        break;
-                }
-                return false;
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case LIST_ITEM_CONTEXT_MENU_DEL:
+                    mOrderItems.remove(position);
+                    refreshOrderItemsList();
+                    break;
+                case LIST_ITEM_CONTEXT_MENU_CHANGE:
+                    startOrderItemChange(orderItem, position);
+                    break;
             }
+            return false;
         });
         popupMenu.show();
     }
-    
-    private View createFooterSummary() {
-        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_summary, orderViewGroup);
-        
+
+    private void setFootersVisibility() {
+        if (mOrderItems.size() == 0) {
+            footerSummary.setVisibility(View.GONE);
+            footerSubmit.setVisibility(View.GONE);
+        } else {
+            footerSummary.setVisibility(View.VISIBLE);
+            footerSubmit.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateFooterSummary() {
         double sumPacks = 0;
         double sumAmount = 0;
         double sumSumma = 0;
@@ -423,35 +605,29 @@ public class OrderActivity extends AppCompatActivity {
             sumWeight += orderItem.weight;
         }
         String mText;
-        
-        mText = "Упак.: " + FormatsUtils.getNumberFormatted(sumPacks, 1);
-        ((TextView) v.findViewById(R.id.tvPacks)).setText(mText);
-        
-        mText = "Масса: " + FormatsUtils.getNumberFormatted(sumWeight, 3);
-        ((TextView) v.findViewById(R.id.tvMass)).setText(mText);
-        
+
+        mText = "Упак.:  " + FormatsUtils.getNumberFormatted(sumPacks, 1);
+        ((TextView) footerSummary.findViewById(R.id.tvPacks)).setText(mText);
+
         mText = "Кол-во: " + FormatsUtils.getNumberFormatted(sumAmount, 0);
-        ((TextView) v.findViewById(R.id.tvAmount)).setText(mText);
-        
+        ((TextView) footerSummary.findViewById(R.id.tvAmount)).setText(mText);
+
+        mText = "Масса: " + FormatsUtils.getNumberFormatted(sumWeight, 3);
+        ((TextView) footerSummary.findViewById(R.id.tvMass)).setText(mText);
+
         mText = "Сумма: " + FormatsUtils.getNumberFormatted(sumSumma, 2);
-        ((TextView) v.findViewById(R.id.tvSum)).setText(mText);
-        
-        return v;
+        ((TextView) footerSummary.findViewById(R.id.tvSum)).setText(mText);
     }
     
-    private View createFooterSubmit() {
-        View v = getLayoutInflater().inflate(R.layout.order_item_list_footer_submit, orderViewGroup);
-        
-        EditText editTextComment = (EditText) v.findViewById(R.id.editTextComment);
+    private void updateFooterSubmit() {
+        EditText editTextComment = footerSubmit.findViewById(R.id.editTextComment);
         editTextComment.setText(mOrder.comment);
         
-        TextView textViewComment = (TextView) v.findViewById(R.id.textViewComment);
+        TextView textViewComment = footerSubmit.findViewById(R.id.textViewComment);
         textViewComment.setVisibility(View.GONE);
-        
-        TextView textViewAnswer = (TextView) v.findViewById(R.id.textViewAnswer);
+
+        TextView textViewAnswer = footerSubmit.findViewById(R.id.textViewAnswer);
         textViewAnswer.setVisibility(View.GONE);
-        
-        return v;
     }
     
     @Override
@@ -470,11 +646,8 @@ public class OrderActivity extends AppCompatActivity {
                 .setTitle("Заявка не сохранена.")
                 .setMessage("Выйти без сохранения заявки?")
                 .setNegativeButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface arg0, int arg1) {
-                        OrderActivity.super.onBackPressed();
-                    }
-                }).create().show();
+                .setPositiveButton(android.R.string.yes, (arg0, arg1) ->
+                        OrderActivity.super.onBackPressed()).create().show();
     }
     
     
@@ -482,11 +655,11 @@ public class OrderActivity extends AppCompatActivity {
         Context ctx;
         LayoutInflater layoutInflater;
         ArrayList<OrderItem> objects;
-        
+
         CustomListViewAdapter(Context context, ArrayList<OrderItem> objects) {
             this.ctx = context;
             this.objects = objects;
-            this.layoutInflater = LayoutInflater.class.cast(ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
+            this.layoutInflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         
         @Override
@@ -521,17 +694,31 @@ public class OrderActivity extends AppCompatActivity {
             mText = "Упак.: " + FormatsUtils.getNumberFormatted(orderItem.packs, 1);
             ((TextView) view.findViewById(R.id.tvAmountPacks)).setText(mText);
             
-            mText = "Кол.: " + FormatsUtils.getNumberFormatted(orderItem.quantity, 0);
+            mText = "Кол-во:" + FormatsUtils.getNumberFormatted(orderItem.quantity, 0);
             ((TextView) view.findViewById(R.id.tvAmount)).setText(mText);
             
-            mText = "Масса: " + FormatsUtils.getNumberFormatted(orderItem.weight, 3);
+            mText = "Масса:" + FormatsUtils.getNumberFormatted(orderItem.weight, 3);
             ((TextView) view.findViewById(R.id.tvMass)).setText(mText);
             
-            mText = "Сумма: " + FormatsUtils.getNumberFormatted(orderItem.summa, 2);
+            mText = "Сумма:" + FormatsUtils.getNumberFormatted(orderItem.summa, 2);
             ((TextView) view.findViewById(R.id.tvSum)).setText(mText);
             
             view.setTag(i);
-            
+
+            ImageButton buttonIncreasePacks = view.findViewById(R.id.ibIncrease);
+            buttonIncreasePacks.setOnClickListener(view1 -> {
+                getOrderItem(i).increasePacks();
+                updateFooterSummary();
+                notifyDataSetChanged();
+            });
+
+            ImageButton buttonDecreasePacks = view.findViewById(R.id.ibDecrease);
+            buttonDecreasePacks.setOnClickListener(view12 -> {
+                getOrderItem(i).decreasePacks();
+                updateFooterSummary();
+                notifyDataSetChanged();
+            });
+
             return view;
         }
         

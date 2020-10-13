@@ -4,19 +4,54 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "iceDBv3";
-    private static final int DATABASE_VERSION = 5;
-    
+    private static final int DATABASE_VERSION = 8;
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private final Lock rLock = rwLock.readLock();
+    private final Lock wLock = rwLock.writeLock();
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
-    
+
+    public static SQLiteDatabase getDatabaseReadable(Context context) {
+        SQLiteDatabase db = null;
+        DBHelper dbHelper = new DBHelper(context);
+        try {
+            db = dbHelper.getReadableDatabase();
+        } catch (SQLiteDatabaseLockedException e) {
+            e.printStackTrace();
+        }
+        return db;
+    }
+
+    public static SQLiteDatabase getDatabaseWritable(Context context) {
+        SQLiteDatabase db = null;
+        DBHelper dbHelper = new DBHelper(context);
+        try {
+            db = dbHelper.getWritableDatabase();
+        } catch (SQLiteDatabaseLockedException e) {
+            e.printStackTrace();
+        }
+        return db;
+    }
+
+    public static void closeDatabase(SQLiteDatabase db) {
+        if (db.inTransaction())
+            db.endTransaction();
+        if (db.isOpen())
+            db.close();
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table " + DBLocal.TABLE_ORDERS + " ("
@@ -34,6 +69,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "name_s text not null,"
                 + "code_p text not null,"
                 + "name_p text not null,"
+                + "agreementId text,"
+                + "order_type integer,"
                 + "weight_p real not null,"
                 + "price_p real not null,"
                 + "num_in_pack_p real not null,"
@@ -101,6 +138,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "time integer not null,"
                 + "time_update integer not null"
                 + ");");
+
+        db.execSQL("create table " + DBLocal.TABLE_AGREEMENTS + " ("
+                + "_id integer primary key autoincrement,"
+                + "code_k text not null,"
+                + "name_k text not null,"
+                + "id text not null,"
+                + "name text not null"
+                + ");");
     }
     
     @Override
@@ -138,7 +183,14 @@ public class DBHelper extends SQLiteOpenHelper {
             orderData.put("processed", cursor.getInt(cursor.getColumnIndex("processed")));
             orderData.put("sent", cursor.getInt(cursor.getColumnIndex("sent")));
             orderData.put("date_unload", cursor.getLong(cursor.getColumnIndex("date_unload")));
-            
+            if (oldVersion > 5)
+                orderData.put("agreementId", cursor.getString(cursor.getColumnIndex("agreementId")));
+            if (oldVersion > 7) {
+                orderData.put("order_type", cursor.getInt(cursor.getColumnIndex("order_type")));
+            } else {
+                orderData.put("order_type", 1);
+            }
+
             ordersDataArray.add(orderData);
         }
         cursor.close();
@@ -162,6 +214,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_DEBTS);
         db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_CONTRAGENTS);
         db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_LOCATION);
+        db.execSQL("DROP TABLE IF EXISTS " + DBLocal.TABLE_AGREEMENTS);
         onCreate(db);
         
         for (ContentValues cv : ordersDataArray) {

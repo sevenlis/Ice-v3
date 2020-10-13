@@ -8,14 +8,14 @@ android {
             storePassword 'iceV3password'
         }
     }
-    compileSdkVersion 27
+    compileSdkVersion 29
     defaultConfig {
         applicationId "by.ingman.sevenlis.ice_v3"
         minSdkVersion 19
-        targetSdkVersion 27
-        versionCode 5
-        versionName '5.005'
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        targetSdkVersion 29
+        versionCode 9
+        versionName '9.09'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
@@ -29,22 +29,29 @@ android {
         abortOnError false
     }
     compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     dexOptions {
     }
+//    viewBinding.enabled = true
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'net.sourceforge.jtds:jtds:1.2.8'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'net.sourceforge.jtds:jtds:1.3.1'
     implementation 'com.hynnet:sqljdbc4-chs:4.0.2206.100'
-    implementation 'com.google.android.gms:play-services-location:11.8.0'
-    implementation 'com.google.android.gms:play-services-maps:11.8.0'
-    implementation 'com.google.maps.android:android-maps-utils:0.5'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.squareup.retrofit:retrofit:1.7.1'
+    implementation 'commons-net:commons-net:20030805.205232'
+    implementation 'com.google.maps.android:android-maps-utils:2.0.3'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.retrofit:retrofit:1.9.0'
+    implementation 'com.google.android.gms:play-services-location:17.1.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.libraries.places:places:2.4.0'
+    implementation 'com.jakewharton:butterknife:10.2.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
 }
 

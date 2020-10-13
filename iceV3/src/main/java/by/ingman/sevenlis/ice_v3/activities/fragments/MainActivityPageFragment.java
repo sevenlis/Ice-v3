@@ -5,21 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.activities.OrderViewActivity;
@@ -44,7 +44,7 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
     
     @SuppressLint("RestrictedApi")
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (orderDateCal == null) {
             orderDateCal = Calendar.getInstance();
@@ -53,7 +53,7 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
             long dateMillis = savedInstanceState.getLong("orderDateLong");
             orderDateCal.setTimeInMillis(dateMillis);
         }
-        ctx = getActivity().getApplicationContext();
+        ctx = Objects.requireNonNull(getActivity()).getApplicationContext();
         mHandler = new Handler();
         ordersList = new ArrayList<>();
         customOrderListAdapter = new CustomOrderListAdapter(ctx, ordersList);
@@ -64,13 +64,13 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
     }
     
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putLong("orderDateLong", orderDateCal.getTimeInMillis());
         super.onSaveInstanceState(outState);
     }
     
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         this.ctx = context;
         super.onAttach(context);
     }
@@ -81,12 +81,9 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
         
         listViewOrders = resultView.findViewById(R.id.listViewOrders);
         listViewOrders.setAdapter(customOrderListAdapter);
-        listViewOrders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Order order = ordersList.get(i);
-                viewOrder(order);
-            }
+        listViewOrders.setOnItemClickListener((adapterView, view, i, l) -> {
+            Order order = ordersList.get(i);
+            viewOrder(order);
         });
         progressBarLoad = resultView.findViewById(R.id.progressBarLoad);
         progressBarLoad.setVisibility(View.GONE);
@@ -100,53 +97,39 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
     }
     
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         refreshOrdersList(true);
     }
     
     @Override
     public void onRefresh() {
-        swipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refreshOrdersList(false);
-            }
-        },0L);
+        swipeRefreshLayout.postDelayed(() -> refreshOrdersList(false),0L);
     }
     
     public void refreshOrdersList(final boolean showProgress) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        listViewOrders.setVisibility(View.GONE);
-                        if (showProgress) {
-                            progressBarLoad.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-                
-                final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
-                
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        customOrderListAdapter.updateOrdersList(orders);
-    
-                        listViewOrders.setVisibility(View.VISIBLE);
-                        if (showProgress) {
-                            progressBarLoad.setVisibility(View.GONE);
-                        }
-    
-                        refreshOrdersListViewFooters();
-                        
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                });
-            }
+        new Thread(() -> {
+            mHandler.post(() -> {
+                listViewOrders.setVisibility(View.GONE);
+                if (showProgress) {
+                    progressBarLoad.setVisibility(View.VISIBLE);
+                }
+            });
+
+            final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
+
+            mHandler.post(() -> {
+                customOrderListAdapter.updateOrdersList(orders);
+
+                listViewOrders.setVisibility(View.VISIBLE);
+                if (showProgress) {
+                    progressBarLoad.setVisibility(View.GONE);
+                }
+
+                refreshOrdersListViewFooters();
+
+                swipeRefreshLayout.setRefreshing(false);
+            });
         }).start();
     }
     
@@ -195,23 +178,23 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
             if (isAdv != -1 && order.getIsAdvInteger() != isAdv) {
                 continue;
             }
-            sumPacks += order.packs;
-            sumAmount += order.quantity;
-            sumSumma += order.summa;
-            sumWeight += order.weight;
+            sumPacks += order.packs * order.orderType;
+            sumAmount += order.quantity * order.orderType;
+            sumSumma += order.summa * order.orderType;
+            sumWeight += order.weight * order.orderType;
         }
         String mText;
         
         mText = "Упак.: " + FormatsUtils.getNumberFormatted(sumPacks, 1);
         ((TextView) v.findViewById(R.id.tvPacks)).setText(mText);
-        
-        mText = "Масса: " + FormatsUtils.getNumberFormatted(sumWeight, 3);
+
+        mText = "Кол-во:" + FormatsUtils.getNumberFormatted(sumAmount, 0);
+        ((TextView) v.findViewById(R.id.tvAmount)).setText(mText);
+
+        mText = "Масса:" + FormatsUtils.getNumberFormatted(sumWeight, 3);
         ((TextView) v.findViewById(R.id.tvMass)).setText(mText);
         
-        mText = "Кол-во: " + FormatsUtils.getNumberFormatted(sumAmount, 0);
-        ((TextView) v.findViewById(R.id.tvAmount)).setText(mText);
-        
-        mText = "Сумма:  " + FormatsUtils.getNumberFormatted(sumSumma, 2);
+        mText = "Сумма:" + FormatsUtils.getNumberFormatted(sumSumma, 2);
         ((TextView) v.findViewById(R.id.tvSum)).setText(mText);
         
         return v;

@@ -1,61 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/activity_order"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="by.ingman.sevenlis.ice_v3.activities.OrderActivity"
-                android:orientation="vertical">
-
-    <RelativeLayout
-        android:id="@+id/rlDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-
-        <TextView
-            android:id="@+id/textViewDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="false"
-            android:layout_marginRight="@dimen/default_gap"
-            android:text="@string/order_date"
-            android:textColor="@color/dark_grey"
-            android:textSize="14sp"/>
-    </RelativeLayout>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_order"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="by.ingman.sevenlis.ice_v3.activities.OrderActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/oder_header"
-        android:layout_below="@+id/rlDate"
         android:paddingLeft="@dimen/default_gap"
         android:paddingRight="@dimen/default_gap">
 
         <TextView
-            android:text="@string/salepoint"
+            android:id="@+id/textViewDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_contragent"
-            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="false"
+            android:layout_marginEnd="@dimen/default_gap"
+            android:gravity="end"
+            android:textAlignment="viewEnd"
+            android:text="@string/order_date"
+            android:textColor="@color/dark_grey"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:text="@string/storehouse_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:id="@+id/textView_point_label"
-            android:layout_marginTop="@dimen/default_gap"
+            android:layout_below="@id/textViewDate"
+            android:id="@+id/textView_storehouse_label"
             android:onClick="onClick"
             android:background="@color/light_grey"/>
+
+        <TextView
+            android:text="@string/select_storehouse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_storehouse"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:layout_below="@+id/textView_storehouse_label"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:background="@color/light_grey"
+            android:focusable="true"/>
 
         <TextView
             android:id="@+id/textView_contr_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
+            android:layout_below="@id/textView_storehouse"
             android:background="@color/light_grey"
+            android:layout_marginTop="@dimen/default_gap"
             android:onClick="onClick"
-            android:text="@string/contragent"
-            />
+            android:text="@string/contragent"/>
 
         <TextView
             android:text="@string/select_contragent"
@@ -65,7 +68,6 @@
             android:textSize="18sp"
             android:textColor="@android:color/black"
             android:layout_below="@+id/textView_contr_label"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:clickable="true"
             android:onClick="onClick"
@@ -73,11 +75,46 @@
             android:focusable="true"/>
 
         <TextView
+            android:text="@string/agreement_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_point"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView_agreement_label"
+            android:layout_marginTop="@dimen/default_gap"
+            android:onClick="onClick"
+            android:background="@color/light_grey"/>
+
+        <TextView
+            android:text="@string/select_agreement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_agreement_label"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView_agreement"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:background="@color/light_grey"
+            android:focusable="true"/>
+
+        <TextView
+            android:text="@string/salepoint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_contragent"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView_point_label"
+            android:layout_marginTop="@dimen/default_gap"
+            android:onClick="onClick"
+            android:background="@color/light_grey"/>
+
+        <TextView
             android:text="@string/select_salepoint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/textView_point_label"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:id="@+id/textView_point"
             android:textSize="18sp"
@@ -87,29 +124,34 @@
             android:background="@color/light_grey"
             android:focusable="true"/>
 
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_agreement"
+            android:layout_marginTop="@dimen/default_gap"
+            android:id="@+id/spinner_orderType"
+            android:entries="@array/order_types"/>
+
         <CheckBox
             android:text="@string/advertising"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_point"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
+            android:layout_alignTop="@id/spinner_orderType"
+            android:layout_alignBottom="@id/spinner_orderType"
+            android:layout_toEndOf="@id/spinner_orderType"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:id="@+id/checkBox_isAdv"
-            android:layout_marginTop="@dimen/default_gap"
             android:onClick="isAdvOnClick"
             android:checked="false"/>
 
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/checkBox_isAdv"
-            android:layout_toRightOf="@+id/checkBox_isAdv"
+            android:layout_alignTop="@id/spinner_orderType"
             android:layout_toEndOf="@+id/checkBox_isAdv"
             android:id="@+id/spinner_advType"
-            android:layout_alignTop="@+id/checkBox_isAdv"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:entries="@array/adv_types_strings"/>
-
     </RelativeLayout>
 
     <ListView

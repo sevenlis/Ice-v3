@@ -3,6 +3,8 @@ package by.ingman.sevenlis.ice_v3.classes;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 public class Storehouse implements Parcelable {
     public static final Creator<Storehouse> CREATOR = new Creator<Storehouse>() {
         @Override
@@ -37,5 +39,11 @@ public class Storehouse implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.code);
         parcel.writeString(this.name);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name;
     }
 }

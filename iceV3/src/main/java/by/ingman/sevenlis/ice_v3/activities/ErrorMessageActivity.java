@@ -1,8 +1,11 @@
 package by.ingman.sevenlis.ice_v3.activities;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Objects;
 
 import by.ingman.sevenlis.ice_v3.R;
 
@@ -19,9 +22,9 @@ public class ErrorMessageActivity extends AppCompatActivity {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
         
-        TextView textView = (TextView) findViewById(R.id.textErrorMessage);
+        TextView textView = findViewById(R.id.textErrorMessage);
         
-        String errorMessage = getIntent().getExtras().getString(EXTRA_ERROR_MESSAGE, null);
+        String errorMessage = Objects.requireNonNull(getIntent().getExtras()).getString(EXTRA_ERROR_MESSAGE, null);
         
         if (errorMessage != null) {
             textView.setText(errorMessage);

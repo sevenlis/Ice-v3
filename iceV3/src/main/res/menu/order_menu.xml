@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/edit_order_group">
+        <item
+            android:id="@+id/item_edit"
+            android:icon="@drawable/ic_action_edit"
+            android:title="@string/edit_order"
+            app:showAsAction="ifRoom|withText" />
+        <item
+            android:id="@+id/item_repeat"
+            android:icon="@drawable/ic_action_repeat"
+            android:title="@string/repeat_order"
+            app:showAsAction="ifRoom|withText" />
+    </group>
+    <item
+        android:id="@+id/item_copy"
+        android:icon="@drawable/ic_action_copy"
+        android:title="@string/copy_order"
+        app:showAsAction="ifRoom|withText" />
+</menu>

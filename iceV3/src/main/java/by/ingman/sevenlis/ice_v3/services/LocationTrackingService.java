@@ -6,14 +6,18 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 
 import java.util.Set;
 
@@ -27,6 +31,8 @@ public class LocationTrackingService extends Service {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Context ctx;
+    private DBLocal dbLocal;
+    private Location previousLocation;
     
     private boolean getLocationPermissions() {
         return ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -54,9 +60,12 @@ public class LocationTrackingService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
     
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onCreate() {
         ctx = this;
+        dbLocal = new DBLocal(ctx);
+        previousLocation = new Location(LocationManager.EXTRA_PROVIDER_NAME);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -94,7 +103,15 @@ public class LocationTrackingService extends Service {
     
     private void saveLocationInDataBase(Location location) {
         if (location != null) {
-            new DBLocal(ctx).saveLocation(location.getLatitude(), location.getLongitude(), location.getTime());
+            if (location.getLatitude() == previousLocation.getLatitude() && location.getLongitude() == previousLocation.getLongitude()) return;
+
+            try {
+                dbLocal.saveLocation(location.getLatitude(), location.getLongitude(), location.getTime());
+            } catch (SQLiteDatabaseLockedException e) {
+                e.printStackTrace();
+            }
+
+            previousLocation = new Location(location);
         }
     }
     

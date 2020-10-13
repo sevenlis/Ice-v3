@@ -47,6 +47,11 @@
         <item>Замена брака</item>
         <item>Проект №1</item>
     </string-array>
+    <string-array name="order_types">
+        <item>ПРОДАЖА</item>
+        <item>ВОЗВРАТ</item>
+        <item>ПРЕДЗАКАЗ</item>
+    </string-array>
     <string-array name="order_statuses">
         <item>Записана</item>
         <item>Отправлена</item>
@@ -117,6 +122,7 @@
     <string name="pref_passDB_default">androidXchangeIngman759153!</string>
     <string name="pref_apk_update_url">http://ingman.by/agent/iceV3.apk</string>
     <string name="developer_name">"@sevenlis"</string>
+    <string name="developer_mail">alexander.lisovski@foodunion.com</string>
     <string name="digit_123">123</string>
     <string name="select_contragent"><![CDATA[<Выберите контрагента>]]></string>
     <string name="select_salepoint"><![CDATA[<Выберите пункт разгрузки>]]></string>
@@ -148,4 +154,33 @@
     <string name="product_name">Наименование продукции</string>
     <string name="items_amount">Количество единиц</string>
     <string name="summa">Сумма</string>
+    <string name="storehouse_label">Место хранения:</string>
+    <string name="select_storehouse"><![CDATA[<Выберите место хранения>]]></string>
+    <string name="agreement_label">Договор:</string>
+    <string name="agreement">Договор</string>
+    <string name="select_agreement"><![CDATA[<Выберите договор>]]></string>
+    <string name="storehouse">Место хранения</string>
+    <string name="repeat_order">Повторить</string>
+    <string name="copy_order">Копировать</string>
+    <string name="edit_order">Изменить</string>
+    <string name="increase">Увеличить</string>
+    <string name="decrease">Уменьшить</string>
+    <string name="code_search">Поиск по коду…</string>
+    <string name="name_search">Поиск по наименованию…</string>
+    <string name="preorders_journ">Журнал предзаказов</string>
+    <string name="save_orders">Сохранить заявки</string>
+    <string name="delete_orders">Удалить заявки</string>
+    <string name="change_date_orders">Изменить дату заявок</string>
+    <string name="by_ingman_sevenlis_ice_v3">by.ingman.sevenlis.ice_v3</string>
+    <string name="ver_3_3_01">ver.3 (3.01)</string>
+    <string name="copyrights">СООО "Ингман мороженое", 2016 – 2020 г.</string>
+    <string name="xx_xx_xxxx">XX.XX.XXXX</string>
+    <string name="orders_xxx">Заявок: XXX</string>
+    <string name="points_xxx">Адресов: XXX</string>
+    <string name="packs_xxx">Упаковок: XXX</string>
+    <string name="total">Итого:</string>
+    <string name="packs_count">Количество упаковок</string>
+    <string name="items_count">Количество единиц</string>
+    <string name="product_mass">Масса продукции</string>
+    <string name="starred">Starred</string>
 </resources>

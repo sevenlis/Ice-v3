@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
         android:defaultValue="@string/pref_manager_name_default"
         android:key="managerName"
@@ -9,10 +10,10 @@
 
     <EditTextPreference
         android:defaultValue="@string/pref_storehouse_code_default"
-        android:inputType="number"
+        android:inputType="number|text"
         android:key="storehouseDefaultCode"
         android:summary="@string/pref_default_storehouse_summ"
-        android:title="@string/pref_default_storehouse_title"/>
+        android:title="@string/pref_default_storehouse_title" />
 
     <EditTextPreference
         android:id="@+id/orderDaysAheadRestrict"
@@ -41,7 +42,7 @@
         android:key="itemSearchInputNumeric"
         android:summary="@string/item_search_input_numeric_summ"
         android:title="@string/item_search_input_numeric"/>
-    <PreferenceScreen
+    <androidx.preference.PreferenceScreen
         android:key="screen_sys_opt"
         android:persistent="false"
         android:summary="@string/pref_screen_sys_options_summ"
@@ -59,13 +60,8 @@
             android:key="exchangeShutdownOnExit"
             android:summary="@string/pref_on_exit"
             android:title="@string/pref_exchange_shutdown_on_exit_title"/>
-        <EditTextPreference
-            android:defaultValue="@string/pref_apk_update_url"
-            android:key="apkUpdateUrl"
-            android:summary="@string/pref_apk_update_url_summ"
-            android:title="@string/pref_apk_update_url_title"/>
 
-        <PreferenceScreen
+        <androidx.preference.PreferenceScreen
             android:key="gps_tracking_screen"
             android:title="@string/pref_gps_tracking_title">
             <ListPreference
@@ -81,9 +77,6 @@
                 android:summary="@string/pref_exchange_frequency_summ"
                 android:title="@string/pref_exchange_frequency_title"/>
             <MultiSelectListPreference
-                android:defaultValue="@string/location_tracking_providers_default"
-                android:entries="@array/location_tracking_providers_names"
-                android:entryValues="@array/location_tracking_providers_values"
                 android:key="locationTrackingProvidersKey"
                 android:title="@string/location_tracking_providers_title"/>
             <CheckBoxPreference
@@ -91,10 +84,10 @@
                 android:key="locationTrackingShutdownOnExit"
                 android:summary="@string/pref_on_exit"
                 android:title="@string/pref_location_tracking_shutdown_on_exit"/>
-        </PreferenceScreen>
+        </androidx.preference.PreferenceScreen>
 
 
-        <PreferenceScreen
+        <androidx.preference.PreferenceScreen
             android:key="remote_DB_settings"
             android:summary="@string/pref_cat_DB_options_summ"
             android:title="@string/pref_cat_DB_options_title">
@@ -129,9 +122,8 @@
                 android:defaultValue="@string/pref_passDB_default"
                 android:inputType="textPassword"
                 android:key="passwordDB"
-                android:password="true"
                 android:title="@string/pref_db_password_title"/>
-        </PreferenceScreen>
-    </PreferenceScreen>
+        </androidx.preference.PreferenceScreen>
+    </androidx.preference.PreferenceScreen>
 
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

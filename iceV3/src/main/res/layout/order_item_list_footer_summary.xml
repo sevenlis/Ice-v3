@@ -3,8 +3,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:id="@+id/order_item_list_footer_summary"
-    >
+              android:id="@+id/order_item_list_footer_summary">
 
     <TextView
         android:id="@+id/textViewCaption"
@@ -13,7 +12,7 @@
         android:layout_marginLeft="@dimen/default_gap"
         android:layout_marginRight="@dimen/default_gap"
         android:fontFamily="monospace"
-        android:text="Итого:"
+        android:text="@string/total"
         android:textColor="@color/colorPrimaryDark" />
 
     <LinearLayout
@@ -21,68 +20,74 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/order_summary"
-        android:layout_gravity="bottom"
+        android:layout_marginLeft="@dimen/default_gap"
+        android:layout_marginRight="@dimen/default_gap"
         android:paddingLeft="@dimen/default_gap"
-        android:paddingRight="@dimen/default_gap">
+        android:paddingRight="@dimen/default_gap"
+        android:paddingTop="@dimen/margin_4dp"
+        android:paddingBottom="@dimen/margin_4dp"
+        android:background="?attr/colorButtonNormal"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1">
 
             <TextView
                 android:id="@+id/tvPacks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:layout_gravity="start|center_vertical"
                 android:background="?attr/colorButtonNormal"
                 android:fontFamily="monospace"
-                android:paddingLeft="@dimen/default_gap"
-                android:paddingTop="@dimen/margin_4dp"
-                android:paddingRight="@dimen/default_gap"
-                android:text="Количество упаковок" />
-
-            <TextView
-                android:id="@+id/tvMass"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/colorButtonNormal"
-                android:fontFamily="monospace"
-                android:paddingLeft="@dimen/default_gap"
-                android:paddingRight="@dimen/default_gap"
-                android:paddingBottom="@dimen/margin_4dp"
-                android:text="Масса продукции" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+                android:text="@string/packs_count" />
 
             <TextView
                 android:id="@+id/tvAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:layout_gravity="start|center_vertical"
                 android:background="?attr/colorButtonNormal"
                 android:fontFamily="monospace"
-                android:gravity="end"
-                android:paddingLeft="@dimen/default_gap"
-                android:paddingTop="@dimen/margin_4dp"
-                android:paddingRight="@dimen/default_gap"
-                android:text="Количество единиц" />
+                android:text="@string/items_count" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end|center_vertical"
+            android:layout_gravity="end|center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvMass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="viewEnd"
+                android:gravity="end|center_vertical"
+                android:layout_gravity="end|center_vertical"
+                android:background="?attr/colorButtonNormal"
+                android:fontFamily="monospace"
+                android:text="@string/product_mass" />
 
             <TextView
                 android:id="@+id/tvSum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end|center_vertical"
+                android:layout_gravity="end|center_vertical"
                 android:background="?attr/colorButtonNormal"
                 android:fontFamily="monospace"
-                android:gravity="end"
-                android:paddingLeft="@dimen/default_gap"
-                android:paddingRight="@dimen/default_gap"
-                android:paddingBottom="@dimen/margin_4dp"
-                android:text="Сумма" />
+                android:textAlignment="viewEnd"
+                android:text="@string/sum" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

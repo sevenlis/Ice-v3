@@ -3,9 +3,9 @@ package by.ingman.sevenlis.ice_v3.classes;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.content.ContextCompat;
 
-import java.util.ArrayList;
+import androidx.core.content.ContextCompat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +28,7 @@ public class Order implements Parcelable {
             return new Order[size];
         }
     };
+    private Context ctx;
     public String orderUid;
     public Date orderDate;
     public Contragent contragent;
@@ -39,7 +40,12 @@ public class Order implements Parcelable {
     public Storehouse storehouse;
     public String storehouseCode;
     public String storehouseName;
+    public Agreement agreement;
+    public String agreementId;
+    public String agreementName;
+    public Answer answer;
     public boolean isAdvertising;
+    public int orderType;
     public int advType;
     public String comment;
     public List<OrderItem> orderItems;
@@ -52,9 +58,11 @@ public class Order implements Parcelable {
     private DBLocal dbLocal;
     
     public Order(Context ctx) {
-        dbLocal = new DBLocal(ctx);
+        this.ctx = ctx;
+        this.dbLocal = new DBLocal(ctx);
         this.orderUid = randomUUID().toString();
         this.isAdvertising = false;
+        this.orderType = 1;
         this.advType = 0;
         this.status = 0;
         setStorehouse(dbLocal.getDefaultStorehouse());
@@ -62,9 +70,11 @@ public class Order implements Parcelable {
         this.dateUnload = now.getTimeInMillis();
         setContragent(new Contragent("", ""));
         setPoint(new Point("", ""));
+        this.agreement = new Agreement("","");
+        this.answer = dbLocal.getAnswer(this.orderUid);
     }
     
-    private Order(Parcel in) {
+    public Order(Parcel in) {
         this.orderUid = in.readString();
         this.contragentCode = in.readString();
         this.contragentName = in.readString();
@@ -81,11 +91,43 @@ public class Order implements Parcelable {
         this.weight = in.readDouble();
         this.status = in.readInt();
         this.dateUnload = in.readLong();
-        
+        this.orderDate = new Date(in.readLong());
+        this.agreementId = in.readString();
+        this.agreementName = in.readString();
+        this.orderType = in.readInt();
+
         this.contragent = new Contragent(this.contragentCode, this.contragentName);
         this.point = new Point(this.pointCode, this.pointName);
         this.storehouse = new Storehouse(this.storehouseCode, this.storehouseName);
-        this.orderDate = new Date(in.readLong());
+        this.agreement = new Agreement(this.agreementId, this.agreementName);
+
+        this.answer = dbLocal.getAnswer(this.orderUid);
+    }
+
+    public String getOrderTypeString() {
+        String[] orderTypes = ctx.getResources().getStringArray(R.array.order_types);
+        return orderTypes[getOrderTypeArrayPosition()];
+    }
+    private int getOrderTypeArrayPosition() {
+        switch (orderType) {
+            case 1:
+                return 0;
+            case -1:
+                return 1;
+            case -20:
+                return 2;
+        }
+        return 0;
+    }
+
+    public String getOrderStatusString() {
+        String[] orderStatuses = ctx.getResources().getStringArray(R.array.order_statuses);
+        return orderStatuses[status];
+    }
+
+    public String getOrderAdvTypeString() {
+        String[] ordedAdvTypes = ctx.getResources().getStringArray(R.array.adv_types_strings);
+        return !isAdvertising ? "" : ordedAdvTypes[advType];
     }
     
     public void setContragent(Contragent contragent) {
@@ -108,7 +150,13 @@ public class Order implements Parcelable {
         this.storehouseCode = storehouse.code;
         this.storehouseName = storehouse.name;
     }
-    
+
+    public void setAgreement(Agreement agreement) {
+        this.agreement = agreement;
+        this.agreementId = agreement.getId();
+        this.agreementName = agreement.getName();
+    }
+
     public void setOrderItems(List<OrderItem> orderItems) {
         if (orderItems == null) return;
         this.orderItems = orderItems;
@@ -117,7 +165,11 @@ public class Order implements Parcelable {
         calcPacks();
         calcSumma();
     }
-    
+
+    public void setAnswer(Answer answer) {
+        this.answer = answer;
+    }
+
     private void calcQuantity() {
         this.quantity = 0;
         for (OrderItem orderItem : this.orderItems) {
@@ -145,21 +197,45 @@ public class Order implements Parcelable {
             this.weight += orderItem.product.weight * orderItem.quantity;
         }
     }
-    
+
+    public double getQuantity() {
+        return this.quantity;
+    }
+
+    public Point getPoint() {
+        return point;
+    }
+
+    public double getPacks() {
+        return packs;
+    }
+
+    public double getSumma() {
+        return summa;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
     public String getQuantityString() {
-        return FormatsUtils.getNumberFormatted(this.quantity, 3);
+        return FormatsUtils.getNumberFormatted(this.getQuantity(), 3);
     }
     
     public String getWeightString() {
-        return FormatsUtils.getNumberFormatted(this.weight, 3);
+        return FormatsUtils.getNumberFormatted(this.getWeight(), 3);
     }
     
     public String getPacksString() {
-        return FormatsUtils.getNumberFormatted(this.packs, 1);
+        return FormatsUtils.getNumberFormatted(this.getPacks(), 1);
     }
     
     public String getSummaString() {
-        return FormatsUtils.getNumberFormatted(this.summa, 2);
+        return FormatsUtils.getNumberFormatted(this.getSumma(), 2);
     }
     
     public String getOrderDateString() {
@@ -179,6 +255,7 @@ public class Order implements Parcelable {
         Answer mAnswer = dbLocal.getAnswer(this.orderUid);
         if (mAnswer == null) return mColor;
         switch (mAnswer.getResult()) {
+            case -1:
             case 0: {
                 mColor = ContextCompat.getColor(ctx, R.color.color_red);
             }
@@ -194,7 +271,13 @@ public class Order implements Parcelable {
         }
         return mColor;
     }
-    
+
+    public int getAnswerResult() {
+        if (answer == null)
+            return -1;
+        return answer.getResult();
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -219,5 +302,8 @@ public class Order implements Parcelable {
         parcel.writeInt(this.status);
         parcel.writeLong(this.dateUnload);
         parcel.writeLong(this.orderDate.getTime());
+        parcel.writeString(this.agreementId);
+        parcel.writeString(this.agreementName);
+        parcel.writeInt(this.orderType);
     }
 }

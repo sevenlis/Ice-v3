@@ -2,6 +2,7 @@ package by.ingman.sevenlis.ice_v3.remote;
 
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -11,9 +12,12 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v4.app.TaskStackBuilder;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.TaskStackBuilder;
+
+import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,10 +26,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.activities.MainActivity;
@@ -35,7 +35,9 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class CheckApkUpdate extends IntentService {
     private static final int NOTIFY_ID = 398;
+    private static final String NOTIF_CHANNEL_ID = "APK_UPDATE_CHANNEL_ID";
     private static NotificationManager notificationManager;
+    private CharSequence channelName = "ICE-V3 APK update notification channel";
     public CheckApkUpdate() {
         super(CheckApkUpdate.class.getSimpleName());
     }
@@ -43,6 +45,14 @@ public class CheckApkUpdate extends IntentService {
     @Override
     public void onCreate() {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(NOTIF_CHANNEL_ID,channelName,importance);
+            channel.setVibrationPattern(new long[]{0});
+            channel.enableVibration(false);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+        }
         super.onCreate();
     }
     
@@ -59,8 +69,8 @@ public class CheckApkUpdate extends IntentService {
         
         int curVersionCode = getVersionCodeLocal();
         int newVersionCode = readVersionCodeFromFile(versionInfoFile);
-        double curVersionName = Double.valueOf(getVersionNameLocal());
-        double newVersionName = Double.valueOf(readVersionNameFromFile(versionInfoFile));
+        double curVersionName = Double.parseDouble(getVersionNameLocal());
+        double newVersionName = Double.parseDouble(readVersionNameFromFile(versionInfoFile));
         
         if (curVersionCode < newVersionCode || curVersionName < newVersionName) {
             sendUpdateAvailableNotification(newVersionCode, newVersionName);
@@ -69,8 +79,14 @@ public class CheckApkUpdate extends IntentService {
     }
     
     private void sendUpdateAvailableNotification(int newVersionCode, double newVersionName) {
-        Notification.Builder mBuilder = new Notification.Builder(this)
-                .setTicker("Доступно обновление")
+        Notification.Builder mBuilder;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            mBuilder = new Notification.Builder(this,NOTIF_CHANNEL_ID);
+            mBuilder.setChannelId(NOTIF_CHANNEL_ID);
+        } else {
+            mBuilder = new Notification.Builder(this);
+        }
+        mBuilder.setTicker("Доступно обновление")
                 .setSmallIcon(R.drawable.ic_info_white)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ice_pict))
                 .setContentTitle("Доступно обновление")
@@ -94,7 +110,7 @@ public class CheckApkUpdate extends IntentService {
     }
     
     private int readVersionCodeFromFile(File versionInfoFile) {
-        int versionCode = 1;
+        int versionCode = 0;
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(versionInfoFile));
             int count = 0;
@@ -102,7 +118,7 @@ public class CheckApkUpdate extends IntentService {
             while ((str = bufferedReader.readLine()) != null) {
                 count++;
                 if (count == 1) {
-                    versionCode = Integer.valueOf(str);
+                    versionCode = Integer.parseInt(str);
                     break;
                 }
             }
@@ -155,8 +171,8 @@ public class CheckApkUpdate extends IntentService {
         return ni != null && ni.isConnected();
     }
     
-    private int getVersionCodeLocal() {
-        int versionCode = 1;
+    public int getVersionCodeLocal() {
+        int versionCode = 0;
         try {
             versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
@@ -165,7 +181,7 @@ public class CheckApkUpdate extends IntentService {
         return versionCode;
     }
     
-    private String getVersionNameLocal() {
+    public String getVersionNameLocal() {
         String versionName = "0.000";
         try {
             versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -205,25 +221,10 @@ public class CheckApkUpdate extends IntentService {
     }
     
     private void getVersionInfoFileRemote(File versionInfoFile) throws IOException {
-        HttpURLConnection connection;
-        String versionUrl = SettingsUtils.Settings.getApkUpdateUrl(this).replace("iceV3.apk", "version.info");
-        URL url = new URL(versionUrl);
-        connection = (HttpURLConnection) url.openConnection();
-        connection.connect();
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            String errorMessage = String.format("Ошибка соединения. Код %s : %s", connection.getResponseCode(), connection.getResponseMessage());
-            Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        OutputStream out = new FileOutputStream(versionInfoFile);
-        InputStream in = connection.getInputStream();
-        byte data[] = new byte[1024];
-        int count;
-        while ((count = in.read(data)) != -1) {
-            out.write(data, 0, count);
-        }
-        out.flush();
-        out.close();
+        FTPClient ftpClient = FTPClientConnector.getFtpClient();
+        ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+        ftpClient.retrieveFile("/htdocs/iceV3/version.info",new FileOutputStream(versionInfoFile));
+        FTPClientConnector.disconnectClient();
     }
     
 }

@@ -1,17 +1,23 @@
 package by.ingman.sevenlis.ice_v3.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.viewpager.widget.ViewPager;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.activities.fragments.MainActivityPageFragment;
@@ -27,17 +33,17 @@ import by.ingman.sevenlis.ice_v3.utils.NotificationsUtil;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_CODE_NEW_ORDER = 0;
+    public static final int REQUEST_CODE_NEW_ORDER = 0;
     private static ExchangeDataIntents exchangeDataIntents;
     private static LocationTrackerTaskIntents locationTrackerTaskIntents;
     private static CheckApkUpdate chkApkUpdate;
-    private static ArrayList<MainActivityPageFragment> fragmentArrayList = new ArrayList<>();
+    private static final ArrayList<MainActivityPageFragment> fragmentArrayList = new ArrayList<>();
     private Context ctx;
     private NotificationsUtil notifUtils;
     private ViewPager viewPager;
     private CustomPagerTabStrip customPagerTabStrip;
     private MainActivityPageFragment currentFragment;
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -69,60 +75,45 @@ public class MainActivity extends AppCompatActivity {
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add_order: {
-                Calendar newOrderDateCal = currentFragment.getOrderDateCal();
-                
-                Calendar nowStart = Calendar.getInstance();
-                FormatsUtils.roundDayToStart(nowStart);
-                
-                if (nowStart.getTimeInMillis() > newOrderDateCal.getTimeInMillis()) {
-                    Calendar tomorrow = Calendar.getInstance();
-                    tomorrow.add(Calendar.DATE, 1);
-                    newOrderDateCal.setTime(tomorrow.getTime());
-                }
-                Intent intent = new Intent(ctx, OrderActivity.class);
-                intent.putExtra("longDate", newOrderDateCal.getTimeInMillis());
-                startActivityForResult(intent, REQUEST_CODE_NEW_ORDER);
+        int itemId = item.getItemId();
+        if (itemId == R.id.add_order) {
+            Calendar newOrderDateCal = currentFragment.getOrderDateCal();
+
+            Calendar nowStart = Calendar.getInstance();
+            FormatsUtils.roundDayToStart(nowStart);
+
+            if (nowStart.getTimeInMillis() > newOrderDateCal.getTimeInMillis()) {
+                Calendar tomorrow = Calendar.getInstance();
+                tomorrow.add(Calendar.DATE, 1);
+                newOrderDateCal.setTime(tomorrow.getTime());
             }
-            break;
-            case R.id.settings: {
-                Intent intent = new Intent(ctx, SettingsActivity.class);
-                startActivity(intent);
-            }
-            break;
-            case R.id.update_data: {
-                Intent intent = new Intent(ctx, UpdateDataActivity.class);
-                startActivity(intent);
-            }
-            break;
-            case R.id.stopExchangeData: {
-                stopExchangeDataService();
-            }
-            break;
-            case R.id.startExchangeData: {
-                startExchangeDataService();
-            }
-            break;
-            case R.id.refresh_list: {
-                refreshCurrentFragment();
-            }
-            break;
-            case R.id.return_today: {
-                currentFragment = findMainActivityFragment(Calendar.getInstance());
-                viewPager.setCurrentItem(fragmentArrayList.indexOf(currentFragment));
-            }
-            break;
-            case R.id.about_app: {
-                Intent intent = new Intent(ctx, AboutActivity.class);
-                startActivity(intent);
-            }
-            break;
-            case R.id.show_location: {
-                Intent intent = new Intent(ctx, MapsActivity.class);
-                startActivity(intent);
-            }
-            break;
+            Intent intent = new Intent(ctx, OrderActivity.class);
+            intent.putExtra("longDate", newOrderDateCal.getTimeInMillis());
+            startActivityForResult(intent, REQUEST_CODE_NEW_ORDER);
+        } else if (itemId == R.id.settings) {
+            Intent intent = new Intent(ctx, SettingsActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.update_data) {
+            Intent intent = new Intent(ctx, UpdateDataActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.stopExchangeData) {
+            stopExchangeDataService();
+        } else if (itemId == R.id.startExchangeData) {
+            startExchangeDataService();
+        } else if (itemId == R.id.refresh_list) {
+            refreshCurrentFragment();
+        } else if (itemId == R.id.return_today) {
+            currentFragment = findMainActivityFragment(Calendar.getInstance());
+            viewPager.setCurrentItem(fragmentArrayList.indexOf(currentFragment));
+        } else if (itemId == R.id.about_app) {
+            Intent intent = new Intent(ctx, AboutActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.show_location) {
+            Intent intent = new Intent(ctx, MapsActivity.class);
+            startActivity(intent);
+        } else if (itemId == R.id.preorders_journ) {
+            Intent intent = new Intent(ctx, PreOrdersActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -148,11 +139,39 @@ public class MainActivity extends AppCompatActivity {
         if (currentFragment == null) currentFragment = new MainActivityPageFragment();
         return currentFragment;
     }
+
+    protected void checkPermissions() {
+        List<String> permissionsList = new ArrayList<>();
+
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+
+        if (!permissionsList.isEmpty()) {
+            ActivityCompat.requestPermissions(this,permissionsList.toArray(new String[]{}),0);
+        }
+    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppBaseTheme);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkPermissions();
         
         ctx = this.getApplicationContext();
         notifUtils = new NotificationsUtil(ctx);
@@ -195,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
         }
         
         MainActivityPagerAdapter mainActivityPagerAdapter = new MainActivityPagerAdapter(getSupportFragmentManager(), fragmentArrayList);
-        
-        viewPager = (ViewPager) findViewById(R.id.main_pager);
+
+        viewPager = findViewById(R.id.main_pager);
         viewPager.setAdapter(mainActivityPagerAdapter);
         viewPager.setCurrentItem(fragmentArrayList.indexOf(currentFragment));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -220,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-        customPagerTabStrip = (CustomPagerTabStrip) findViewById(R.id.pager_title_strip);
+        customPagerTabStrip = findViewById(R.id.pager_title_strip);
         if (customPagerTabStrip != null) {
             customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
             customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
@@ -234,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
     }
     
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong("currentDateMillis", currentFragment.getOrderDateCal().getTimeInMillis());
     }

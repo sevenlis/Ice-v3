@@ -53,6 +53,20 @@ public class OrderItem implements Parcelable {
         this.calcSumma();
         this.calcWeight();
     }
+
+    public void increasePacks() {
+        this.quantity += this.product.num_in_pack;
+        reCalcAll();
+    }
+
+    public void decreasePacks() {
+        this.quantity -= this.product.num_in_pack;
+        reCalcAll();
+    }
+
+    public String getProductCode() {
+        return this.product.code;
+    }
     
     @Override
     public int describeContents() {

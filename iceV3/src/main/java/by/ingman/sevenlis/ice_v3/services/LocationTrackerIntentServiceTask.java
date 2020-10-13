@@ -8,13 +8,16 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+
+import java.util.Objects;
 
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 
 public class LocationTrackerIntentServiceTask extends IntentService {
-    private Context ctx;
+    private final Context ctx;
     
     public LocationTrackerIntentServiceTask() {
         super(LocationTrackerIntentServiceTask.class.getSimpleName());
@@ -36,7 +39,7 @@ public class LocationTrackerIntentServiceTask extends IntentService {
                 ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return new Location(locationManager.getBestProvider(new Criteria(), true));
         }
-        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(new Criteria(), true));
+        Location location = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(new Criteria(), true)));
         if (location == null) {
             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
