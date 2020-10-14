@@ -46,6 +46,7 @@ public class PreOrdersActivity extends AppCompatActivity {
 
         ExpandableListView expandableListView = findViewById(R.id.groups_list);
         expandableListView.setAdapter(preOrdersExpListAdapter);
+        expandableListView.setDividerHeight(0);
 
         registerForContextMenu(expandableListView);
 

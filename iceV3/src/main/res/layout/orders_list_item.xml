@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/light_light_grey"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,19 +20,19 @@
             android:layout_weight="1.25"
             android:text="@string/dd_mm_yyyy"
             android:textColor="@android:color/holo_green_dark"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/textView_orderId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.55"
+            android:gravity="end"
             android:text="@string/uid_uid"
             android:textAlignment="viewEnd"
             android:textColor="@color/colorAccent"
             android:textSize="10sp"
-            tools:ignore="SmallSp"
-            android:gravity="end" />
+            tools:ignore="SmallSp" />
     </LinearLayout>
 
     <LinearLayout
@@ -47,7 +48,7 @@
             android:layout_height="wrap_content"
             android:text="@string/contragent_name"
             android:textColor="@android:color/black"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/textView_point"
@@ -55,21 +56,21 @@
             android:layout_height="wrap_content"
             android:text="@string/delivery_point_address"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
+        android:baselineAligned="false"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -91,10 +92,10 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginRight="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -102,8 +103,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:textAlignment="viewEnd"
                 android:text="@string/mass"
+                android:textAlignment="viewEnd"
                 android:textStyle="normal|bold"
                 android:theme="@style/order_list_item_Summary" />
 
@@ -112,11 +113,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:textAlignment="viewEnd"
                 android:text="@string/sum"
+                android:textAlignment="viewEnd"
                 android:textStyle="normal|bold"
                 android:theme="@style/order_list_item_Summary"
-                tools:ignore="NestedWeights"/>
+                tools:ignore="NestedWeights" />
         </LinearLayout>
     </LinearLayout>
 
@@ -134,7 +135,7 @@
             android:layout_weight="1.25"
             android:text="@string/isAdvertising"
             android:textColor="@color/colorAccent"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/textView_advType"
@@ -143,7 +144,7 @@
             android:layout_weight="1"
             android:text="@string/adv_type"
             android:textColor="@color/colorAccent"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/textView_status"
@@ -151,11 +152,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_weight="1"
+            android:gravity="end"
             android:text="@string/order_condition"
             android:textAlignment="viewEnd"
-            android:gravity="end"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -174,7 +175,7 @@
             android:text="@string/comment"
             android:textColor="@color/colorAccent"
             android:textSize="12sp"
-            tools:ignore="NestedWeights"/>
+            tools:ignore="NestedWeights" />
 
         <TextView
             android:id="@+id/textView_dateUnload"
@@ -182,11 +183,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_weight="1"
+            android:gravity="end"
             android:text="@string/datetime"
             android:textAlignment="viewEnd"
-            android:gravity="end"
             android:textColor="@color/colorAccent"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
     </LinearLayout>
 
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/list_items_divider"/>
 </LinearLayout>

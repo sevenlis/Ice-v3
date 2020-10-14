@@ -1,5 +1,9 @@
 package by.ingman.sevenlis.ice_v3.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.util.TypedValue;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,5 +68,14 @@ public class FormatsUtils {
         if (z == 0) return Math.round(d);
         double zz = Math.pow(10, z);
         return Math.round(d * zz) / zz;
+    }
+
+    public static int getPixelsForDp(Context mContext, int dpMeasure) {
+        Resources resources = mContext.getResources();
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dpMeasure,
+                resources.getDisplayMetrics()
+        );
     }
 }

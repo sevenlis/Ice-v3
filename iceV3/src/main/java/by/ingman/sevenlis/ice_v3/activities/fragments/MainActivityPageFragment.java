@@ -85,6 +85,7 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
             Order order = ordersList.get(i);
             viewOrder(order);
         });
+        listViewOrders.setDividerHeight(0);
         progressBarLoad = resultView.findViewById(R.id.progressBarLoad);
         progressBarLoad.setVisibility(View.GONE);
         listViewOrders.setVisibility(View.VISIBLE);

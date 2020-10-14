@@ -1,3 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE
+    resources [
+        <!ENTITY nbsp "&#160;"> <!-- non-breaking space, U+00A0 -->
+    ]>
 <resources>
     <string name="app_name">ICE-V3</string>
     <string name="manager_name">МенеджерNN</string>
@@ -149,7 +154,7 @@
     <string name="datetime">Дата время</string>
     <string name="title_activity_maps">Карта</string>
     <string name="show_location">Местоположение</string>
-    <string name="map_follow_my_location">Показывать текущий пройденный путь</string>
+    <string name="map_follow_my_location">Показывать текущий пройденный путь&nbsp;&nbsp;&nbsp;</string>
     <string name="text_none">none</string>
     <string name="product_name">Наименование продукции</string>
     <string name="items_amount">Количество единиц</string>

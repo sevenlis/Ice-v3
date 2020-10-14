@@ -1,6 +1,7 @@
 package by.ingman.sevenlis.ice_v3.activities;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -112,7 +113,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.maps_menu,menu);
+        getMenuInflater().inflate(R.menu.maps_menu, menu);
         menuItemDate = menu.findItem(R.id.menu_item_date);
         menuItemDate.setTitle(FormatsUtils.getDateFormatted(curDateCalendar.getTime()));
         menuItemDate.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -128,7 +129,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         MenuItem menuItemFollow = menu.findItem(R.id.menu_item_follow);
         menuItemFollow.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menuItemFollow.setActionView(checkBoxFollow);
-       
+
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(
+                ActionBar.LayoutParams.WRAP_CONTENT,
+                ActionBar.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 0, FormatsUtils.getPixelsForDp(ctx,10), 0);
+        checkBoxFollow.setLayoutParams(params);
+
         return super.onCreateOptionsMenu(menu);
     }
     

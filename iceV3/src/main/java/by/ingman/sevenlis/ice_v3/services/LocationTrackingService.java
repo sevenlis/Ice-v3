@@ -47,14 +47,14 @@ public class LocationTrackingService extends Service {
             
             if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_GPS) &
                     ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 0f, locationListener);
             }
             if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_NETWORK) &
                     ActivityCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000L, 0f, locationListener);
             }
             if (providers.contains(SettingsUtils.LOCATION_TRACKING_PROVIDER_PASSIVE)) {
-                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0L, 0f, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000L, 0f, locationListener);
             }
         }
         return super.onStartCommand(intent, flags, startId);
