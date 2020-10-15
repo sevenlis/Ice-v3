@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.preference.PreferenceScreen
+<PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
         android:defaultValue="@string/pref_manager_name_default"
@@ -42,7 +42,8 @@
         android:key="itemSearchInputNumeric"
         android:summary="@string/item_search_input_numeric_summ"
         android:title="@string/item_search_input_numeric"/>
-    <androidx.preference.PreferenceScreen
+
+    <PreferenceScreen
         android:key="screen_sys_opt"
         android:persistent="false"
         android:summary="@string/pref_screen_sys_options_summ"
@@ -61,7 +62,7 @@
             android:summary="@string/pref_on_exit"
             android:title="@string/pref_exchange_shutdown_on_exit_title"/>
 
-        <androidx.preference.PreferenceScreen
+        <PreferenceScreen
             android:key="gps_tracking_screen"
             android:title="@string/pref_gps_tracking_title">
             <ListPreference
@@ -84,10 +85,9 @@
                 android:key="locationTrackingShutdownOnExit"
                 android:summary="@string/pref_on_exit"
                 android:title="@string/pref_location_tracking_shutdown_on_exit"/>
-        </androidx.preference.PreferenceScreen>
+        </PreferenceScreen>
 
-
-        <androidx.preference.PreferenceScreen
+        <PreferenceScreen
             android:key="remote_DB_settings"
             android:summary="@string/pref_cat_DB_options_summ"
             android:title="@string/pref_cat_DB_options_title">
@@ -123,7 +123,8 @@
                 android:inputType="textPassword"
                 android:key="passwordDB"
                 android:title="@string/pref_db_password_title"/>
-        </androidx.preference.PreferenceScreen>
-    </androidx.preference.PreferenceScreen>
+        </PreferenceScreen>
 
-</androidx.preference.PreferenceScreen>
+    </PreferenceScreen>
+
+</PreferenceScreen>
