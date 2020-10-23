@@ -8,13 +8,13 @@ android {
             storePassword 'iceV3password'
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "by.ingman.sevenlis.ice_v3"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 9
-        versionName '9.09'
+        versionName '9.100'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {

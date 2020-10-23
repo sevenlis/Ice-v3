@@ -16,6 +16,7 @@
         android:id="@+id/refresh_list"
         android:icon="@drawable/ic_cached_white"
         android:title="@string/refresh_list"
+        android:visible="false"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/preorders_journ"

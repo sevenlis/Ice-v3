@@ -19,12 +19,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.activities.OrderViewActivity;
 import by.ingman.sevenlis.ice_v3.adapters.CustomOrderListAdapter;
 import by.ingman.sevenlis.ice_v3.classes.Order;
+import by.ingman.sevenlis.ice_v3.intents.ExchangeDataIntents;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
@@ -53,7 +53,7 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
             long dateMillis = savedInstanceState.getLong("orderDateLong");
             orderDateCal.setTimeInMillis(dateMillis);
         }
-        ctx = Objects.requireNonNull(getActivity()).getApplicationContext();
+        ctx = requireActivity().getApplicationContext();
         mHandler = new Handler();
         ordersList = new ArrayList<>();
         customOrderListAdapter = new CustomOrderListAdapter(ctx, ordersList);
@@ -116,6 +116,10 @@ public class MainActivityPageFragment extends Fragment implements SwipeRefreshLa
                     progressBarLoad.setVisibility(View.VISIBLE);
                 }
             });
+
+            Intent intent = ExchangeDataIntents.getExchangeDataServiceIntent(ctx);
+            intent.setAction("UPDATE-ORDERS-ONLY");
+            ctx.startService(intent);
 
             final List<Order> orders = new DBLocal(ctx).getOrdersList(orderDateCal);
 

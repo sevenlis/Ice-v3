@@ -68,43 +68,56 @@ public class ExchangeDataService extends IntentService {
     
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (isConnected) doExchangeData();
+        if (isConnected) doExchangeData(intent);
     }
-    
-    private void doExchangeData() {
-        if (SettingsUtils.Runtime.getUpdateInProgress(this)) return;
-        
+
+    private void exchangeOrdersData() {
         SettingsUtils.Runtime.setUpdateInProgress(this, true);
-        try {
-            updateRests();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
-        try {
-            updateDebts();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
-        try {
-            updateClients();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
         try {
             sentUnsentOrders();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
         try {
             receiveAnswers();
         } catch (Exception e) {
             e.printStackTrace();
         }
         SettingsUtils.Runtime.setUpdateInProgress(this, false);
+    }
+
+    private void exchangeReferences() {
+        SettingsUtils.Runtime.setUpdateInProgress(this, true);
+        try {
+            updateRests();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            updateDebts();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            updateClients();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        SettingsUtils.Runtime.setUpdateInProgress(this, false);
+    }
+    
+    private void doExchangeData(Intent intent) {
+
+        exchangeOrdersData();
+
+        if (intent.getAction() != null)
+            if (intent.getAction().equals("UPDATE-ORDERS-ONLY")) return;
+
+        exchangeReferences();
+
     }
     
     private void sendBroadcastMessage(String channel, String messageBroadcast) {
