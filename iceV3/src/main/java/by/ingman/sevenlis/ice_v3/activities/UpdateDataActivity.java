@@ -57,13 +57,13 @@ import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
 public class UpdateDataActivity extends AppCompatActivity {
     static ProgressDialog progressDialog;
-    private Context ctx;
+    private Context context;
     private Handler mHandler;
     private Button pressedButton;
     private int[] pressedButtons = new int[]{-1,-1,-1};
     private boolean[] pressedButtonsStates = new boolean[]{true,true,true};
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -99,18 +99,22 @@ public class UpdateDataActivity extends AppCompatActivity {
             }
         }
     };
-    
+
+    public Context getContext() {
+        return context;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_data);
         
-        this.ctx = this;
+        context = this;
         registerReceiver(broadcastReceiver, new IntentFilter(UpdateDataService.CHANNEL));
         
         mHandler = new Handler();
 
-        progressDialog = new ProgressDialog(ctx);
+        progressDialog = new ProgressDialog(context);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setCancelable(false);
 
@@ -173,29 +177,29 @@ public class UpdateDataActivity extends AppCompatActivity {
     
     public void buttonRestsOnClick(View view) {
         if (isNotConnected()) {
-            Toast.makeText(ctx, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
             return;
         }
         pressedButton = findViewById(view.getId());
         pressedButton.setEnabled(false);
         pressedButtons[2] = view.getId();
         pressedButtonsStates[2] = false;
-        Intent intent = new Intent(ctx, UpdateDataService.class);
+        Intent intent = new Intent(context, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_RESTS_VALUE);
         intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_RESTS_BUTTON_ID_KEY, pressedButton.getId());
-        startService(intent);
+        context.startService(intent);
     }
     
     public void buttonClientsOnClick(View view) {
         if (isNotConnected()) {
-            Toast.makeText(ctx, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
             return;
         }
         pressedButton = findViewById(view.getId());
         pressedButton.setEnabled(false);
         pressedButtons[0] = view.getId();
         pressedButtonsStates[0] = false;
-        Intent intent = new Intent(ctx, UpdateDataService.class);
+        Intent intent = new Intent(context, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_VALUE);
         intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_CLIENTS_BUTTON_ID_KEY, pressedButton.getId());
         startService(intent);
@@ -203,14 +207,14 @@ public class UpdateDataActivity extends AppCompatActivity {
     
     public void buttonDebtsOnClick(View view) {
         if (isNotConnected()) {
-            Toast.makeText(ctx, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
             return;
         }
         pressedButton = findViewById(view.getId());
         pressedButton.setEnabled(false);
         pressedButtons[1] = view.getId();
         pressedButtonsStates[1] = false;
-        Intent intent = new Intent(ctx, UpdateDataService.class);
+        Intent intent = new Intent(context, UpdateDataService.class);
         intent.putExtra(UpdateDataService.EXTRA_ACTION_KEY, UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_VALUE);
         intent.putExtra(UpdateDataService.EXTRA_UPDATE_ALL_DEBTS_BUTTON_ID_KEY, pressedButton.getId());
         startService(intent);
@@ -218,7 +222,7 @@ public class UpdateDataActivity extends AppCompatActivity {
     
     public void updateAPK(View view) {
         if (isNotConnected()) {
-            Toast.makeText(ctx, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
             return;
         }
         //downloadAndInstallUpdateApk();
@@ -232,7 +236,7 @@ public class UpdateDataActivity extends AppCompatActivity {
 
             Uri apkUri;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                apkUri = GenericFileProvider.getUriForFile(ctx, BuildConfig.APPLICATION_ID + ".file.provider", apkFile);
+                apkUri = GenericFileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".file.provider", apkFile);
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
             } else {
                 apkUri = Uri.fromFile(apkFile);
@@ -241,7 +245,7 @@ public class UpdateDataActivity extends AppCompatActivity {
             intent.setDataAndType(apkUri, MimeTypeMap.getSingleton().getMimeTypeFromExtension("apk"));
             startActivity(intent);
         } else {
-            Toast.makeText(ctx, "Файл APK не найден!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Файл APK не найден!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -251,12 +255,12 @@ public class UpdateDataActivity extends AppCompatActivity {
         //Delete update file if exists
         if (apkFile.exists())
             if (!apkFile.delete())
-                Toast.makeText(ctx, "Error deleting file.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Error deleting file.", Toast.LENGTH_SHORT).show();
 
         //get url of app on server
         String url = "http://ftp.ingman.by/iceV3/iceV3-debug.apk";
 
-        //set downloadmanager
+        //set download manager
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.setDescription("Загрузка обновления...");
         request.setTitle(getResources().getString(R.string.app_name));
@@ -282,7 +286,7 @@ public class UpdateDataActivity extends AppCompatActivity {
     
     public void getOrdersFromRemote(View view) {
         if (isNotConnected()) {
-            Toast.makeText(ctx, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
             return;
         }
         new GetOrdersFromRemoteTask(this).execute();
@@ -290,26 +294,32 @@ public class UpdateDataActivity extends AppCompatActivity {
     
     static class GetOrdersFromRemoteTask extends AsyncTask<Void, Integer, Void> {
         WeakReference<UpdateDataActivity> weakReference;
-        String managerName;
+        String managerName, managerCode;
         String progressDialogTitle;
         Handler mHandler;
 
         public GetOrdersFromRemoteTask(UpdateDataActivity updateDataActivity) {
+            super();
             this.weakReference = new WeakReference<>(updateDataActivity);
-            this.managerName = SettingsUtils.Settings.getManagerName(weakReference.get().ctx).toUpperCase();
+            this.managerName = SettingsUtils.Settings.getUser1cName(getWeakContext()).toUpperCase();
+            this.managerCode = SettingsUtils.Settings.getManagerCode(getWeakContext()).toUpperCase();
             this.mHandler = new Handler(Looper.getMainLooper());
+        }
+
+        private Context getWeakContext() {
+            return weakReference.get().getContext();
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            SettingsUtils.Runtime.setUpdateInProgress(weakReference.get().ctx, true);
+            SettingsUtils.Runtime.setUpdateInProgress(getWeakContext(), true);
             try {
                 getOrdersFromRemote();
                 getAnswersFromRemote();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            SettingsUtils.Runtime.setUpdateInProgress(weakReference.get().ctx, false);
+            SettingsUtils.Runtime.setUpdateInProgress(getWeakContext(), false);
             return null;
         }
         
@@ -317,18 +327,18 @@ public class UpdateDataActivity extends AppCompatActivity {
             progressDialogTitle = "Получение заявок...";
             mHandler.post(() -> setProgress(-1, 0, progressDialogTitle));
 
-            int daysAhead = SettingsUtils.Settings.getOrderLogDepth(weakReference.get().ctx);
+            int daysAhead = SettingsUtils.Settings.getOrderLogDepth(getWeakContext());
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -daysAhead);
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             
             int rsSize = 0, rsCount = 0;
-            Connection connection = new ConnectionFactory().getConnection(weakReference.get().ctx);
+            Connection connection = new ConnectionFactory().getConnection(getWeakContext());
             if (connection != null) {
                 List<ContentValues> contentValuesList = new ArrayList<>();
                 try {
-                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) as count_rs FROM orders WHERE UPPER(name_m) = '" + managerName + "' AND order_date > CAST('" + fDate + "' as datetime)");
+                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) as count_rs FROM orders WHERE (UPPER(LTRIM(RTRIM(name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "') AND order_date > CAST('" + fDate + "' as datetime)");
                     ResultSet rs_count = stat_count.executeQuery();
                     
                     if (rs_count.next()) {
@@ -336,7 +346,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                         publishProgress(rsCount, rsSize);
                     }
 
-                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM orders WHERE UPPER(name_m) = '" + managerName + "' AND order_date > CAST('" + fDate + "' as datetime) ORDER BY in_datetime");
+                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM orders WHERE (UPPER(LTRIM(RTRIM(name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "') AND order_date > CAST('" + fDate + "' as datetime) ORDER BY in_datetime");
                     ResultSet rs = stat.executeQuery();
                     while (rs != null && rs.next()) {
                         ContentValues cv = new ContentValues();
@@ -395,18 +405,18 @@ public class UpdateDataActivity extends AppCompatActivity {
         private void getAnswersFromRemote() throws SQLException {
             progressDialogTitle = "Получение ответов на загруженные заявки...";
             mHandler.post(() -> setProgress(-1, 0, progressDialogTitle));
-            int daysAhead = SettingsUtils.Settings.getOrderLogDepth(weakReference.get().ctx);
+            int daysAhead = SettingsUtils.Settings.getOrderLogDepth(getWeakContext());
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -daysAhead);
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
             
             int rsSize = 0, rsCount = 0;
-            Connection connection = new ConnectionFactory().getConnection(weakReference.get().ctx);
+            Connection connection = new ConnectionFactory().getConnection(getWeakContext());
             if (connection != null) {
                 List<ContentValues> contentValuesList = new ArrayList<>();
                 try {
-                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(0) AS count_rs FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE UPPER(O.name_m) = '" + managerName + "' AND O.order_date > CAST('" + fDate + "' as datetime))");
+                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(0) AS count_rs FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "') AND O.order_date > CAST('" + fDate + "' as datetime))");
                     ResultSet rs_count = stat_count.executeQuery();
                     
                     if (rs_count.next()) {
@@ -414,7 +424,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                         publishProgress(rsCount, rsSize);
                     }
                     
-                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE UPPER(O.name_m) = '" + managerName + "' AND O.order_date > CAST('" + fDate + "' as datetime)) ORDER BY R.datetime_unload");
+                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "') AND O.order_date > CAST('" + fDate + "' as datetime)) ORDER BY R.datetime_unload");
                     ResultSet rs = stat.executeQuery();
                     while (rs != null && rs.next()) {
                         ContentValues cv = new ContentValues();
@@ -535,22 +545,23 @@ public class UpdateDataActivity extends AppCompatActivity {
     }
 
     static class UpdateAPKTask extends AsyncTask<Void, Integer, Void> {
-        private WeakReference<UpdateDataActivity> weakReference;
+        private final WeakReference<UpdateDataActivity> weakReference;
         private static final int batchSize = 2048;
         private static final int progressSizeDivider = 1024;
         private final File apkFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "iceV3.apk");
         private String errorMessage = null;
         private String progressDialogTitle;
-        private Handler mHandler;
+        private final Handler mHandler;
 
         public UpdateAPKTask(UpdateDataActivity updateDataActivity) {
+            super();
             this.weakReference = new WeakReference<>(updateDataActivity);
             this.mHandler = new Handler(Looper.getMainLooper());
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            SettingsUtils.Runtime.setUpdateInProgress(weakReference.get().ctx, true);
+            SettingsUtils.Runtime.setUpdateInProgress(weakReference.get().context, true);
 
             progressDialogTitle = "Получение файла обновления...";
             mHandler.post(() -> setProgress(-1, 0, progressDialogTitle));
@@ -570,7 +581,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                     created = apkFile.createNewFile();
                 }
                 if (!created) {
-                    weakReference.get().mHandler.post(() -> Toast.makeText(weakReference.get().ctx, "Error creating file " + apkFile.getPath(), Toast.LENGTH_SHORT).show());
+                    weakReference.get().mHandler.post(() -> Toast.makeText(weakReference.get().context, "Error creating file " + apkFile.getPath(), Toast.LENGTH_SHORT).show());
                     return null;
                 }
                 output = new FileOutputStream(apkFile);
@@ -621,7 +632,7 @@ public class UpdateDataActivity extends AppCompatActivity {
                 }
                 FTPClientConnector.disconnectClient();
             }
-            SettingsUtils.Runtime.setUpdateInProgress(weakReference.get().ctx, false);
+            SettingsUtils.Runtime.setUpdateInProgress(weakReference.get().context, false);
             return null;
         }
         
@@ -637,7 +648,7 @@ public class UpdateDataActivity extends AppCompatActivity {
             if (progressDialog.isShowing())
                 progressDialog.dismiss();
             if (errorMessage != null) {
-                Toast.makeText(weakReference.get().ctx, errorMessage, Toast.LENGTH_SHORT).show();
+                Toast.makeText(weakReference.get().context, errorMessage, Toast.LENGTH_SHORT).show();
                 errorMessage = null;
             } else {
                 if (apkFile.exists()) {

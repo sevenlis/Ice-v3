@@ -31,13 +31,15 @@ import static by.ingman.sevenlis.ice_v3.activities.SelectOrderItemActivity.CHECK
 import static by.ingman.sevenlis.ice_v3.activities.SelectOrderItemActivity.STRING_FILTER_KEY;
 
 public class SearchProductActivity extends AppCompatActivity {
-    public static final String PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY = "by.ingman.sevenlis.ice_v3.PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY";
+    public static final String PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY = SearchProductActivity.class.getSimpleName() + ".PARCELABLE_PRODUCT_SINGLE_ARRAY_KEY";
     public static final String STOREHOUSE_CODE_KEY = SearchProductActivity.class.getSimpleName() + ".storehouse_code_key";
+    public static final String ORDER_TYPE_KEY = SearchProductActivity.class.getSimpleName() + ".order_type_key";
     CheckBox checkBoxInputTypeNumeric;
     EditText editTextFilter;
     List<Product> arrayListProducts = new ArrayList<>();
     DBLocal dbLocal;
     String mStorehouseCode;
+    int mOrderType;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class SearchProductActivity extends AppCompatActivity {
         mStorehouseCode = SettingsUtils.Settings.getDefaultStoreHouseCode(this);
         if (getIntent().getExtras() != null) {
             mStorehouseCode = getIntent().getExtras().getString(STOREHOUSE_CODE_KEY);
+            mOrderType = getIntent().getIntExtra(ORDER_TYPE_KEY, 1);
         }
         dbLocal.setStorehouseCode(mStorehouseCode);
         
@@ -113,13 +116,20 @@ public class SearchProductActivity extends AppCompatActivity {
         String condition = "code_s = ?";
         String[] conditionArgs = new String[]{mStorehouseCode};
         if (!strFilter.isEmpty()) {
-            if (checkBoxInputTypeNumeric.isChecked()) {
-                condition += " AND code_p like ?";
-            } else {
-                condition += " AND search_uppercase like ?";
-            }
+            condition += checkBoxInputTypeNumeric.isChecked() ? " AND code_p like ?" : " AND search_uppercase like ?";
+            condition += " AND amount <> 0";
             conditionArgs = new String[]{mStorehouseCode, dbLocal.addWildcards(strFilter)};
         }
+
+        if (mOrderType != 1) {
+            condition = "";
+            conditionArgs = new String[]{};
+            if (!strFilter.isEmpty()) {
+                condition = checkBoxInputTypeNumeric.isChecked() ? "code_p like ?" : "search_uppercase like ?";
+                conditionArgs = new String[]{dbLocal.addWildcards(strFilter)};
+            }
+        }
+
         arrayListProducts = dbLocal.getProducts(condition, conditionArgs);
         
         CustomListViewAdapter customListViewAdapter = new CustomListViewAdapter(this, arrayListProducts);
@@ -190,21 +200,31 @@ public class SearchProductActivity extends AppCompatActivity {
             if (view == null) {
                 view = layoutInflater.inflate(R.layout.select_product_list_item, viewGroup, false);
             }
-            String mText;
+            int colorRed = getResources().getColor(R.color.color_red);
+            int colorGreen = getResources().getColor(R.color.green_darker);
+
             Product product = getObjectItem(i);
-            
+
+            double restPacks = dbLocal.getProductRestPacks(product) - dbLocal.getProductBlockPacks(product);
+            double restAmount = dbLocal.getProductRestAmount(product) - dbLocal.getProductBlockAmount(product);
+
+            String mText;
+
             mText = product.code;
             ((TextView) view.findViewById(R.id.tvItemCode)).setText(mText);
+            ((TextView) view.findViewById(R.id.tvItemCode)).setTextColor((restPacks <= 0D) || (restAmount <= 0D) ? colorRed : colorGreen);
             
             mText = product.name;
             ((TextView) view.findViewById(R.id.tvItemName)).setText(mText);
-            
-            mText = "Упак.: " + FormatsUtils.getNumberFormatted(dbLocal.getProductRestPacks(product) - dbLocal.getProductBlockPacks(product), 1);
+
+            mText = "Упак.: " + FormatsUtils.getNumberFormatted(restPacks, 1);
             ((TextView) view.findViewById(R.id.tvRestPacks)).setText(mText);
-            
-            mText = "Кол.: " + FormatsUtils.getNumberFormatted(dbLocal.getProductRestAmount(product) - dbLocal.getProductBlockAmount(product), 0);
+            ((TextView) view.findViewById(R.id.tvRestPacks)).setTextColor((restPacks <= 0D) ? colorRed : colorGreen);
+
+            mText = "Кол.: " + FormatsUtils.getNumberFormatted(restAmount, 0);
             ((TextView) view.findViewById(R.id.tvRestAmount)).setText(mText);
-            
+            ((TextView) view.findViewById(R.id.tvRestAmount)).setTextColor((restAmount <= 0D) ? colorRed : colorGreen);
+
             mText = "Цена: " + FormatsUtils.getNumberFormatted(product.price, 2);
             ((TextView) view.findViewById(R.id.tvPrice)).setText(mText);
             

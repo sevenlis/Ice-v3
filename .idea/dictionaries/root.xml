@@ -3,6 +3,8 @@
     <words>
       <w>contragent</w>
       <w>contragents</w>
+      <w>ltrim</w>
+      <w>rtrim</w>
     </words>
   </dictionary>
 </component>

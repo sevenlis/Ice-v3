@@ -6,16 +6,16 @@
 <resources>
     <string name="app_name">ICE-V3</string>
     <string name="manager_name">МенеджерNN</string>
-    <string name="manager">Менеджер</string>
-    <string name="manager_summary">Имя пользователя в 1С</string>
-    <string name="manager_pref_key">manager_pref_key</string>
+    <string name="manager_code_title">Код менеджера</string>
+    <string name="manager_code_summary">Код менеджера (сотрудника) в 1С</string>
+    <string name="manager_code_pref_key">manager_code_pref_key</string>
     <string name="add_order">Добавить заявку</string>
     <string name="update_data">Обновить данные</string>
     <string name="refresh_list">Обновить</string>
     <string name="return_today">Сегодня</string>
     <string name="settings">Настройки</string>
-    <string name="pref_manager_db_summ">Имя пользователя в 1С</string>
-    <string name="pref_manager_db">Менеджер</string>
+    <string name="pref_user_1c_sum">Имя пользователя в 1С</string>
+    <string name="pref_user_1c_title">Пользователь 1С</string>
     <string name="pref_default_storehouse_summ">Код склада по умолчанию</string>
     <string name="pref_default_storehouse_title">Код склада</string>
     <string name="pref_order_days_ahead_summ">На сколько дней вперед можно резервировать заявки</string>
@@ -117,7 +117,7 @@
     <string name="item_search_input_numeric">Поиск продукции по цифровому коду</string>
     <string name="item_search_input_numeric_summ">Значение по умолчанию</string>
 
-    <string name="pref_manager_name_default">МенеджерNN</string>
+    <string name="pref_user_1c_name_default">МенеджерNN</string>
     <string name="pref_storehouse_code_default">00279</string>
     <string name="pref_hostDB_default">212.98.187.177</string>
     <string name="pref_instanceDB_default">""</string>

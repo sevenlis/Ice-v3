@@ -465,7 +465,7 @@ public class ExchangeDataService extends IntentService {
         boolean success = false;
         int[] batchResults = new int[]{};
         String messageOnBroadcast = "";
-        String managerName = SettingsUtils.Settings.getManagerName(this);
+        String managerName = SettingsUtils.Settings.getUser1cName(this);
         
         List<Order> orderUnsentList = dbLocal.getUnsentOrdersList();
         if (orderUnsentList.size() == 0) return;
@@ -573,7 +573,7 @@ public class ExchangeDataService extends IntentService {
                 e.printStackTrace();
                 success = false;
                 try {
-                    if (conn.isClosed()) {
+                    if (!conn.isClosed()) {
                         conn.rollback();
                         conn.close();
                     }

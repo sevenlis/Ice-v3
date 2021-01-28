@@ -46,6 +46,7 @@ public class OrderViewActivity extends AppCompatActivity {
             if (action != null && action.equals(ExchangeDataService.CHANNEL_ORDERS_UPDATES)) {
                 Answer answer = new DBLocal(context).getAnswer(mOrder.orderUid);
                 mOptionsMenu.setGroupVisible(R.id.edit_order_group, answer == null || answer.getResult() < 0);
+                mOptionsMenu.findItem(R.id.item_edit).setVisible(false);
                 mOrder.setAnswer(answer);
                 if (footerSubmit != null) {
                     TextView textViewAnswer = footerSubmit.findViewById(R.id.textViewAnswer);
@@ -120,6 +121,7 @@ public class OrderViewActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.order_menu, menu);
         mOptionsMenu = menu;
         mOptionsMenu.setGroupVisible(R.id.edit_order_group,mOrder.getAnswerResult() == -1);
+        menu.findItem(R.id.item_edit).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 

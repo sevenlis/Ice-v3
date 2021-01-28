@@ -334,6 +334,7 @@ public class OrderActivity extends AppCompatActivity {
     public void startOrderItemSelection() {
         Intent intent = new Intent(this, SelectOrderItemActivity.class);
         intent.putExtra(SelectOrderItemActivity.STOREHOUSE_CODE_KEY, mStorehouse.code);
+        intent.putExtra(SelectOrderItemActivity.ORDER_TYPE_KEY, mOrder.getOrderType());
         startActivityForResult(intent, SELECT_ORDER_ITEM_REQUEST_CODE);
     }
     
@@ -438,16 +439,20 @@ public class OrderActivity extends AppCompatActivity {
                 EditText editTextComment = findViewById(R.id.editTextComment);
                 if (editTextComment != null) mOrder.comment = editTextComment.getText().toString();
                 if (!checkDataFilling()) return;
-                dbLocal.saveOrder(mOrder);
-                Intent answerIntent = new Intent();
-                answerIntent.putExtra("orderDateMillis", orderDateCalendar.getTimeInMillis());
-                setResult(RESULT_OK, answerIntent);
-                if (Objects.equals(getIntent().getAction(), ACTION_ORDER_COPY) || Objects.equals(getIntent().getAction(), ACTION_ORDER_EDIT)) {
-                    dbLocal.deleteRemoteAnswerResult(mOrder.orderUid);
-                    Intent intent = new Intent(ExchangeDataService.CHANNEL_ORDERS_UPDATES);
-                    sendBroadcast(intent);
-                }
-                finish();
+
+                new Thread(() -> {
+                    dbLocal.saveOrder(mOrder);
+                    Intent answerIntent = new Intent();
+                    answerIntent.putExtra("orderDateMillis", orderDateCalendar.getTimeInMillis());
+                    setResult(RESULT_OK, answerIntent);
+                    if (Objects.equals(getIntent().getAction(), ACTION_ORDER_COPY) || Objects.equals(getIntent().getAction(), ACTION_ORDER_EDIT)) {
+                        dbLocal.deleteRemoteAnswerResult(mOrder.orderUid);
+                        Intent intent = new Intent(ExchangeDataService.CHANNEL_ORDERS_UPDATES);
+                        sendBroadcast(intent);
+                    }
+                    finish();
+                }).start();
+
             }
             break;
         }

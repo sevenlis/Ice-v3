@@ -26,7 +26,8 @@ public class SettingsUtils {
     
     private static final String PREF_UPDATE_IN_PROGRESS = "PREF_UPDATE_IN_PROGRESS";
 
-    private static final String PREF_MANAGER_NAME = "managerName";
+    private static final String PREF_USER_1C_NAME = "user1cName";
+    private static final String PREF_MANAGER_CODE = "manager_code_pref_key";
     private static final String PREF_DEFAULT_STOREHOUSE_CODE = "storehouseDefaultCode";
     private static final String PREF_NOTIFICATIONS_ENABLED = "updateNotificationsEnabled";
     private static final String PREF_DATA_UPDATE_INTERVAL = "exchangeFrequency";
@@ -54,8 +55,12 @@ public class SettingsUtils {
     }
     
     public static class Settings {
-        public static String getManagerName(Context ctx) {
-            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_MANAGER_NAME, ctx.getResources().getString(R.string.pref_manager_name_default));
+        public static String getUser1cName(Context ctx) {
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_USER_1C_NAME, ctx.getResources().getString(R.string.pref_user_1c_name_default));
+        }
+
+        public static String getManagerCode(Context ctx) {
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_MANAGER_CODE, "");
         }
 
         public static String[] getStorehousesCodes(Context ctx) {

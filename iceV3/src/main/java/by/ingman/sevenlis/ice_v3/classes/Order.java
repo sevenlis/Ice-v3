@@ -255,6 +255,10 @@ public class Order implements Parcelable {
         Answer mAnswer = dbLocal.getAnswer(this.orderUid);
         if (mAnswer == null) return mColor;
         switch (mAnswer.getResult()) {
+            case -2: {
+                mColor = ContextCompat.getColor(ctx, R.color.color_yellow);
+            }
+            break;
             case -1:
             case 0: {
                 mColor = ContextCompat.getColor(ctx, R.color.color_red);
@@ -305,5 +309,9 @@ public class Order implements Parcelable {
         parcel.writeString(this.agreementId);
         parcel.writeString(this.agreementName);
         parcel.writeInt(this.orderType);
+    }
+
+    public int getOrderType() {
+        return orderType;
     }
 }

@@ -470,7 +470,7 @@ public class DBLocal {
         for (OrderItem oi : order.orderItems) {
             ContentValues cv = new ContentValues();
             cv.put("order_id", order.orderUid);
-            cv.put("name_m", SettingsUtils.Settings.getManagerName(ctx));
+            cv.put("name_m", SettingsUtils.Settings.getUser1cName(ctx));
             cv.put("order_date", order.orderDate.getTime());
             cv.put("is_advertising", order.getIsAdvInteger());
             cv.put("adv_type", order.advType);
@@ -661,39 +661,43 @@ public class DBLocal {
         return answer;
     }
 
-    public void deleteRemoteAnswerResult(String orderUid) {
-        new Thread(() -> {
-            try {
-                Connection conn = new ConnectionFactory().getConnection(ctx);
-                if (conn == null) throw new SQLException("Error: SQL connection is NULL");
-                PreparedStatement statement = conn.prepareStatement("DELETE FROM results WHERE order_id = ?");
-                statement.setString(1, orderUid);
-                statement.execute();
-                conn.commit();
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }).start();
+    public boolean deleteRemoteAnswerResult(String orderUid) {
+        try {
+            Connection conn = new ConnectionFactory().getConnection(ctx);
+            if (conn == null) throw new SQLException("Error: SQL connection is NULL");
+
+            PreparedStatement statement = conn.prepareStatement("DELETE FROM results WHERE order_id = ?");
+            statement.setString(1, orderUid);
+            statement.execute();
+            conn.commit();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
-    public void deleteRemoteOrder(String orderUid) {
-        new Thread(() -> {
-            try {
-                Connection conn = new ConnectionFactory().getConnection(ctx);
-                if (conn == null) throw new SQLException("Error: SQL connection is NULL");
-                PreparedStatement statement = conn.prepareStatement("DELETE FROM orders WHERE order_id = ?");
-                statement.setString(1, orderUid);
-                statement.execute();
-                conn.commit();
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }).start();
+    public boolean deleteRemoteOrder(String orderUid) {
+        try {
+            Connection conn = new ConnectionFactory().getConnection(ctx);
+            if (conn == null) throw new SQLException("Error: SQL connection is NULL");
+
+            PreparedStatement statement = conn.prepareStatement("DELETE FROM orders WHERE order_id = ?");
+            statement.setString(1, orderUid);
+            statement.execute();
+            conn.commit();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return deleteRemoteAnswerResult(orderUid);
     }
 
     public boolean repeatOrder(String orderUid) {
+        if (!deleteRemoteOrder(orderUid)) return false;
+
         SQLiteDatabase db = DBHelper.getDatabaseWritable(ctx);
         if (db == null) return false;
         try {
@@ -724,8 +728,6 @@ public class DBLocal {
 
         DBHelper.closeDatabase(db);
 
-        deleteRemoteOrder(orderUid);
-        deleteRemoteAnswerResult(orderUid);
         return true;
     }
 
@@ -794,4 +796,5 @@ public class DBLocal {
         
         return positions;
     }
+
 }

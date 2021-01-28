@@ -3,10 +3,17 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
-        android:defaultValue="@string/pref_manager_name_default"
-        android:key="managerName"
-        android:summary="@string/pref_manager_db_summ"
-        android:title="@string/pref_manager_db"/>
+        android:defaultValue="@string/pref_user_1c_name_default"
+        android:key="user1cName"
+        android:summary="@string/pref_user_1c_sum"
+        android:title="@string/pref_user_1c_title"/>
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:inputType="number|text"
+        android:key="manager_code_pref_key"
+        android:summary="@string/manager_code_summary"
+        android:title="@string/manager_code_title" />
 
     <EditTextPreference
         android:defaultValue="@string/pref_storehouse_code_default"

@@ -37,7 +37,7 @@ public class CheckApkUpdate extends IntentService {
     private static final int NOTIFY_ID = 398;
     private static final String NOTIF_CHANNEL_ID = "APK_UPDATE_CHANNEL_ID";
     private static NotificationManager notificationManager;
-    private CharSequence channelName = "ICE-V3 APK update notification channel";
+    private final CharSequence channelName = "ICE-V3 APK update notification channel";
     public CheckApkUpdate() {
         super(CheckApkUpdate.class.getSimpleName());
     }

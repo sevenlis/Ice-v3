@@ -45,6 +45,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
     public static final String CHECKBOX_INPUT_TYPE_STATUS_KEY = "by.ingman.sevenlis.ice_v3.CheckBox_input_status_key";
     public static final String STRING_FILTER_KEY = "by.ingman.sevenlis.ice_v3.String_filter_key";
     public static final String STOREHOUSE_CODE_KEY = SelectOrderItemActivity.class.getSimpleName() + ".storehouse_code_key";
+    public static final String ORDER_TYPE_KEY = SelectOrderItemActivity.class.getSimpleName() + ".order_type_key";
     Product mProduct = null;
     EditText editTextNumPacks;
     double mNumPacks = 1.0d;
@@ -61,6 +62,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
     LinearLayout layoutNumPacks;
     private DBLocal dbLocal;
     String mStorehouseCode;
+    int mOrderType;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
         mStorehouseCode = SettingsUtils.Settings.getDefaultStoreHouseCode(this);
         if (getIntent().getExtras() != null) {
             mStorehouseCode = getIntent().getExtras().getString(STOREHOUSE_CODE_KEY);
+            mOrderType = getIntent().getIntExtra(ORDER_TYPE_KEY,1);
         }
         dbLocal.setStorehouseCode(mStorehouseCode);
         
@@ -171,6 +174,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             orderItem = savedInstanceState.getParcelable("orderItem");
             orderItemPosition = savedInstanceState.getInt("orderItemPosition");
+            mOrderType = savedInstanceState.getInt("orderType");
         }
 
         if (orderItem != null) {
@@ -205,6 +209,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
         }
         outState.putParcelable("orderItem",orderItem);
         outState.putInt("orderItemPosition",orderItemPosition);
+        outState.putInt("orderType", mOrderType);
         super.onSaveInstanceState(outState);
     }
 
@@ -252,6 +257,7 @@ public class SelectOrderItemActivity extends AppCompatActivity {
         intent.putExtra(CHECKBOX_INPUT_TYPE_STATUS_KEY, checkBoxInputTypeNumeric.isChecked());
         intent.putExtra(STRING_FILTER_KEY, autoCompleteTextView.getText().toString());
         intent.putExtra(SearchProductActivity.STOREHOUSE_CODE_KEY, mStorehouseCode);
+        intent.putExtra(SearchProductActivity.ORDER_TYPE_KEY, mOrderType);
         startActivityForResult(intent, SEARCH_PRODUCT_REQUEST_CODE);
     }
 

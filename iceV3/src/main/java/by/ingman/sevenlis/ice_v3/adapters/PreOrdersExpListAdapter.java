@@ -18,9 +18,9 @@ import by.ingman.sevenlis.ice_v3.classes.PreOrdersListGroup;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class PreOrdersExpListAdapter extends BaseExpandableListAdapter {
-    private Context context;
+    private final Context context;
     private List<PreOrdersListGroup> mGroups;
-    private LayoutInflater layoutInflater;
+    private final LayoutInflater layoutInflater;
 
     public PreOrdersExpListAdapter(Context context, List<PreOrdersListGroup> mGroups) {
         this.context = context;
