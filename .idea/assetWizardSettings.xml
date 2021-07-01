@@ -24,8 +24,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\root\AppData\Local\Temp\baseline_add_box_24.xml" />
-                                                <entry key="opacityPercent" value="60" />
+                                                <entry key="imagePath" value="C:\Users\root\AppData\Local\Temp\baseline_send_24.xml" />
+                                                <entry key="opacityPercent" value="80" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -36,7 +36,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/USER/AndroidStudio/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/add_box/baseline_add_box_24.xml" />
+                                                <entry key="url" value="jar:file:/D:/USER/AndroidStudio/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/send/baseline_send_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -82,7 +82,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="imageAsset" value="D:\ic_launcher.png" />
-                                      <entry key="outputName" value="ic_action_increase" />
+                                      <entry key="outputName" value="ic_action_send" />
+                                      <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ffffff" />
                                     </map>
                                   </option>

@@ -1,5 +1,7 @@
 package by.ingman.sevenlis.ice_v3.classes;
 
+import static java.util.UUID.randomUUID;
+
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,8 +15,6 @@ import java.util.List;
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
-
-import static java.util.UUID.randomUUID;
 
 public class Order implements Parcelable {
     public static final Creator<Order> CREATOR = new Creator<Order>() {
@@ -54,6 +54,8 @@ public class Order implements Parcelable {
     public double summa;
     public double weight;
     public int status;
+    public int sent;
+    public int processed;
     public long dateUnload;
     private DBLocal dbLocal;
     
@@ -65,6 +67,8 @@ public class Order implements Parcelable {
         this.orderType = 1;
         this.advType = 0;
         this.status = 0;
+        this.sent = 0;
+        this.processed = 0;
         setStorehouse(dbLocal.getDefaultStorehouse());
         Calendar now = Calendar.getInstance();
         this.dateUnload = now.getTimeInMillis();
@@ -95,6 +99,8 @@ public class Order implements Parcelable {
         this.agreementId = in.readString();
         this.agreementName = in.readString();
         this.orderType = in.readInt();
+        this.sent = in.readInt();
+        this.processed = in.readInt();
 
         this.contragent = new Contragent(this.contragentCode, this.contragentName);
         this.point = new Point(this.pointCode, this.pointName);
@@ -120,14 +126,34 @@ public class Order implements Parcelable {
         return 0;
     }
 
+    public String getOrderUid() {
+        return orderUid;
+    }
+
+    public int getSent() {
+        return sent;
+    }
+
+    public void setSent(int sent) {
+        this.sent = sent;
+    }
+
+    public int getProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(int processed) {
+        this.processed = processed;
+    }
+
     public String getOrderStatusString() {
         String[] orderStatuses = ctx.getResources().getStringArray(R.array.order_statuses);
         return orderStatuses[status];
     }
 
     public String getOrderAdvTypeString() {
-        String[] ordedAdvTypes = ctx.getResources().getStringArray(R.array.adv_types_strings);
-        return !isAdvertising ? "" : ordedAdvTypes[advType];
+        String[] orderAdvTypes = ctx.getResources().getStringArray(R.array.adv_types_strings);
+        return !isAdvertising ? "" : orderAdvTypes[advType];
     }
     
     public void setContragent(Contragent contragent) {
@@ -250,7 +276,7 @@ public class Order implements Parcelable {
         return this.isAdvertising ? 1 : 0;
     }
     
-    public int getStatusResultColor(Context ctx) {
+    public int getAnswerResultColor(Context ctx) {
         int mColor = ContextCompat.getColor(ctx, R.color.colorPrimaryDark);
         Answer mAnswer = dbLocal.getAnswer(this.orderUid);
         if (mAnswer == null) return mColor;
@@ -309,6 +335,8 @@ public class Order implements Parcelable {
         parcel.writeString(this.agreementId);
         parcel.writeString(this.agreementName);
         parcel.writeInt(this.orderType);
+        parcel.writeInt(this.sent);
+        parcel.writeInt(this.processed);
     }
 
     public int getOrderType() {

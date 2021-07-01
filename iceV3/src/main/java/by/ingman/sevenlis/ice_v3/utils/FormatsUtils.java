@@ -7,7 +7,10 @@ import android.util.TypedValue;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import by.ingman.sevenlis.ice_v3.classes.Order;
 
 public class FormatsUtils {
     public static String getDateFormatted(Date date) {
@@ -78,4 +81,23 @@ public class FormatsUtils {
                 resources.getDisplayMetrics()
         );
     }
+
+    public static String getOrdersUidsForInClause(List<Order> orderList) {
+        StringBuilder builder = new StringBuilder();
+        for (Order order : orderList) {
+            builder.append("'").append(order.getOrderUid()).append("',");
+        }
+        builder.deleteCharAt(builder.length()-1);
+        return builder.toString();
+    }
+
+    public static String getUidsForInClause(List<String> uidsList) {
+        StringBuilder builder = new StringBuilder();
+        for (String uid : uidsList) {
+            builder.append("'").append(uid).append("',");
+        }
+        builder.deleteCharAt(builder.length()-1);
+        return builder.toString();
+    }
+
 }

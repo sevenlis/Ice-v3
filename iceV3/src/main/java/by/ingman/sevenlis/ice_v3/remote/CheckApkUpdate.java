@@ -92,6 +92,7 @@ public class CheckApkUpdate extends IntentService {
                 .setContentTitle("Доступно обновление")
                 .setContentText("Доступно обновление до версии " + FormatsUtils.getNumberFormatted(newVersionCode, 0).trim() + " (" + FormatsUtils.getNumberFormatted(newVersionName, 3).trim() + ")");
         Intent resultIntent = new Intent(this, UpdateDataActivity.class);
+        resultIntent.setAction("START_APK_UPDATE");
         
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         // Adds the back stack
@@ -222,8 +223,11 @@ public class CheckApkUpdate extends IntentService {
     
     private void getVersionInfoFileRemote(File versionInfoFile) throws IOException {
         FTPClient ftpClient = FTPClientConnector.getFtpClient();
+        if (!ftpClient.isConnected()) {
+            return;
+        }
         ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-        ftpClient.retrieveFile("/htdocs/iceV3/version.info",new FileOutputStream(versionInfoFile));
+        ftpClient.retrieveFile("/iceV3/version.info",new FileOutputStream(versionInfoFile));
         FTPClientConnector.disconnectClient();
     }
     

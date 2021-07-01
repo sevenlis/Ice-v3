@@ -85,6 +85,8 @@ public class OrderViewActivity extends AppCompatActivity {
         
         TextView textViewClientName = findViewById(R.id.textViewClientName);
         textViewClientName.setText(mOrder.contragent.getName());
+        if (mOrder.contragent.isInStop())
+            textViewClientName.setTextColor(getResources().getColor(R.color.color_red));
         
         TextView textViewPoint = findViewById(R.id.textViewPointName);
         textViewPoint.setText(mOrder.pointName);
@@ -103,7 +105,7 @@ public class OrderViewActivity extends AppCompatActivity {
 
         TextView textViewStatus = findViewById(R.id.textViewStatus);
         textViewStatus.setText(orderStatuses[mOrder.status]);
-        textViewStatus.setTextColor(mOrder.getStatusResultColor(this));
+        textViewStatus.setTextColor(mOrder.getAnswerResultColor(this));
         
         refreshOrderItemsList();
 
@@ -119,15 +121,15 @@ public class OrderViewActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.order_menu, menu);
-        mOptionsMenu = menu;
-        mOptionsMenu.setGroupVisible(R.id.edit_order_group,mOrder.getAnswerResult() == -1);
         menu.findItem(R.id.item_edit).setVisible(false);
+        menu.findItem(R.id.item_send).setVisible((mOrder.getAnswerResult() == -1) && (mOrder.getSent() == 0));
+        mOptionsMenu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.item_repeat) {
+        if (item.getItemId() == R.id.item_send) {
             repeatSendOrder(mOrder.orderUid);
         } else if (item.getItemId() == R.id.item_edit) {
             Intent intent = new Intent(context, OrderActivity.class);

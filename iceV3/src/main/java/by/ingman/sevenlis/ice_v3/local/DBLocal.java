@@ -53,6 +53,71 @@ public class DBLocal {
         this.mStorehouseCode = mStorehouseCode;
     }
 
+    public List<Order> getOrdersList() {
+        List<Order> ordersList = new ArrayList<>();
+
+        List<String> ordersUids = new ArrayList<>();
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(ctx);
+        if (db == null) return ordersList;
+        Cursor cursor = db.query(true, TABLE_ORDERS, new String[]{"order_id"}, "order_type <> -20", null, null, null, null, null);
+        while (cursor.moveToNext())
+            ordersUids.add(cursor.getString(cursor.getColumnIndex("order_id")));
+        cursor.close();
+
+        for (String orderUid : ordersUids) {
+            ordersList.add(getOrder(orderUid));
+        }
+        DBHelper.closeDatabase(db);
+        return ordersList;
+    }
+
+    public void cleanOrders() {
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(ctx);
+        if (db == null) return;
+
+        int daysAhead = SettingsUtils.Settings.getOrderLogDepth(ctx);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -daysAhead);
+        FormatsUtils.roundDayToStart(cal);
+        String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
+
+        String statement;
+        Cursor cursor;
+        statement = "DELETE FROM " + TABLE_ANSWERS + " WHERE order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE O.order_date < CAST('" + fDate + "' as datetime))";
+        cursor = db.rawQuery(statement,null);
+        cursor.close();
+
+        statement = "DELETE FROM " + TABLE_ORDERS + " WHERE order_date < CAST('" + fDate + "' as datetime)";
+        cursor = db.rawQuery(statement,null);
+        cursor.close();
+
+        DBHelper.closeDatabase(db);
+    }
+
+    public List<String> getOrdersUids() {
+        List<String> ordersUids = new ArrayList<>();
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(ctx);
+        if (db == null) return ordersUids;
+        Cursor cursor = db.query(true, TABLE_ORDERS, new String[]{"order_id"}, "order_type <> -20", null, null, null, null, null);
+        while (cursor.moveToNext())
+            ordersUids.add(cursor.getString(cursor.getColumnIndex("order_id")));
+        cursor.close();
+        DBHelper.closeDatabase(db);
+        return ordersUids;
+    }
+
+    public List<String> getAnswersUids() {
+        List<String> ordersUids = new ArrayList<>();
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(ctx);
+        if (db == null) return ordersUids;
+        Cursor cursor = db.query(true, TABLE_ANSWERS, new String[]{"order_id"}, null, null, null, null, null, null);
+        while (cursor.moveToNext())
+            ordersUids.add(cursor.getString(cursor.getColumnIndex("order_id")));
+        cursor.close();
+        DBHelper.closeDatabase(db);
+        return ordersUids;
+    }
+
     public List<Order> getOrdersList(Calendar dateCal) {
         List<Order> ordersList = new ArrayList<>();
 
@@ -174,7 +239,9 @@ public class DBLocal {
             mOrder.orderUid = cursor.getString(cursor.getColumnIndex("order_id"));
             mOrder.orderDate = new Date(cursor.getLong(cursor.getColumnIndex("order_date")));
             mOrder.comment = cursor.getString(cursor.getColumnIndex("comments"));
-            mOrder.setContragent(new Contragent(cursor.getString(cursor.getColumnIndex("code_k")), cursor.getString(cursor.getColumnIndex("name_k"))));
+            Contragent contragent = new Contragent(cursor.getString(cursor.getColumnIndex("code_k")), cursor.getString(cursor.getColumnIndex("name_k")));
+            contragent.setInStop(getContragentInStop(contragent));
+            mOrder.setContragent(contragent);
             mOrder.setPoint(new Point(cursor.getString(cursor.getColumnIndex("code_r")), cursor.getString(cursor.getColumnIndex("name_r"))));
             mOrder.setStorehouse(new Storehouse(cursor.getString(cursor.getColumnIndex("code_s")), cursor.getString(cursor.getColumnIndex("name_s"))));
             mOrder.isAdvertising = cursor.getInt(cursor.getColumnIndex("is_advertising")) == 1;
@@ -184,6 +251,8 @@ public class DBLocal {
             mOrder.setAgreement(getAgreementById(cursor.getString(cursor.getColumnIndex("agreementId"))));
             mOrder.orderType = cursor.getInt(cursor.getColumnIndex("order_type"));
             mOrder.answer = getAnswer(orderUid);
+            mOrder.setSent(cursor.getInt(cursor.getColumnIndex("sent")));
+            mOrder.setProcessed(cursor.getInt(cursor.getColumnIndex("processed")));
         }
         cursor.close();
         DBHelper.closeDatabase(db);
@@ -215,13 +284,14 @@ public class DBLocal {
         if (db == null) return contragentArrayList;
         Cursor cursor;
         if (condition.isEmpty()) {
-            cursor = db.query(true, TABLE_CONTRAGENTS, new String[]{"code_k", "name_k"}, null, null, null, null, null, null);
+            cursor = db.query(true, TABLE_CONTRAGENTS, new String[]{"code_k", "name_k", "in_stop"}, null, null, null, null, "name_k ASC", null);
         } else {
-            cursor = db.query(true, TABLE_CONTRAGENTS, new String[]{"code_k", "name_k"}, condition, conditionArgs, null, null, null, null);
+            cursor = db.query(true, TABLE_CONTRAGENTS, new String[]{"code_k", "name_k", "in_stop"}, condition, conditionArgs, null, null, "name_k ASC", null);
         }
         
         while (cursor.moveToNext()) {
             Contragent contragent = new Contragent(cursor.getString(cursor.getColumnIndex("code_k")), cursor.getString(cursor.getColumnIndex("name_k")));
+            contragent.setInStop(cursor.getInt(cursor.getColumnIndex("in_stop")) == 1);
             contragentArrayList.add(contragent);
         }
         cursor.close();
@@ -229,14 +299,32 @@ public class DBLocal {
 
         return contragentArrayList;
     }
+
+    public boolean getContragentInStop(Contragent contragent) {
+        SQLiteDatabase db = DBHelper.getDatabaseReadable(ctx);
+        if (db == null) return false;
+
+        boolean value = false;
+        Cursor cursor = db.query(true, DBLocal.TABLE_CONTRAGENTS, new String[]{"in_stop"}, "code_k = ? AND name_k = ?", new String[]{contragent.getCode(), contragent.getName()}, null, null, null, "1");
+        if (cursor.moveToFirst()) {
+            value = cursor.getInt(cursor.getColumnIndex("in_stop")) == 1;
+        }
+        cursor.close();
+        DBHelper.closeDatabase(db);
+
+        return value;
+    }
     
     public List<Contragent> getRecentContragents() {
         List<Contragent> contragentArrayList = new ArrayList<>();
         SQLiteDatabase db = DBHelper.getDatabaseReadable(ctx);
         if (db == null) return contragentArrayList;
-        Cursor cursor = db.query(true, TABLE_ORDERS, new String[]{"code_k", "name_k"}, null, null, null, null, "name_k ASC", null);
+        Cursor cursor = //db.query(true, TABLE_ORDERS, new String[]{"code_k", "name_k"}, null, null, null, null, "name_k ASC", "100");
+                db.rawQuery("select distinct O.code_k as code_k, O.name_k as name_k, C.in_stop as in_stop from " + TABLE_ORDERS + " as O " +
+                                 "inner join " + TABLE_CONTRAGENTS + " as C on (C.code_k = O.code_k and C.name_k = O.name_k) order by O.name_k asc" ,null);
         while (cursor.moveToNext()) {
             Contragent contragent = new Contragent(cursor.getString(cursor.getColumnIndex("code_k")), cursor.getString(cursor.getColumnIndex("name_k")));
+            contragent.setInStop(cursor.getInt(cursor.getColumnIndex("in_stop")) == 1);
             contragentArrayList.add(contragent);
         }
         cursor.close();

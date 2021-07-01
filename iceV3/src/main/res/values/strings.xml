@@ -165,7 +165,7 @@
     <string name="agreement">Договор</string>
     <string name="select_agreement"><![CDATA[<Выберите договор>]]></string>
     <string name="storehouse">Место хранения</string>
-    <string name="repeat_order">Повторить</string>
+    <string name="resend_order">Отправить</string>
     <string name="copy_order">Копировать</string>
     <string name="edit_order">Изменить</string>
     <string name="increase">Увеличить</string>

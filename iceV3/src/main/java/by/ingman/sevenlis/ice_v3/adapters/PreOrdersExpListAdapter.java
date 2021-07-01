@@ -136,7 +136,7 @@ public class PreOrdersExpListAdapter extends BaseExpandableListAdapter {
 
         TextView textViewStatus = convertView.findViewById(R.id.textView_status);
         textViewStatus.setText(order.getOrderStatusString());
-        textViewStatus.setTextColor(order.getStatusResultColor(context));
+        textViewStatus.setTextColor(order.getAnswerResultColor(context));
 
         convertView.setTag(childPosition);
 

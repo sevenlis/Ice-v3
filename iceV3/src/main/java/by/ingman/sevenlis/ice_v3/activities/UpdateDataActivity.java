@@ -48,6 +48,7 @@ import by.ingman.sevenlis.ice_v3.BuildConfig;
 import by.ingman.sevenlis.ice_v3.R;
 import by.ingman.sevenlis.ice_v3.classes.Product;
 import by.ingman.sevenlis.ice_v3.local.DBHelper;
+import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.remote.ConnectionFactory;
 import by.ingman.sevenlis.ice_v3.remote.FTPClientConnector;
 import by.ingman.sevenlis.ice_v3.services.UpdateDataService;
@@ -135,6 +136,10 @@ public class UpdateDataActivity extends AppCompatActivity {
                     }
                 }
             }
+        }
+
+        if (Objects.equals(getIntent().getAction(), "START_APK_UPDATE")) {
+            updateAPK(findViewById(R.id.buttonUpdateAPK));
         }
     }
 
@@ -289,6 +294,10 @@ public class UpdateDataActivity extends AppCompatActivity {
             Toast.makeText(context, "Соединение отсутствует", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (SettingsUtils.Settings.getManagerCode(context).equals("---") || SettingsUtils.Settings.getManagerCode(context).equals("")) {
+            Toast.makeText(context, "Не указан код менеджера для загрузки заявок!", Toast.LENGTH_LONG).show();
+            return;
+        }
         new GetOrdersFromRemoteTask(this).execute();
     }
     
@@ -327,18 +336,21 @@ public class UpdateDataActivity extends AppCompatActivity {
             progressDialogTitle = "Получение заявок...";
             mHandler.post(() -> setProgress(-1, 0, progressDialogTitle));
 
-            int daysAhead = SettingsUtils.Settings.getOrderLogDepth(getWeakContext());
+            //int daysAhead = SettingsUtils.Settings.getOrderLogDepth(getWeakContext());
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -daysAhead);
+            //cal.add(Calendar.DATE, -daysAhead);
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
-            
+
+            List<String> uidList = new DBLocal(getWeakContext()).getOrdersUids();
+
             int rsSize = 0, rsCount = 0;
             Connection connection = new ConnectionFactory().getConnection(getWeakContext());
             if (connection != null) {
                 List<ContentValues> contentValuesList = new ArrayList<>();
                 try {
-                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) as count_rs FROM orders WHERE (UPPER(LTRIM(RTRIM(name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "') AND order_date > CAST('" + fDate + "' as datetime)");
+                    //PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) as count_rs FROM orders WHERE (UPPER(LTRIM(RTRIM(name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "') AND order_date > CAST('" + fDate + "' as datetime)");
+                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) as count_rs FROM orders WHERE (UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "' AND order_date > CAST('" + fDate + "' as datetime))");
                     ResultSet rs_count = stat_count.executeQuery();
                     
                     if (rs_count.next()) {
@@ -346,7 +358,8 @@ public class UpdateDataActivity extends AppCompatActivity {
                         publishProgress(rsCount, rsSize);
                     }
 
-                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM orders WHERE (UPPER(LTRIM(RTRIM(name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "') AND order_date > CAST('" + fDate + "' as datetime) ORDER BY in_datetime");
+                    //PreparedStatement stat = connection.prepareStatement("SELECT * FROM orders WHERE (UPPER(LTRIM(RTRIM(name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "') AND order_date > CAST('" + fDate + "' as datetime) ORDER BY in_datetime");
+                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM orders WHERE (UPPER(LTRIM(RTRIM(code_m))) = '" + managerCode + "' AND order_date > CAST('" + fDate + "' as datetime)) ORDER BY in_datetime");
                     ResultSet rs = stat.executeQuery();
                     while (rs != null && rs.next()) {
                         ContentValues cv = new ContentValues();
@@ -379,9 +392,9 @@ public class UpdateDataActivity extends AppCompatActivity {
                         cv.put("sent",              1);
                         cv.put("date_unload",       rs.getTimestamp("in_datetime").getTime());
 
-                        contentValuesList.add(cv);
-                        //putOrderToLocalDB(cv);
-                        
+                        if (!uidList.contains(String.valueOf(cv.get("order_id"))))
+                            contentValuesList.add(cv);
+
                         publishProgress(rsCount++, rsSize);
                     }
                 } finally {
@@ -410,21 +423,25 @@ public class UpdateDataActivity extends AppCompatActivity {
             cal.add(Calendar.DATE, -daysAhead);
             FormatsUtils.roundDayToStart(cal);
             String fDate = FormatsUtils.getDateFormatted(cal.getTime(), "yyyy-MM-dd HH:mm:ss.000");
+
+            List<String> uidList = new DBLocal(getWeakContext()).getAnswersUids();
             
             int rsSize = 0, rsCount = 0;
             Connection connection = new ConnectionFactory().getConnection(getWeakContext());
             if (connection != null) {
                 List<ContentValues> contentValuesList = new ArrayList<>();
                 try {
-                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(0) AS count_rs FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "') AND O.order_date > CAST('" + fDate + "' as datetime))");
+                    //PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) AS count_rs FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "') AND O.order_date > CAST('" + fDate + "' as datetime))");
+                    PreparedStatement stat_count = connection.prepareStatement("SELECT COUNT(*) AS count_rs FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "' AND O.order_date > CAST('" + fDate + "' as datetime)))");
                     ResultSet rs_count = stat_count.executeQuery();
                     
                     if (rs_count.next()) {
                         rsSize = rs_count.getInt("count_rs");
                         publishProgress(rsCount, rsSize);
                     }
-                    
-                    PreparedStatement stat = connection.prepareStatement("SELECT * FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "') AND O.order_date > CAST('" + fDate + "' as datetime)) ORDER BY R.datetime_unload");
+
+                    //PreparedStatement stat = connection.prepareStatement("SELECT DISTINCT * FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.name_m))) = '" + managerName + "' OR UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "') AND O.order_date > CAST('" + fDate + "' as datetime)) ORDER BY R.datetime_unload");
+                    PreparedStatement stat = connection.prepareStatement("SELECT DISTINCT * FROM results AS R WHERE R.order_id in (SELECT DISTINCT O.order_id FROM orders AS O WHERE (UPPER(LTRIM(RTRIM(O.code_m))) = '" + managerCode + "' AND O.order_date > CAST('" + fDate + "' as datetime))) ORDER BY R.datetime_unload");
                     ResultSet rs = stat.executeQuery();
                     while (rs != null && rs.next()) {
                         ContentValues cv = new ContentValues();
@@ -433,9 +450,9 @@ public class UpdateDataActivity extends AppCompatActivity {
                         cv.put("date_unload",   rs.getTimestamp("datetime_unload").getTime());
                         cv.put("result",        rs.getInt("result"));
 
-                        contentValuesList.add(cv);
-                        //putAnswerToLocalDB(cv);
-                        
+                        if (!uidList.contains(String.valueOf(cv.get("order_id"))))
+                            contentValuesList.add(cv);
+
                         publishProgress(rsCount++, rsSize);
                     }
                 } finally {
@@ -588,7 +605,7 @@ public class UpdateDataActivity extends AppCompatActivity {
 
                 ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
 
-                String ftpFilePath = "/htdocs/iceV3/iceV3-debug.apk";
+                String ftpFilePath = "/iceV3/iceV3-debug.apk";
 
                 int fileLength = 0;
                 FTPFile[] ftpFiles = ftpClient.listFiles(ftpFilePath);

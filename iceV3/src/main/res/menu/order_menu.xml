@@ -9,9 +9,9 @@
             android:title="@string/edit_order"
             app:showAsAction="ifRoom|withText" />
         <item
-            android:id="@+id/item_repeat"
-            android:icon="@drawable/ic_action_repeat"
-            android:title="@string/repeat_order"
+            android:id="@+id/item_send"
+            android:icon="@drawable/ic_action_send"
+            android:title="@string/resend_order"
             app:showAsAction="ifRoom|withText" />
     </group>
     <item

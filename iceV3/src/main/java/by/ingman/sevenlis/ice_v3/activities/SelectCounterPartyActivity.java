@@ -29,6 +29,7 @@ import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 public class SelectCounterPartyActivity extends AppCompatActivity {
     public static final String CONTRAGENT_CODE_VALUE_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_CODE_VALUE_KEY";
     public static final String CONTRAGENT_NAME_VALUE_KEY = "by.ingman.sevenlis.ice_v3.CONTRAGENT_NAME_VALUE_KEY";
+    public static final String CONTRAGENT_STOP_VALUE_KEY = SelectCounterPartyActivity.class.getSimpleName() + ".CONTRAGENT_STOP_VALUE_KEY";
     Boolean useRecent = false;
     ImageButton buttonRecent;
     EditText editTextFilter;
@@ -108,6 +109,7 @@ public class SelectCounterPartyActivity extends AppCompatActivity {
             Intent answerIntent = new Intent();
             answerIntent.putExtra(CONTRAGENT_CODE_VALUE_KEY, contragent.getCode());
             answerIntent.putExtra(CONTRAGENT_NAME_VALUE_KEY, contragent.getName());
+            answerIntent.putExtra(CONTRAGENT_STOP_VALUE_KEY, contragent.isInStop());
             setResult(RESULT_OK, answerIntent);
             finish();
         });
@@ -169,6 +171,8 @@ public class SelectCounterPartyActivity extends AppCompatActivity {
             ((TextView) view.findViewById(R.id.tvRating)).setText(dbLocal.getContragentRating(contragent));
             ((TextView) view.findViewById(R.id.tvDebt)).setText(fDebt);
             ((TextView) view.findViewById(R.id.tvOverdue)).setText(fOver);
+
+            ((TextView) view.findViewById(R.id.tvContrName)).setTextColor(getResources().getColor(contragent.isInStop() ? R.color.color_red : R.color.dark));
             
             return view;
         }

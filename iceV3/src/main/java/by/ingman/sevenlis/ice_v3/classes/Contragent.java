@@ -20,6 +20,7 @@ public class Contragent implements Parcelable {
     private String rating;
     private double debt;
     private double overdue;
+    private boolean inStop;
     
     public Contragent(String code, String name) {
         setCode(code);
@@ -32,6 +33,7 @@ public class Contragent implements Parcelable {
         this.rating = in.readString();
         this.debt = in.readDouble();
         this.overdue = in.readDouble();
+        this.inStop = in.readInt() == 1;
     }
     
     public String getCode() {
@@ -49,7 +51,15 @@ public class Contragent implements Parcelable {
     public void setName(String name) {
         this.name = name;
     }
-    
+
+    public boolean isInStop() {
+        return inStop;
+    }
+
+    public void setInStop(boolean inStop) {
+        this.inStop = inStop;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -62,5 +72,6 @@ public class Contragent implements Parcelable {
         parcel.writeString(this.rating);
         parcel.writeDouble(this.debt);
         parcel.writeDouble(this.overdue);
+        parcel.writeInt(this.inStop ? 1 : 0);
     }
 }

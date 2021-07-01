@@ -25,6 +25,7 @@ import by.ingman.sevenlis.ice_v3.adapters.MainActivityPagerAdapter;
 import by.ingman.sevenlis.ice_v3.classes.CustomPagerTabStrip;
 import by.ingman.sevenlis.ice_v3.intents.ExchangeDataIntents;
 import by.ingman.sevenlis.ice_v3.intents.LocationTrackerTaskIntents;
+import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.remote.CheckApkUpdate;
 import by.ingman.sevenlis.ice_v3.services.ExchangeDataService;
 import by.ingman.sevenlis.ice_v3.services.LocationTrackingService;
@@ -240,6 +241,8 @@ public class MainActivity extends AppCompatActivity {
             customPagerTabStrip.setTextColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
             customPagerTabStrip.setTabIndicatorColor(customPagerTabStrip.getDateColor(currentFragment.getOrderDateCal()));
         }
+
+        new DBLocal(ctx).cleanOrders();
     
         startExchangeDataService();
     

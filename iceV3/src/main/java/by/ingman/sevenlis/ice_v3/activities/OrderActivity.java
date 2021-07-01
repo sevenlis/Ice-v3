@@ -1,5 +1,7 @@
 package by.ingman.sevenlis.ice_v3.activities;
 
+import static java.util.UUID.randomUUID;
+
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -46,8 +48,6 @@ import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.services.ExchangeDataService;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
-
-import static java.util.UUID.randomUUID;
 
 public class OrderActivity extends AppCompatActivity {
     public static final String ACTION_ORDER_COPY = OrderActivity.class.getSimpleName() + "_ACTION_ORDER_COPY";
@@ -216,6 +216,8 @@ public class OrderActivity extends AppCompatActivity {
         if (savedInstanceState != null || Objects.equals(getIntent().getAction(), ACTION_ORDER_EDIT) || Objects.equals(getIntent().getAction(), ACTION_ORDER_COPY)) {
             this.mContragent = mOrder.contragent;
             ((TextView) findViewById(R.id.textView_contragent)).setText(this.mContragent.getName());
+            if (this.mContragent.isInStop())
+                ((TextView) findViewById(R.id.textView_contragent)).setTextColor(getResources().getColor(R.color.color_red));
             
             this.mPoint = mOrder.point;
             ((TextView) findViewById(R.id.textView_point)).setText(this.mPoint.name);
@@ -486,8 +488,11 @@ public class OrderActivity extends AppCompatActivity {
                 String code = data.getExtras().getString(SelectCounterPartyActivity.CONTRAGENT_CODE_VALUE_KEY);
                 String name = data.getExtras().getString(SelectCounterPartyActivity.CONTRAGENT_NAME_VALUE_KEY);
                 this.mContragent = new Contragent(code, name);
+                this.mContragent.setInStop(data.getExtras().getBoolean(SelectCounterPartyActivity.CONTRAGENT_STOP_VALUE_KEY));
                 this.mOrder.setContragent(this.mContragent);
                 ((TextView) findViewById(R.id.textView_contragent)).setText(this.mContragent.getName());
+                if (this.mContragent.isInStop())
+                    ((TextView) findViewById(R.id.textView_contragent)).setTextColor(getResources().getColor(R.color.color_red));
                 this.mPoint = null;
                 this.mOrder.point = null;
                 ((TextView) findViewById(R.id.textView_point)).setText(getResources().getString(R.string.select_salepoint));

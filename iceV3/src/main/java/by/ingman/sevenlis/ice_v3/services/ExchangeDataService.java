@@ -25,6 +25,7 @@ import by.ingman.sevenlis.ice_v3.classes.OrderItem;
 import by.ingman.sevenlis.ice_v3.local.DBHelper;
 import by.ingman.sevenlis.ice_v3.local.DBLocal;
 import by.ingman.sevenlis.ice_v3.remote.ConnectionFactory;
+import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 import by.ingman.sevenlis.ice_v3.utils.NotificationsUtil;
 import by.ingman.sevenlis.ice_v3.utils.SettingsUtils;
 
@@ -420,6 +421,7 @@ public class ExchangeDataService extends IntentService {
                     cv.put("date_unload", rs.getTimestamp("datetime_unload").getTime());
                     cv.put("client_uppercase", rs.getString("name_k").toUpperCase());
                     cv.put("point_uppercase", rs.getString("name_r").toUpperCase());
+                    cv.put("in_stop", rs.getInt("in_stop"));
                     cvList.add(cv);
                 }
                 messageOnBroadcast += "Обновление таблицы контрагентов и разгрузок завершено.";
@@ -459,6 +461,33 @@ public class ExchangeDataService extends IntentService {
         notifUtils.dismissNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
         notifUtils.showUpdateCompleteNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_CONTRAGENTS_ID);
     }
+
+    private boolean deleteOrdersRemote(List<Order> orderList) {
+        Connection conn;
+        try {
+            conn = new ConnectionFactory().getConnection(this);
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+        if (conn == null) return false;
+
+        String queryString = "DELETE FROM orders WHERE order_id IN (%s)";
+        String statementString = String.format(queryString, FormatsUtils.getOrdersUidsForInClause(orderList));
+        try {
+            PreparedStatement statement = conn.prepareStatement(statementString);
+            statement.executeUpdate();
+            if (!conn.isClosed()) {
+                conn.commit();
+                conn.close();
+                return true;
+            }
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+        return false;
+    }
     
     private void sentUnsentOrders() throws SQLException {
         Connection conn;
@@ -466,9 +495,11 @@ public class ExchangeDataService extends IntentService {
         int[] batchResults = new int[]{};
         String messageOnBroadcast = "";
         String managerName = SettingsUtils.Settings.getUser1cName(this);
+        String managerCode = SettingsUtils.Settings.getManagerCode(this);
         
         List<Order> orderUnsentList = dbLocal.getUnsentOrdersList();
         if (orderUnsentList.size() == 0) return;
+        if (!deleteOrdersRemote(orderUnsentList)) return;
         
         notifUtils.showUpdateProgressNotification(NotificationsUtil.NOTIF_UPDATE_PROGRESS_ORDERS_ID);
         
@@ -502,9 +533,11 @@ public class ExchangeDataService extends IntentService {
                                 "summa, " +
                                 "version, " +
                                 "agreementId, " +
-                                "order_type" +
+                                "order_type," +
+                                "code_m" +
                                 ")" +
                         " VALUES (" +
+                                "?, " +
                                 "?, " +
                                 "?, " +
                                 "?, " +
@@ -562,6 +595,7 @@ public class ExchangeDataService extends IntentService {
                         stat.setInt(24, VERSION);
                         stat.setString(25, order.agreement.getId());
                         stat.setInt(26, order.orderType);
+                        stat.setString(27, managerCode);
                         
                         stat.addBatch();
                     }
@@ -602,7 +636,7 @@ public class ExchangeDataService extends IntentService {
         }
         
         if (success) {
-            messageOnBroadcast += "Все не отправленные заявки отправлены";
+            messageOnBroadcast += "Все заявки отправлены";
             dbLocal.setUnsetOrdersAsSent(orderUnsentList);
         }
         

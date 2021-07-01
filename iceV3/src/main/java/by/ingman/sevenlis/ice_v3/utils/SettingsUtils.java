@@ -60,7 +60,7 @@ public class SettingsUtils {
         }
 
         public static String getManagerCode(Context ctx) {
-            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_MANAGER_CODE, "");
+            return PreferenceManager.getDefaultSharedPreferences(ctx).getString(PREF_MANAGER_CODE, "---");
         }
 
         public static String[] getStorehousesCodes(Context ctx) {

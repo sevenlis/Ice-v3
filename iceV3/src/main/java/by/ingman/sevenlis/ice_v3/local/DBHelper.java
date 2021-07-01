@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "iceDBv3";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Lock rLock = rwLock.readLock();
     private final Lock wLock = rwLock.writeLock();
@@ -129,7 +129,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "name_mr text not null,"
                 + "client_uppercase text,"
                 + "point_uppercase text,"
-                + "date_unload integer not null" + ");");
+                + "date_unload integer not null,"
+                + "in_stop integer"
+                + ");");
     
         db.execSQL("create table " + DBLocal.TABLE_LOCATION + " ("
                 + "_id integer primary key autoincrement,"

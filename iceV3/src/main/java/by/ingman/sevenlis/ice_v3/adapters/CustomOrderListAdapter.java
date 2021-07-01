@@ -17,9 +17,9 @@ import by.ingman.sevenlis.ice_v3.classes.Order;
 import by.ingman.sevenlis.ice_v3.utils.FormatsUtils;
 
 public class CustomOrderListAdapter extends BaseAdapter {
-    private Context ctx;
-    private LayoutInflater layoutInflater;
-    private List<Order> objects;
+    private final Context ctx;
+    private final LayoutInflater layoutInflater;
+    private final List<Order> objects;
     private static String[] advTypesStrings;
     private static String[] orderStatuses;
     private static String[] orderTypes;
@@ -68,6 +68,7 @@ public class CustomOrderListAdapter extends BaseAdapter {
         ((TextView) view.findViewById(R.id.textView_date)).setText(order.getOrderDateString());
         ((TextView) view.findViewById(R.id.textView_orderId)).setText(order.orderUid);
         ((TextView) view.findViewById(R.id.textView_buyer)).setText(order.contragentName);
+        ((TextView) view.findViewById(R.id.textView_buyer)).setTextColor(ctx.getResources().getColor(order.contragent.isInStop() ? R.color.color_red : R.color.dark));
         ((TextView) view.findViewById(R.id.textView_point)).setText(order.pointName);
         mText = "Упак:  " + FormatsUtils.getNumberFormatted(order.packs,1);
         ((TextView) view.findViewById(R.id.textView_qtyPacks)).setText(mText);
@@ -85,6 +86,7 @@ public class CustomOrderListAdapter extends BaseAdapter {
         } else {
             mText = "Реклама: " + order.getIsAdvString();
             ((TextView) view.findViewById(R.id.textView_adv)).setText(mText);
+            ((TextView) view.findViewById(R.id.textView_adv)).setTextColor(ctx.getResources().getColor(R.color.dark_grey));
         }
         ((TextView) view.findViewById(R.id.textView_advType)).setText(getAdvTypeString(order));
 
@@ -93,7 +95,7 @@ public class CustomOrderListAdapter extends BaseAdapter {
         
         TextView textViewStatus = view.findViewById(R.id.textView_status);
         textViewStatus.setText(getOrderStatusString(order.status));
-        textViewStatus.setTextColor(order.getStatusResultColor(ctx));
+        textViewStatus.setTextColor(order.getAnswerResultColor(ctx));
         
         view.setTag(i);
         

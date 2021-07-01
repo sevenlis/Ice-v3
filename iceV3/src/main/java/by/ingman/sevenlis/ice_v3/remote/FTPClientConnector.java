@@ -7,8 +7,8 @@ import java.io.IOException;
 public class FTPClientConnector {
     private static FTPClient ftpClient;
     private static final String FTP_SERVER  = "ftp.ingman.by";
-    private static final int FTP_PORT       = 2100;
-    private static final String FTP_USER    = "ftpingmanby";
+    private static final int FTP_PORT       = 21;
+    private static final String FTP_USER    = "ftpingmanby@ftp.ingman.by";
     private static final String FTP_PASS    = "S4IJs3BtNVfw";
 
     private static FTPClient getClient() {

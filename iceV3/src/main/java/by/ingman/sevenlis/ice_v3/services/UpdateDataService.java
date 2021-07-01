@@ -178,6 +178,7 @@ public class UpdateDataService extends IntentService {
                     cv.put("date_unload", rs.getTimestamp("datetime_unload").getTime());
                     cv.put("client_uppercase", rs.getString("name_k").toUpperCase());
                     cv.put("point_uppercase", rs.getString("name_r").toUpperCase());
+                    cv.put("in_stop", rs.getInt("in_stop"));
                     clientsList.add(cv);
                     
                 }

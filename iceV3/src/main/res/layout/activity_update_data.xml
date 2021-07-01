@@ -74,7 +74,7 @@
         android:layout_centerVertical="true"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:onClick="getOrdersFromRemote"
-        android:text="Получить все заявки с сервера"/>
+        android:text="Загрузить заявки с сервера"/>
 
     <Button
         android:id="@+id/buttonUpdateAPK"
